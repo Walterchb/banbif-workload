@@ -1,1 +1,356 @@
-
+{
+  "meta": {
+    "app": "banbif_workload",
+    "exportedAt": "2026-02-09T03:39:43.209Z",
+    "version": 2,
+    "schema": "full_backup",
+    "counts": {
+      "team": 3,
+      "projects": 6,
+      "activities": 6,
+      "holidays": 0
+    }
+  },
+  "state": {
+    "settings": {
+      "defaultStartHour": 8,
+      "defaultEndHour": 19,
+      "defaultCapacityHoursPerDay": 8,
+      "workdays": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    "team": [
+      {
+        "id": "u1",
+        "name": "WALTER",
+        "startHour": 8,
+        "endHour": 19,
+        "capacityHoursPerDay": 10,
+        "blocks": [
+          {
+            "id": "b_u1_lunch",
+            "type": "Almuerzo",
+            "startDate": "2026-01-01",
+            "endDate": "2026-12-31",
+            "allDay": false,
+            "startHour": "14:15",
+            "endHour": "16:00",
+            "note": ""
+          },
+          {
+            "id": "b_y3brr89",
+            "type": "Trayecto",
+            "startDate": "2026-01-01",
+            "endDate": "2026-12-31",
+            "allDay": false,
+            "startHour": "09:00",
+            "endHour": "10:00",
+            "note": ""
+          }
+        ]
+      },
+      {
+        "id": "u2",
+        "name": "DIEGO",
+        "startHour": 8,
+        "endHour": 19,
+        "capacityHoursPerDay": 10,
+        "blocks": [
+          {
+            "id": "b_u2_lunch",
+            "type": "Almuerzo",
+            "startDate": "2026-01-01",
+            "endDate": "2026-12-31",
+            "allDay": false,
+            "startHour": "14:15",
+            "endHour": "16:00",
+            "note": ""
+          },
+          {
+            "id": "b_yphzx7h",
+            "type": "Otro",
+            "startDate": "2026-01-01",
+            "endDate": "2026-02-17",
+            "allDay": true,
+            "startHour": "08:00",
+            "endHour": "19:00",
+            "note": ""
+          }
+        ]
+      },
+      {
+        "id": "u_zqqvadc",
+        "name": "DIANA",
+        "startHour": 8,
+        "endHour": 19,
+        "capacityHoursPerDay": 10,
+        "blocks": [
+          {
+            "id": "b_lahd216",
+            "type": "Almuerzo",
+            "startDate": "2026-01-01",
+            "endDate": "2026-12-31",
+            "allDay": false,
+            "startHour": "14:00",
+            "endHour": "15:00",
+            "note": ""
+          },
+          {
+            "id": "b_u0hp1tj",
+            "type": "Otro",
+            "startDate": "2026-01-01",
+            "endDate": "2026-12-31",
+            "allDay": false,
+            "startHour": "08:00",
+            "endHour": "11:00",
+            "note": ""
+          }
+        ]
+      }
+    ],
+    "teamBoard": {
+      "leader": {
+        "name": "BIAGIO DE VILLENA",
+        "role": "Sub. Gerente de Mercado de Capitales & Control de Gestión"
+      },
+      "members": [
+        {
+          "id": "tm_1c3996k",
+          "name": "DIEGO BALBIN",
+          "role": "ESPECIALISTA",
+          "area": "General",
+          "responsibilities": [
+            "Prueba 1",
+            "Prueba 2"
+          ]
+        },
+        {
+          "id": "tm_efexpef",
+          "name": "WALTER CHAVEZ",
+          "role": "ANALISTA",
+          "area": "General",
+          "responsibilities": [
+            "Prueba 1",
+            "Prueba 2"
+          ]
+        },
+        {
+          "id": "tm_lgmubrg",
+          "name": "DIANA HERRERA",
+          "role": "PRACTICANTE",
+          "area": "General",
+          "responsibilities": [
+            "Prueba 1",
+            "Prueba 2"
+          ]
+        }
+      ]
+    },
+    "projects": [
+      {
+        "id": "p_zmalm3v",
+        "name": "Reporte de Concentración",
+        "client": "ALM",
+        "reqDate": "2026-02-08",
+        "startDate": "2026-01-01",
+        "endDate": "2026-12-31",
+        "priority": "Baja",
+        "recurrenceFrequency": "Diaria",
+        "leaderId": "u1",
+        "importance": 2,
+        "objective": "",
+        "deliverable": "",
+        "notes": "",
+        "isPrimaryFocus": false,
+        "activities": [
+          {
+            "id": "a_88t3yo6",
+            "name": "Enviar Correo Concentración",
+            "startDate": "2026-01-01",
+            "endDate": "2026-12-31",
+            "startHour": "08:00",
+            "endHour": "08:30",
+            "ownerId": "u1",
+            "detail": "El correo lo recibe ALM y Distribución",
+            "done": false,
+            "primaryFocus": false
+          }
+        ]
+      },
+      {
+        "id": "p_hbbubpq",
+        "name": "Análisis de la Posición",
+        "client": "Interno",
+        "reqDate": "2026-02-09",
+        "startDate": "2026-01-01",
+        "endDate": "2026-12-31",
+        "priority": "Media",
+        "recurrenceFrequency": "Diaria",
+        "leaderId": "u1",
+        "importance": 3,
+        "objective": "",
+        "deliverable": "",
+        "notes": "",
+        "isPrimaryFocus": false,
+        "activities": [
+          {
+            "id": "a_0h5dus4",
+            "name": "Revisar Posición USD",
+            "startDate": "2026-01-01",
+            "endDate": "2026-12-31",
+            "startHour": "08:30",
+            "endHour": "09:00",
+            "ownerId": "u1",
+            "detail": "Revisar y enviar correo al equipo interno",
+            "done": false,
+            "primaryFocus": false
+          }
+        ]
+      },
+      {
+        "id": "p_plu9urt",
+        "name": "Revisión ROF",
+        "client": "Interno",
+        "reqDate": "2026-02-09",
+        "startDate": "2026-01-01",
+        "endDate": "2026-12-31",
+        "priority": "Media",
+        "recurrenceFrequency": "Diaria",
+        "leaderId": "u1",
+        "importance": 3,
+        "objective": "",
+        "deliverable": "",
+        "notes": "",
+        "isPrimaryFocus": false,
+        "activities": [
+          {
+            "id": "a_rsyurla",
+            "name": "Revisión Cambios Inversiones",
+            "startDate": "2026-01-01",
+            "endDate": "2026-12-31",
+            "startHour": "10:00",
+            "endHour": "11:00",
+            "ownerId": "u1",
+            "detail": "Revisión del ROF a través del archivo comparativo",
+            "done": false,
+            "primaryFocus": false
+          }
+        ]
+      },
+      {
+        "id": "p_9ia66o0",
+        "name": "Clasificadora de Riesgos",
+        "client": "Interno",
+        "reqDate": "2026-02-09",
+        "startDate": "2026-02-09",
+        "endDate": "2026-02-13",
+        "priority": "Alta",
+        "recurrenceFrequency": "Ninguna",
+        "leaderId": "u1",
+        "importance": 4,
+        "objective": "",
+        "deliverable": "",
+        "notes": "",
+        "isPrimaryFocus": true,
+        "activities": [
+          {
+            "id": "a_uup9r21",
+            "name": "Seguimiento Clasificadora de Riesgos",
+            "startDate": "2026-02-09",
+            "endDate": "2026-02-13",
+            "startHour": "11:00",
+            "endHour": "12:00",
+            "ownerId": "u1",
+            "detail": "Revisión y seguimientos de la información solicitada por Moodys y PCR",
+            "done": false,
+            "primaryFocus": true
+          }
+        ]
+      },
+      {
+        "id": "p_jn14rgl",
+        "name": "Presentación de Resultados",
+        "client": "Tesorería",
+        "reqDate": "2026-02-09",
+        "startDate": "2026-02-09",
+        "endDate": "2026-02-18",
+        "priority": "Alta",
+        "recurrenceFrequency": "Ninguna",
+        "leaderId": "u1",
+        "importance": 5,
+        "objective": "",
+        "deliverable": "",
+        "notes": "",
+        "isPrimaryFocus": false,
+        "activities": []
+      },
+      {
+        "id": "p_2uawlm5",
+        "name": "Prueba Diana",
+        "client": "Distribución",
+        "reqDate": "2026-02-09",
+        "startDate": "2026-02-09",
+        "endDate": "2026-02-13",
+        "priority": "Baja",
+        "recurrenceFrequency": "Ninguna",
+        "leaderId": "u_zqqvadc",
+        "importance": 2,
+        "objective": "",
+        "deliverable": "",
+        "notes": "",
+        "isPrimaryFocus": false,
+        "activities": [
+          {
+            "id": "a_4zgesuh",
+            "name": "Presetear Archivos",
+            "startDate": "2026-02-09",
+            "endDate": "2026-02-11",
+            "startHour": "11:00",
+            "endHour": "13:00",
+            "ownerId": "u_zqqvadc",
+            "detail": "Prueba 1",
+            "done": false,
+            "primaryFocus": false
+          },
+          {
+            "id": "a_62hea17",
+            "name": "Implementar",
+            "startDate": "2026-02-12",
+            "endDate": "2026-02-13",
+            "startHour": "11:00",
+            "endHour": "13:00",
+            "ownerId": "u_zqqvadc",
+            "detail": "Esta es una prueba",
+            "done": false,
+            "primaryFocus": false
+          }
+        ]
+      }
+    ]
+  },
+  "holidays": {
+    "version": 1,
+    "items": []
+  },
+  "theme": "light",
+  "ui": {
+    "view": "day",
+    "date": "2026-02-09",
+    "roadmapZoom": "month",
+    "manageTab": "data",
+    "manageProjectSort": "priority_desc",
+    "manageProjectSearch": "",
+    "filters": {
+      "owner": "",
+      "client": "",
+      "status": "",
+      "priority": "",
+      "q": ""
+    }
+  }
+}
