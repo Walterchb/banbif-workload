@@ -1,13 +1,13 @@
 {
   "meta": {
     "app": "banbif_workload",
-    "exportedAt": "2026-02-09T09:20:02.192Z",
+    "exportedAt": "2026-02-09T10:10:44.609Z",
     "version": 2,
     "schema": "full_backup",
     "counts": {
       "team": 3,
-      "projects": 6,
-      "activities": 13,
+      "projects": 7,
+      "activities": 19,
       "holidays": 2
     }
   },
@@ -30,7 +30,7 @@
         "name": "WALTER",
         "startHour": 8,
         "endHour": 22,
-        "capacityHoursPerDay": 14,
+        "capacityHoursPerDay": 10,
         "blocks": [
           {
             "id": "b_u1_lunch",
@@ -50,6 +50,16 @@
             "allDay": false,
             "startHour": "09:00",
             "endHour": "10:00",
+            "note": ""
+          },
+          {
+            "id": "b_so6rxy1",
+            "type": "Otro",
+            "startDate": "2026-02-13",
+            "endDate": "2026-02-13",
+            "allDay": false,
+            "startHour": "16:00",
+            "endHour": "22:00",
             "note": ""
           }
         ]
@@ -290,7 +300,7 @@
         "objective": "",
         "deliverable": "",
         "notes": "",
-        "isPrimaryFocus": false,
+        "isPrimaryFocus": true,
         "activities": [
           {
             "id": "a_3tok2jk",
@@ -349,6 +359,42 @@
             "endHour": "22:00",
             "ownerId": "u1",
             "detail": "Revisar los resultados de Distribución y enviar para la conformidad",
+            "done": false,
+            "primaryFocus": true
+          },
+          {
+            "id": "a_m380bat",
+            "name": "Preparación Excel y archivos",
+            "startDate": "2026-02-10",
+            "endDate": "2026-02-10",
+            "startHour": "12:00",
+            "endHour": "14:00",
+            "ownerId": "u1",
+            "detail": "Preparar todo lo necesario para armar la PPT Tesorería",
+            "done": false,
+            "primaryFocus": false
+          },
+          {
+            "id": "a_kn0e1y2",
+            "name": "PPT Tesorería",
+            "startDate": "2026-02-10",
+            "endDate": "2026-02-10",
+            "startHour": "16:00",
+            "endHour": "18:00",
+            "ownerId": "u1",
+            "detail": "Elaborar PPT Tesorería",
+            "done": false,
+            "primaryFocus": false
+          },
+          {
+            "id": "a_a2pu2x6",
+            "name": "PPT Flujos & PJ",
+            "startDate": "2026-02-12",
+            "endDate": "2026-02-12",
+            "startHour": "16:00",
+            "endHour": "19:00",
+            "ownerId": "u1",
+            "detail": "Avance de ambas PPTs",
             "done": false,
             "primaryFocus": false
           }
@@ -419,6 +465,60 @@
             "primaryFocus": true
           }
         ]
+      },
+      {
+        "id": "p_bvr6sjp",
+        "name": "Covenants Trimestrales",
+        "client": "Interno",
+        "reqDate": "2026-02-10",
+        "startDate": "2026-02-10",
+        "endDate": "2026-02-13",
+        "priority": "Alta",
+        "recurrenceFrequency": "Ninguna",
+        "leaderId": "u1",
+        "importance": 5,
+        "objective": "",
+        "deliverable": "",
+        "notes": "",
+        "isPrimaryFocus": false,
+        "activities": [
+          {
+            "id": "a_ombkn5u",
+            "name": "Revisar y Preparar Flujo",
+            "startDate": "2026-02-10",
+            "endDate": "2026-02-10",
+            "startHour": "18:00",
+            "endHour": "19:00",
+            "ownerId": "u1",
+            "detail": "Revisar el reporte pasado para entender el nuevo envío",
+            "done": false,
+            "primaryFocus": false
+          },
+          {
+            "id": "a_6ojvj6e",
+            "name": "Flujo Covenants",
+            "startDate": "2026-02-11",
+            "endDate": "2026-02-13",
+            "startHour": "12:00",
+            "endHour": "14:00",
+            "ownerId": "u1",
+            "detail": "Por definir",
+            "done": false,
+            "primaryFocus": false
+          },
+          {
+            "id": "a_adhcmai",
+            "name": "Flujo Covenants",
+            "startDate": "2026-02-11",
+            "endDate": "2026-02-11",
+            "startHour": "16:00",
+            "endHour": "19:00",
+            "ownerId": "u1",
+            "detail": "Por definir",
+            "done": false,
+            "primaryFocus": false
+          }
+        ]
       }
     ]
   },
@@ -442,7 +542,7 @@
   "theme": "light",
   "ui": {
     "view": "day",
-    "date": "2026-02-09",
+    "date": "2026-02-13",
     "roadmapZoom": "week",
     "manageTab": "data",
     "manageProjectSort": "priority_desc",
