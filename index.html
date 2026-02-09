@@ -3236,7 +3236,7 @@ function openAccessGate(){
         document.execCommand('copy');
         ta.remove();
       }
-      toast(`Resumen listo para WhatsApp/Teams (${fmtDate(ui.date)})`);
+      toast('Resumen Copiado');
     }catch(err){
       console.error(err);
       window.prompt('No se pudo copiar automáticamente. Copia este resumen:', text);
@@ -3244,48 +3244,48 @@ function openAccessGate(){
   }
 
   
+
 function buildDaySummaryText(dayISO=ui.date){
     const selectedDate = normalizeISO(dayISO) || todayISO();
-    const prettyDate = fmtDate(selectedDate);
-    const weekdayRaw = parseISO(selectedDate).toLocaleDateString(APP_LOCALE,{weekday:'long'});
+    const d = parseISO(selectedDate);
+    const dateObj = Number.isNaN(d.getTime()) ? new Date() : d;
+
+    const dd = String(dateObj.getDate()).padStart(2,'0');
+    const mm = String(dateObj.getMonth()+1).padStart(2,'0');
+    const yyyy = dateObj.getFullYear();
+    const weekdayRaw = dateObj.toLocaleDateString(APP_LOCALE,{weekday:'long'});
     const weekday = weekdayRaw ? weekdayRaw.charAt(0).toUpperCase() + weekdayRaw.slice(1) : '';
-    const now = new Date();
-    const generatedAt = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+    const team = getFilteredTeam();
+    const teamById = new Map(team.map(p=>[p.id,p]));
+    const ownerOrder = new Map(team.map((p,i)=>[p.id,i]));
 
     const activities = getVisibleActivityInstances(selectedDate)
       .slice()
-      .sort((a,b)=>
-        a.ownerName.localeCompare(b.ownerName, APP_LOCALE) ||
-        a.startHour.localeCompare(b.startHour) ||
-        a.projectName.localeCompare(b.projectName, APP_LOCALE) ||
-        a.taskName.localeCompare(b.taskName, APP_LOCALE)
-      );
-
-    const filterParts = [];
-    if(ui.filters.owner){
-      const ownerName = findTeam(ui.filters.owner)?.name || ui.filters.owner;
-      filterParts.push(`Responsable: ${ownerName}`);
-    }
-    if(ui.filters.client) filterParts.push(`Equipo: ${ui.filters.client}`);
-    if(ui.filters.status) filterParts.push(`Estatus: ${ui.filters.status}`);
-    if(ui.filters.priority) filterParts.push(`Prioridad: ${ui.filters.priority}`);
-    if(ui.filters.q) filterParts.push(`Búsqueda: ${ui.filters.q}`);
-
-    const totalMin = activities.reduce((acc,a)=>acc + (Number.isFinite(a.minutes) ? a.minutes : durationMinutes(a.startHour,a.endHour)),0);
-    const uniqueProjects = new Set(activities.map(a=>a.projectId));
+      .sort((a,b)=>{
+        const idxA = ownerOrder.has(a.ownerId) ? ownerOrder.get(a.ownerId) : Number.MAX_SAFE_INTEGER;
+        const idxB = ownerOrder.has(b.ownerId) ? ownerOrder.get(b.ownerId) : Number.MAX_SAFE_INTEGER;
+        return (
+          idxA - idxB ||
+          a.startHour.localeCompare(b.startHour) ||
+          a.endHour.localeCompare(b.endHour) ||
+          a.projectName.localeCompare(b.projectName, APP_LOCALE) ||
+          a.taskName.localeCompare(b.taskName, APP_LOCALE)
+        );
+      });
 
     const statusCount = { Programado:0, 'En curso':0, Demorado:0, Finalizado:0 };
     const prioCount = { Alta:0, Media:0, Baja:0 };
+
     activities.forEach(a=>{
       if(Object.prototype.hasOwnProperty.call(statusCount,a.status)) statusCount[a.status]++;
       const p = PRIORITIES.includes(a.priority) ? a.priority : 'Media';
       prioCount[p]++;
     });
 
-    const team = getFilteredTeam();
-    const teamById = new Map(team.map(p=>[p.id,p]));
     const byOwnerActs = new Map();
     team.forEach(person=>byOwnerActs.set(person.id, []));
+
     activities.forEach(a=>{
       if(!byOwnerActs.has(a.ownerId)) byOwnerActs.set(a.ownerId, []);
       byOwnerActs.get(a.ownerId).push(a);
@@ -3294,138 +3294,59 @@ function buildDaySummaryText(dayISO=ui.date){
     for(const arr of byOwnerActs.values()){
       arr.sort((x,y)=>
         x.startHour.localeCompare(y.startHour) ||
+        x.endHour.localeCompare(y.endHour) ||
         x.projectName.localeCompare(y.projectName, APP_LOCALE) ||
         x.taskName.localeCompare(y.taskName, APP_LOCALE)
       );
     }
 
-    const risksRaw = getRiskMetrics(selectedDate) || {};
-    const conflicts = Number(risksRaw.conflicts ?? 0) || 0;
-    const blockedConflicts = Number(risksRaw.blocked ?? risksRaw.bloqueado ?? 0) || 0;
-
-    const teamCapMin = team.reduce((acc,p)=> acc + (Number(p.capacityHoursPerDay || state.settings.defaultCapacityHoursPerDay || 8)*60),0);
-    const teamUtilPct = teamCapMin>0 ? Math.round((totalMin/teamCapMin)*100) : 0;
-    const activeOwners = Array.from(byOwnerActs.values()).filter(arr=>arr.length>0).length;
-
-    const projectMap = new Map();
-    activities.forEach(a=>{
-      const key = `${a.projectName || 'Proyecto sin nombre'}||${a.client || ''}`;
-      if(!projectMap.has(key)){
-        projectMap.set(key, {
-          projectName: a.projectName || 'Proyecto sin nombre',
-          client: a.client || '',
-          minutes: 0,
-          activities: 0,
-          owners: new Set()
-        });
-      }
-      const row = projectMap.get(key);
-      row.minutes += Number.isFinite(a.minutes) ? a.minutes : durationMinutes(a.startHour,a.endHour);
-      row.activities += 1;
-      row.owners.add(a.ownerName || 'Sin dueño');
-    });
-
-    const projectRows = Array.from(projectMap.values())
-      .sort((a,b)=> b.minutes - a.minutes || b.activities - a.activities || a.projectName.localeCompare(b.projectName, APP_LOCALE));
-
-    const lines = [];
-    lines.push(`*PROYECTOS | RESUMEN DIARIO*`);
-    lines.push(`Fecha: ${prettyDate}${weekday ? ` (${weekday})` : ''}`);
-    lines.push(`Generado: ${generatedAt}`);
-    if(filterParts.length) lines.push(`Filtros: ${filterParts.join(' | ')}`);
-    lines.push('');
-    lines.push('────────────────────────');
-    lines.push('*PANORAMA*');
-    lines.push(`• Proyectos activos: ${uniqueProjects.size}`);
-    lines.push(`• Actividades programadas: ${activities.length}`);
-    lines.push(`• Horas planificadas: ${fmtH(totalMin)}`);
-    lines.push(`• Responsables activos: ${activeOwners}/${team.length}`);
-    lines.push(`• Ocupación estimada del equipo: ${teamUtilPct}%`);
-    lines.push(`• Prioridad: Alta ${prioCount.Alta} | Media ${prioCount.Media} | Baja ${prioCount.Baja}`);
-    lines.push(`• Estatus: Programado ${statusCount['Programado']} | En curso ${statusCount['En curso']} | Demorado ${statusCount['Demorado']} | Finalizado ${statusCount['Finalizado']}`);
-    lines.push(`• Alertas: Solapes ${conflicts} | Cruces con bloqueos ${blockedConflicts}`);
-
-    if(!activities.length){
-      lines.push('');
-      lines.push('────────────────────────');
-      lines.push('*DETALLE POR RESPONSABLE*');
-
-      const owners = team.slice().sort((a,b)=> String(a.name||'').localeCompare(String(b.name||''), APP_LOCALE));
-      owners.forEach(person=>{
-        const capMin = Math.max(0, Number(person.capacityHoursPerDay || state.settings.defaultCapacityHoursPerDay || 8) * 60);
-        const blockedMin = Math.max(0, Number(sumBlockedMinutes(person, selectedDate)) || 0);
-        const availableMin = Math.max(0, capMin - blockedMin);
-        const detail = blockedMin>0
-          ? `Disponibilidad ${fmtH(availableMin)} (bloqueos ${fmtH(blockedMin)})`
-          : `Disponibilidad ${fmtH(availableMin)}`;
-
-        lines.push(`• ${person.name}: Sin actividades asignadas. ${detail}.`);
-      });
-
-      lines.push('');
-      lines.push('────────────────────────');
-      lines.push('*MENSAJE LISTO PARA ENVIAR*');
-      lines.push(`Equipo, para ${prettyDate} no hay actividades planificadas en el tablero. Quedamos atentos a requerimientos y ajustes de prioridad.`);
-      return lines.join('\n');
-    }
-
-    lines.push('');
-    lines.push('────────────────────────');
-    lines.push('*DETALLE POR RESPONSABLE*');
-
     const ownerEntries = Array.from(byOwnerActs.entries())
       .map(([ownerId, acts])=>({
         ownerId,
         acts,
-        ownerName: teamById.get(ownerId)?.name || acts[0]?.ownerName || 'Sin dueño'
-      }))
-      .sort((a,b)=> a.ownerName.localeCompare(b.ownerName, APP_LOCALE));
+        ownerName: teamById.get(ownerId)?.name || acts[0]?.ownerName || 'Sin responsable'
+      }));
 
-    ownerEntries.forEach(({ownerId, acts, ownerName})=>{
-      const person = teamById.get(ownerId);
-      const personMin = acts.reduce((acc,a)=>acc + (Number.isFinite(a.minutes) ? a.minutes : durationMinutes(a.startHour,a.endHour)),0);
-      const capMin = Math.max(0, Number(person?.capacityHoursPerDay || state.settings.defaultCapacityHoursPerDay || 8) * 60);
-      const blockedMin = person ? Math.max(0, Number(sumBlockedMinutes(person, selectedDate)) || 0) : 0;
-      const availableMin = Math.max(0, capMin - blockedMin);
-      const utilPct = capMin>0 ? Math.round((personMin/capMin)*100) : 0;
-      const utilAvailPct = availableMin>0 ? Math.round((personMin/availableMin)*100) : (personMin>0 ? 999 : 0);
+    const lines = [];
+    lines.push('*ACTIVIDADES | RESUMEN DIARIO*');
+    lines.push(`Fecha: ${dd}/${mm}/${yyyy}${weekday ? ` (${weekday})` : ''}`);
+    lines.push('────────────────────────');
+    lines.push('');
+    lines.push('*PANORAMA*');
+    lines.push('');
+    lines.push(`• Actividades programadas: ${activities.length}`);
+    lines.push(`• Prioridad: Alta ${prioCount.Alta} | Media ${prioCount.Media} | Baja ${prioCount.Baja}`);
+    lines.push(`• Estatus: Programado ${statusCount['Programado']} | En curso ${statusCount['En curso']} | Demorado ${statusCount['Demorado']} | Finalizado ${statusCount['Finalizado']}`);
+    lines.push('────────────────────────');
+    lines.push('');
+    lines.push('*DETALLE POR RESPONSABLE*');
+    lines.push('');
 
-      const loadTxt = blockedMin>0
-        ? `Ocupación ${utilPct}% (${fmtH(personMin)} de ${fmtH(capMin)}) | Bloqueos ${fmtH(blockedMin)} | Sobre disponibilidad ${utilAvailPct}%`
-        : `Ocupación ${utilPct}% (${fmtH(personMin)} de ${fmtH(capMin)})`;
+    if(!ownerEntries.length){
+      lines.push('• SIN RESPONSABLES — Foco:');
+      lines.push('- Sin actividades asignadas');
+      return lines.join('\n').replace(/\n+$/,'');
+    }
 
-      lines.push(``);
-      lines.push(`• ${ownerName} — ${loadTxt}`);
+    ownerEntries.forEach(({acts, ownerName}, idx)=>{
+      const owner = String(ownerName || 'Sin responsable').toUpperCase();
+      lines.push(`• ${owner} — Foco:`);
 
       if(!acts.length){
-        lines.push(`  - Sin actividades asignadas`);
-        return;
+        lines.push('- Sin actividades asignadas');
+      }else{
+        acts.forEach(a=>{
+          const pri = PRIORITIES.includes(a.priority) ? a.priority : 'Media';
+          const proj = a.projectName || 'Proyecto sin nombre';
+          const task = a.taskName || 'Actividad';
+          lines.push(`- ${a.startHour}-${a.endHour} | ${proj} | ${task} | Prioridad: ${pri}`);
+        });
       }
 
-      acts.forEach(a=>{
-        const pri = PRIORITIES.includes(a.priority) ? a.priority : 'Media';
-        const proj = a.projectName || 'Proyecto sin nombre';
-        const task = a.taskName || 'Actividad';
-        const client = a.client || 'Interno';
-        lines.push(`  - ${a.startHour}-${a.endHour} | ${proj} | ${task} | Equipo: ${client} | Estatus: ${a.status} | Prioridad: ${pri}`);
-      });
+      if(idx < ownerEntries.length - 1) lines.push('');
     });
 
-    lines.push('');
-    lines.push('────────────────────────');
-    lines.push('*RESUMEN POR PROYECTO*');
-
-    projectRows.forEach(p=>{
-      const ownersTxt = Array.from(p.owners).sort((a,b)=>a.localeCompare(b, APP_LOCALE)).join(', ');
-      lines.push(`• ${p.projectName}${p.client ? ` (Equipo: ${p.client})` : ''} -> ${p.activities} actividad(es), ${fmtH(p.minutes)}, Responsable(s): ${ownersTxt}`);
-    });
-
-    lines.push('');
-    lines.push('────────────────────────');
-    lines.push('*MENSAJE LISTO PARA ENVIAR*');
-    lines.push(`Equipo, comparto la agenda del ${prettyDate}: ${uniqueProjects.size} proyectos activos, ${activities.length} actividades y ${fmtH(totalMin)} planificadas. Alertas actuales: ${conflicts} solape(s) y ${blockedConflicts} cruce(s) con bloqueos. Si hay cambios de prioridad, los ajustamos en el primer bloque de coordinación.`);
-
-    return lines.join('\n');
+    return lines.join('\n').replace(/\n+$/,'');
   }
 
 
@@ -3457,7 +3378,7 @@ function buildDaySummaryText(dayISO=ui.date){
       copyBtn.className = 'btn';
       copyBtn.type = 'button';
       copyBtn.textContent = 'Resumen';
-      copyBtn.title = 'Copiar resumen claro y listo para WhatsApp/Teams';
+      copyBtn.title = 'Copiar resumen diario';
       copyBtn.addEventListener('click', copySelectedDaySummary);
     }
 
