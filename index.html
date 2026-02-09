@@ -511,6 +511,93 @@
     .info-meta{border:1px solid var(--line);border-radius:10px;background:var(--surface-2);padding:10px;display:grid;gap:8px}
     .info-meta div{font-size:12px;color:var(--muted)}
     .info-meta b{color:var(--text)}
+    #btnInfo{position:relative}
+    #btnInfo.has-alert{border-color:color-mix(in srgb,var(--danger) 55%, var(--line));}
+    #btnInfo.has-alert::after{
+      content:attr(data-badge);
+      position:absolute;
+      top:-5px;
+      right:-5px;
+      min-width:16px;
+      height:16px;
+      padding:0 4px;
+      border-radius:999px;
+      font-size:10px;
+      font-weight:800;
+      line-height:16px;
+      text-align:center;
+      color:#fff;
+      background:var(--danger);
+      box-shadow:0 0 0 2px var(--surface);
+      pointer-events:none;
+    }
+    .notif-top{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .notif-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .notif-controls .ctrl{min-width:180px}
+    .notif-form{
+      border:1px solid var(--line);
+      border-radius:10px;
+      background:var(--surface-2);
+      padding:10px;
+      display:grid;
+      grid-template-columns:1.1fr 1fr .8fr .7fr auto;
+      gap:8px;
+      align-items:end;
+    }
+    .notif-list{display:grid;gap:8px}
+    .notif-card{
+      border:1px solid var(--line);
+      border-radius:10px;
+      background:var(--surface);
+      padding:10px;
+      display:grid;
+      gap:8px;
+    }
+    .notif-card.done{opacity:.78}
+    .notif-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+    .notif-title{font-size:13px;font-weight:800;line-height:1.35}
+    .notif-target{font-size:11px;color:var(--muted);margin-top:2px}
+    .notif-msg{font-size:12px;line-height:1.45;white-space:pre-wrap}
+    .notif-meta-row{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .notif-meta{font-size:11px;color:var(--muted)}
+    .notif-actions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
+    .notif-pill{
+      display:inline-flex;
+      align-items:center;
+      padding:3px 8px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      font-size:10px;
+      font-weight:800;
+      letter-spacing:.2px;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
+    .notif-pill.overdue{
+      color:var(--danger);
+      border-color:color-mix(in srgb,var(--danger) 55%, var(--line));
+      background:color-mix(in srgb,var(--danger) 10%, transparent);
+    }
+    .notif-pill.today{
+      color:var(--warn);
+      border-color:color-mix(in srgb,var(--warn) 55%, var(--line));
+      background:color-mix(in srgb,var(--warn) 12%, transparent);
+    }
+    .notif-pill.scheduled{
+      color:var(--primary);
+      border-color:color-mix(in srgb,var(--primary) 50%, var(--line));
+      background:color-mix(in srgb,var(--primary) 12%, transparent);
+    }
+    .notif-pill.done{
+      color:var(--ok);
+      border-color:color-mix(in srgb,var(--ok) 50%, var(--line));
+      background:color-mix(in srgb,var(--ok) 12%, transparent);
+    }
+    .notif-pill.none{
+      color:var(--muted);
+      border-color:var(--line);
+      background:transparent;
+    }
     .detail-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:12px}
     .detail-card{border:1px solid var(--line);border-radius:0;background:var(--surface);padding:10px}
     .detail-card h4{margin:0 0 8px;font-size:13px}
@@ -1339,12 +1426,14 @@
           <button class="btn tab active" data-tab="projects">Proyectos</button>
           <button class="btn tab" data-tab="team">Equipo y Bloqueos</button>
           <button class="btn tab" data-tab="holidays">Feriados</button>
+          <button class="btn tab" data-tab="notifications">Notificaciones</button>
           <button class="btn tab" data-tab="data">Datos</button>
         </div>
 
         <div id="tab_projects"></div>
         <div id="tab_team" class="hidden"></div>
         <div id="tab_holidays" class="hidden"></div>
+        <div id="tab_notifications" class="hidden"></div>
         <div id="tab_data" class="hidden"></div>
       </div>
       <div class="m-foot">
@@ -1391,18 +1480,12 @@
   <div class="overlay" id="infoOverlay">
     <div class="modal info-modal">
       <div class="m-head">
-        <b>Información de la herramienta</b>
+        <b>Notificaciones</b>
         <button class="btn" data-close="infoOverlay">✕</button>
       </div>
-      <div class="m-body info-body">
-        <div class="info-line">Desarrollado por Walter Chávez | Analista de Mercado de Capitales y Control de Gestión.</div>
-        <div class="info-meta">
-          <div><span>Versión:</span> <b id="toolVersion">v91</b></div>
-          <div><span>Fecha de actualización:</span> <b id="toolUpdatedAt">08/02/2026</b></div>
-        </div>
-      </div>
+      <div class="m-body info-body" id="infoBody"></div>
       <div class="m-foot">
-        <span class="small muted">Información general</span>
+        <span class="small muted" id="infoFooterNote">Centro de recordatorios</span>
         <button class="btn" data-close="infoOverlay">Cerrar</button>
       </div>
     </div>
@@ -1470,6 +1553,7 @@
   const PRIORITIES = ['Alta','Media','Baja'];
   const RECURRENCE_FREQUENCIES = ['Ninguna','Diaria','Mensual','Trimestral','Anual'];
   const BLOCK_TYPES = ['Almuerzo','Vacaciones','Permiso','Capacitación','Trayecto','Otro'];
+  const NOTIF_ALL_USERS = '__all__';
 
   const DEFAULT_STATE = {
     settings: {
@@ -1547,7 +1631,8 @@
           { id:'a8', name:'Mejoras dashboard', startDate:'2026-02-01', endDate:'2026-12-31', startHour:'16:00', endHour:'18:00', ownerId:'u2', done:false }
         ]
       }
-    ]
+    ],
+    notifications: []
   };
 
   const DEFAULT_HOLIDAYS_STATE = {
@@ -1563,6 +1648,12 @@
     manageTab: 'projects',
     manageProjectSort: 'priority_desc',
     manageProjectSearch: '',
+    manageNotifUser: '',
+    manageNotifQ: '',
+    manageNotifShowDone: true,
+    infoNotifUser: '',
+    infoNotifQ: '',
+    infoNotifShowDone: false,
     roadmapZoom: 'month',
     filters: { owner:'', client:'', status:'', priority:'', q:'' },
     lastAdjustedBusinessDates: 0,
@@ -1971,6 +2062,16 @@
       @media (max-width:1200px){
         .holiday-form{grid-template-columns:1fr 1fr;align-items:stretch}
         .holiday-form .col-span-2{grid-column:span 2}
+      }
+      @media (max-width:1100px){
+        .notif-form{grid-template-columns:1fr 1fr}
+        .notif-form button{grid-column:span 2}
+      }
+      @media (max-width:760px){
+        .notif-controls{width:100%}
+        .notif-controls .ctrl{min-width:100%}
+        .notif-form{grid-template-columns:1fr}
+        .notif-form button{grid-column:auto}
       }
       /* v22: Tarjetas más compactas y funcionales (día) */
       .day-grid{grid-template-columns:60px repeat(var(--team-count), minmax(210px,1fr));}
@@ -2882,7 +2983,7 @@
 
     $('btnManage').addEventListener('click', openManage);
     $('btnTheme').addEventListener('click', toggleTheme);
-    $('btnInfo')?.addEventListener('click', ()=>openOverlay('infoOverlay'));
+    $('btnInfo')?.addEventListener('click', ()=>{ renderInfoNotifications(); openOverlay('infoOverlay'); });
 
     $('datePicker').addEventListener('change',e=>{ const v = normalizeISO(e.target.value); if(!v){ e.target.value = fmtDate(ui.date); toast('Fecha inválida. Usa dd/mm/aaaa'); return; } ui.date = v; render(); });
     $('prevBtn').addEventListener('click',()=>shiftDate(-1));
@@ -4508,6 +4609,8 @@ function buildDaySummaryText(dayISO=ui.date){
 
     }
 
+    out.notifications = sanitizeNotifications(s.notifications, out.team);
+
     return out;
   }
 
@@ -4950,7 +5053,8 @@ function buildDaySummaryText(dayISO=ui.date){
         leader: { name:'Líder del equipo', role:'Líder de operaciones' },
         members: []
       },
-      projects: []
+      projects: [],
+      notifications: []
     });
   }
 
@@ -4989,6 +5093,12 @@ function buildDaySummaryText(dayISO=ui.date){
     ui.manageTab = 'projects';
     ui.manageProjectSort = 'priority_desc';
     ui.manageProjectSearch = '';
+    ui.manageNotifUser = '';
+    ui.manageNotifQ = '';
+    ui.manageNotifShowDone = true;
+    ui.infoNotifUser = '';
+    ui.infoNotifQ = '';
+    ui.infoNotifShowDone = false;
     ui.roadmapZoom = 'month';
     ui.lastAdjustedBusinessDates = 0;
     ui.filters = { owner:'', client:'', status:'', priority:'', q:'' };
@@ -5016,11 +5126,13 @@ function buildDaySummaryText(dayISO=ui.date){
 
     $('datePicker').value = fmtDate(ui.date);
     updateRoleUI();
+    updateNotificationIndicator();
     renderHeaderControls();
     renderKPIBand();
     renderTodayCards();
     renderPriorityRadar();
     renderView();
+    if($('infoOverlay')?.classList.contains('open')) renderInfoNotifications();
     applyStatTooltips(document);
     $('lastUpdate').textContent = `${formatDateTime(new Date())} · ${labelView(ui.view)} · ${rangeLabel()}`;
   }
@@ -7287,8 +7399,8 @@ function buildDaySummaryText(dayISO=ui.date){
   }
 
   function renderManage(){
-    const allTabs = ['projects','team','holidays','data'];
-    const allowedTabs = isAdmin() ? allTabs : ['projects','data'];
+    const allTabs = ['projects','team','holidays','notifications','data'];
+    const allowedTabs = isAdmin() ? allTabs : ['projects','notifications','data'];
     if(!allowedTabs.includes(ui.manageTab)) ui.manageTab = 'projects';
 
     const tabsRoot = $('manageTabs');
@@ -7311,6 +7423,7 @@ function buildDaySummaryText(dayISO=ui.date){
     if(ui.manageTab==='projects') renderManageProjects();
     if(ui.manageTab==='team') renderManageTeam();
     if(ui.manageTab==='holidays') renderManageHolidays();
+    if(ui.manageTab==='notifications') renderManageNotifications();
     if(ui.manageTab==='data') renderManageData();
   }
 
@@ -7894,7 +8007,8 @@ function buildDaySummaryText(dayISO=ui.date){
     const projects = (snapshotState?.projects || []).length;
     const activities = countActivitiesInState(snapshotState);
     const holidays = (snapshotHolidays?.items || []).length;
-    return { team, projects, activities, holidays };
+    const notifications = (snapshotState?.notifications || []).length;
+    return { team, projects, activities, holidays, notifications };
   }
 
   function buildBackupPayload(){
@@ -7927,6 +8041,12 @@ function buildDaySummaryText(dayISO=ui.date){
         manageTab: ui.manageTab,
         manageProjectSort: ui.manageProjectSort,
         manageProjectSearch: ui.manageProjectSearch,
+        manageNotifUser: ui.manageNotifUser,
+        manageNotifQ: ui.manageNotifQ,
+        manageNotifShowDone: ui.manageNotifShowDone,
+        infoNotifUser: ui.infoNotifUser,
+        infoNotifQ: ui.infoNotifQ,
+        infoNotifShowDone: ui.infoNotifShowDone,
         filters: { ...ui.filters }
       }
     };
@@ -7988,11 +8108,17 @@ function buildDaySummaryText(dayISO=ui.date){
       if(bundle.ui.roadmapZoom === 'week' || bundle.ui.roadmapZoom === 'month' || bundle.ui.roadmapZoom === 'year'){
         ui.roadmapZoom = bundle.ui.roadmapZoom;
       }
-      if(bundle.ui.manageTab === 'projects' || bundle.ui.manageTab === 'team' || bundle.ui.manageTab === 'holidays' || bundle.ui.manageTab === 'data'){
+      if(bundle.ui.manageTab === 'projects' || bundle.ui.manageTab === 'team' || bundle.ui.manageTab === 'holidays' || bundle.ui.manageTab === 'notifications' || bundle.ui.manageTab === 'data'){
         ui.manageTab = bundle.ui.manageTab;
       }
       if(typeof bundle.ui.manageProjectSort === 'string') ui.manageProjectSort = bundle.ui.manageProjectSort;
       if(typeof bundle.ui.manageProjectSearch === 'string') ui.manageProjectSearch = bundle.ui.manageProjectSearch;
+      if(typeof bundle.ui.manageNotifUser === 'string') ui.manageNotifUser = bundle.ui.manageNotifUser;
+      if(typeof bundle.ui.manageNotifQ === 'string') ui.manageNotifQ = bundle.ui.manageNotifQ;
+      if(typeof bundle.ui.manageNotifShowDone === 'boolean') ui.manageNotifShowDone = bundle.ui.manageNotifShowDone;
+      if(typeof bundle.ui.infoNotifUser === 'string') ui.infoNotifUser = bundle.ui.infoNotifUser;
+      if(typeof bundle.ui.infoNotifQ === 'string') ui.infoNotifQ = bundle.ui.infoNotifQ;
+      if(typeof bundle.ui.infoNotifShowDone === 'boolean') ui.infoNotifShowDone = bundle.ui.infoNotifShowDone;
       if(bundle.ui.filters && typeof bundle.ui.filters === 'object'){
         ui.filters = {
           owner: String(bundle.ui.filters.owner || ''),
@@ -8015,7 +8141,7 @@ function buildDaySummaryText(dayISO=ui.date){
 
     if(!options.silentToast){
       const c = summarizeBackupCounts(state, holidaysState);
-      toast(`${options.restoring ? 'Respaldo restaurado' : 'Importación exitosa'} · ${c.projects} proyecto(s), ${c.activities} actividad(es), ${c.holidays} feriado(s).`);
+      toast(`${options.restoring ? 'Respaldo restaurado' : 'Importación exitosa'} · ${c.projects} proyecto(s), ${c.activities} actividad(es), ${c.holidays} feriado(s), ${c.notifications} notificación(es).`);
     }
   }
 
@@ -8084,6 +8210,446 @@ function buildDaySummaryText(dayISO=ui.date){
     return stamp;
   }
 
+
+  function normalizeSearchText(v=''){
+    return String(v || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g,'')
+      .toLowerCase()
+      .trim();
+  }
+
+  function normalizeOptionalHHMM(raw){
+    const txt = String(raw || '').trim();
+    if(!txt) return '';
+    const m = txt.match(/^(\d{1,2}):(\d{2})$/);
+    if(!m) return '';
+    const h = Number(m[1]);
+    const mm = Number(m[2]);
+    if(!Number.isFinite(h) || !Number.isFinite(mm)) return '';
+    if(h < 0 || h > 23 || mm < 0 || mm > 59) return '';
+    return `${String(h).padStart(2,'0')}:${String(mm).padStart(2,'0')}`;
+  }
+
+  function sanitizeNotifications(rawList, teamList = []){
+    const arr = Array.isArray(rawList) ? rawList : [];
+    const teamIds = new Set((teamList || []).map(t=>String(t.id)));
+    const seen = new Set();
+
+    const clean = arr.map((n, idx)=>{
+      if(!n || typeof n !== 'object') return null;
+
+      const id = String(n.id || rid('n')).trim();
+      if(!id || seen.has(id)) return null;
+      seen.add(id);
+
+      const title = String(n.title || n.subject || `Recordatorio ${idx+1}`).slice(0,120).trim() || `Recordatorio ${idx+1}`;
+      const message = String(n.message || n.detail || n.note || '').slice(0,600).trim();
+
+      let userId = String(n.userId || n.ownerId || NOTIF_ALL_USERS).trim() || NOTIF_ALL_USERS;
+      if(userId !== NOTIF_ALL_USERS && !teamIds.has(userId)) userId = NOTIF_ALL_USERS;
+
+      const remindDate = normalizeISO(n.remindDate || n.date || n.reminderDate || '');
+      const remindTime = normalizeOptionalHHMM(n.remindTime || n.time || n.reminderTime || '');
+      const done = Boolean(n.done || n.completed || n.attended || n.read);
+
+      const createdAt = typeof n.createdAt === 'string' ? n.createdAt : '';
+      const updatedAt = typeof n.updatedAt === 'string' ? n.updatedAt : '';
+
+      return {
+        id,
+        title,
+        message,
+        userId,
+        remindDate,
+        remindTime,
+        done,
+        createdAt,
+        updatedAt
+      };
+    }).filter(Boolean);
+
+    return clean.sort(compareNotifications);
+  }
+
+  function compareNotifications(a,b){
+    if(Boolean(a.done) !== Boolean(b.done)) return a.done ? 1 : -1;
+
+    const ad = String(a.remindDate || '9999-12-31');
+    const bd = String(b.remindDate || '9999-12-31');
+    if(ad !== bd) return ad.localeCompare(bd);
+
+    const at = String(a.remindTime || '23:59');
+    const bt = String(b.remindTime || '23:59');
+    if(at !== bt) return at.localeCompare(bt);
+
+    const au = String(a.updatedAt || a.createdAt || '');
+    const bu = String(b.updatedAt || b.createdAt || '');
+    if(au !== bu) return bu.localeCompare(au);
+
+    return String(a.title || '').localeCompare(String(b.title || ''), APP_LOCALE, { sensitivity:'base' });
+  }
+
+  function notificationTargetName(userId){
+    if(userId === NOTIF_ALL_USERS) return 'Todos';
+    return findTeam(userId)?.name || 'Usuario';
+  }
+
+  function notificationAppliesToFilter(notif, selectedUserId = ''){
+    const selected = String(selectedUserId || '');
+    if(!selected) return true;
+    if(selected === NOTIF_ALL_USERS) return notif.userId === NOTIF_ALL_USERS;
+    return notif.userId === selected || notif.userId === NOTIF_ALL_USERS;
+  }
+
+  function filterNotifications(list, { userId = '', q = '', includeDone = true } = {}){
+    const needle = normalizeSearchText(q);
+    return (Array.isArray(list) ? list : [])
+      .filter(n=>{
+        if(!notificationAppliesToFilter(n, userId)) return false;
+        if(!includeDone && n.done) return false;
+        if(!needle) return true;
+        const haystack = [
+          n.title,
+          n.message,
+          notificationTargetName(n.userId),
+          n.remindDate,
+          n.remindTime,
+          n.done ? 'atendida' : 'pendiente'
+        ].map(normalizeSearchText).join(' | ');
+        return haystack.includes(needle);
+      })
+      .sort(compareNotifications);
+  }
+
+  function isNotificationDue(notif, refDate = new Date()){
+    if(!notif || notif.done || !notif.remindDate) return false;
+    const today = toISO(refDate);
+    if(notif.remindDate < today) return true;
+    if(notif.remindDate > today) return false;
+    if(!notif.remindTime) return true;
+    return timeToMin(notif.remindTime) <= (refDate.getHours()*60 + refDate.getMinutes());
+  }
+
+  function notificationStatus(notif, refDate = new Date()){
+    if(notif.done) return { label:'Atendida', cls:'done' };
+    if(!notif.remindDate) return { label:'Sin fecha', cls:'none' };
+
+    const today = toISO(refDate);
+    if(notif.remindDate < today) return { label:'Vencida', cls:'overdue' };
+    if(notif.remindDate > today) return { label:'Programada', cls:'scheduled' };
+
+    return { label:'Hoy', cls:'today' };
+  }
+
+  function formatNotificationReminder(notif){
+    if(!notif.remindDate) return 'Sin fecha programada';
+    const d = fmtDate(notif.remindDate);
+    if(!notif.remindTime) return d;
+    return `${d} ${notif.remindTime}`;
+  }
+
+  function countPendingNotifications(list){
+    return (Array.isArray(list) ? list : []).filter(n=>!n.done).length;
+  }
+
+  function updateNotificationIndicator(){
+    const infoBtn = $('btnInfo');
+    if(!infoBtn) return;
+
+    const pending = countPendingNotifications(state.notifications || []);
+    const badge = pending > 99 ? '99+' : String(pending);
+
+    infoBtn.classList.toggle('has-alert', pending > 0);
+    if(pending > 0) infoBtn.setAttribute('data-badge', badge);
+    else infoBtn.removeAttribute('data-badge');
+
+    const suffix = pending > 0 ? ` · ${pending} recordatorio(s) pendiente(s)` : '';
+    infoBtn.title = `Notificaciones${suffix}`;
+  }
+
+  function upsertNotificationDone(id, doneValue){
+    const nowIso = new Date().toISOString();
+    state.notifications = sanitizeNotifications(
+      (state.notifications || []).map(n=> n.id === id ? { ...n, done:Boolean(doneValue), updatedAt:nowIso } : n),
+      state.team
+    );
+    saveState();
+    updateNotificationIndicator();
+    if($('infoOverlay')?.classList.contains('open')) renderInfoNotifications();
+  }
+
+  function removeNotificationById(id){
+    state.notifications = sanitizeNotifications((state.notifications || []).filter(n=>n.id !== id), state.team);
+    saveState();
+    updateNotificationIndicator();
+    if($('infoOverlay')?.classList.contains('open')) renderInfoNotifications();
+  }
+
+  function renderManageNotifications(){
+    const tab = $('tab_notifications');
+    if(!tab) return;
+
+    if(typeof ui.manageNotifUser !== 'string') ui.manageNotifUser = '';
+    if(typeof ui.manageNotifQ !== 'string') ui.manageNotifQ = '';
+    if(typeof ui.manageNotifShowDone !== 'boolean') ui.manageNotifShowDone = true;
+
+    state.notifications = sanitizeNotifications(state.notifications, state.team);
+
+    const users = state.team.slice();
+    const userOptions = [
+      `<option value="">Todos los usuarios</option>`,
+      `<option value="${esc(NOTIF_ALL_USERS)}" ${ui.manageNotifUser===NOTIF_ALL_USERS?'selected':''}>Global (todos)</option>`,
+      ...users.map(u=>`<option value="${esc(u.id)}" ${ui.manageNotifUser===u.id?'selected':''}>${esc(u.name)}</option>`)
+    ].join('');
+
+    const filtered = filterNotifications(state.notifications, {
+      userId: ui.manageNotifUser,
+      q: ui.manageNotifQ,
+      includeDone: ui.manageNotifShowDone
+    });
+
+    const due = filtered.filter(n=>isNotificationDue(n)).length;
+    const pending = filtered.filter(n=>!n.done).length;
+
+    const cards = filtered.map(n=>{
+      const st = notificationStatus(n);
+      return `
+        <div class="notif-card ${n.done?'done':''}">
+          <div class="notif-head">
+            <div>
+              <div class="notif-title">${esc(n.title)}</div>
+              <div class="notif-target">Para: ${esc(notificationTargetName(n.userId))}</div>
+            </div>
+            <span class="notif-pill ${st.cls}">${st.label}</span>
+          </div>
+          <div class="notif-msg">${n.message ? esc(n.message) : '<span class="muted">Sin detalle</span>'}</div>
+          <div class="notif-meta-row">
+            <div class="notif-meta">Recordatorio: ${esc(formatNotificationReminder(n))}</div>
+            <div class="notif-actions">
+              <button class="btn" data-n-toggle="${esc(n.id)}">${n.done ? 'Reabrir' : 'Marcar atendida'}</button>
+              ${isAdmin() ? `<button class="btn danger" data-n-del="${esc(n.id)}">Eliminar</button>` : ''}
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    tab.innerHTML = `
+      <div class="notif-top" style="margin-bottom:8px">
+        <div class="notif-controls">
+          <select class="ctrl" id="manageNotifFilterUser">${userOptions}</select>
+          <input class="ctrl" id="manageNotifSearch" type="search" placeholder="Buscar notificación..." value="${esc(ui.manageNotifQ)}" />
+          <label class="small muted" style="display:inline-flex;align-items:center;gap:6px">
+            <input type="checkbox" id="manageNotifShowDone" ${ui.manageNotifShowDone?'checked':''} />
+            Mostrar atendidas
+          </label>
+        </div>
+        <div class="small muted">Pendientes: ${pending} · Vencidas/hoy: ${due}</div>
+      </div>
+
+      ${isAdmin() ? `
+      <div class="notif-form" style="margin-bottom:10px">
+        <div>
+          <label class="label">Título</label>
+          <input class="ctrl" id="notifTitle" maxlength="120" placeholder="Ej. Enviar reporte de concentración" />
+        </div>
+        <div>
+          <label class="label">Detalle</label>
+          <input class="ctrl" id="notifMessage" maxlength="600" placeholder="Opcional" />
+        </div>
+        <div>
+          <label class="label">Usuario destino</label>
+          <select class="ctrl" id="notifUser">${[
+            `<option value="${esc(NOTIF_ALL_USERS)}">Global (todos)</option>`,
+            ...users.map(u=>`<option value="${esc(u.id)}">${esc(u.name)}</option>`)
+          ].join('')}</select>
+        </div>
+        <div class="row" style="gap:8px">
+          <div style="min-width:130px">
+            <label class="label">Fecha</label>
+            <input class="ctrl" id="notifDate" type="date" />
+          </div>
+          <div style="min-width:110px">
+            <label class="label">Hora</label>
+            <input class="ctrl" id="notifTime" type="time" />
+          </div>
+        </div>
+        <button class="btn primary" id="notifAddBtn">Agregar</button>
+      </div>` : '<div class="small muted" style="margin-bottom:10px">Modo lectura: puedes buscar y revisar notificaciones.</div>'}
+
+      <div class="notif-list">${cards || '<div class="muted">No hay notificaciones para el filtro seleccionado.</div>'}</div>
+    `;
+
+    $('manageNotifFilterUser')?.addEventListener('change', e=>{
+      ui.manageNotifUser = String(e.target.value || '');
+      renderManageNotifications();
+    });
+
+    $('manageNotifSearch')?.addEventListener('input', e=>{
+      ui.manageNotifQ = String(e.target.value || '');
+      renderManageNotifications();
+    });
+
+    $('manageNotifShowDone')?.addEventListener('change', e=>{
+      ui.manageNotifShowDone = Boolean(e.target.checked);
+      renderManageNotifications();
+    });
+
+    tab.querySelectorAll('[data-n-toggle]').forEach(btn=>btn.addEventListener('click', ()=>{
+      const id = btn.dataset.nToggle;
+      const target = (state.notifications || []).find(n=>n.id===id);
+      if(!target) return;
+      upsertNotificationDone(id, !target.done);
+      renderManageNotifications();
+      toast(target.done ? 'Recordatorio reabierto.' : 'Recordatorio marcado como atendido.');
+    }));
+
+    tab.querySelectorAll('[data-n-del]').forEach(btn=>btn.addEventListener('click', ()=>{
+      const id = btn.dataset.nDel;
+      if(!id) return;
+      if(!confirm('¿Eliminar notificación?')) return;
+      removeNotificationById(id);
+      renderManageNotifications();
+      toast('Notificación eliminada.');
+    }));
+
+    $('notifAddBtn')?.addEventListener('click', ()=>{
+      const title = String($('notifTitle')?.value || '').trim();
+      if(!title){
+        toast('Ingresa un título para la notificación.');
+        $('notifTitle')?.focus();
+        return;
+      }
+
+      let userId = String($('notifUser')?.value || NOTIF_ALL_USERS).trim() || NOTIF_ALL_USERS;
+      if(userId !== NOTIF_ALL_USERS && !state.team.some(t=>t.id===userId)) userId = NOTIF_ALL_USERS;
+
+      const remindDate = normalizeISO($('notifDate')?.value || '');
+      const remindTime = normalizeOptionalHHMM($('notifTime')?.value || '');
+      const message = String($('notifMessage')?.value || '').trim().slice(0,600);
+      const nowIso = new Date().toISOString();
+
+      const notif = {
+        id: rid('n'),
+        title: title.slice(0,120),
+        message,
+        userId,
+        remindDate,
+        remindTime,
+        done: false,
+        createdAt: nowIso,
+        updatedAt: nowIso
+      };
+
+      state.notifications = sanitizeNotifications([...(state.notifications || []), notif], state.team);
+      saveState();
+      updateNotificationIndicator();
+      if($('infoOverlay')?.classList.contains('open')) renderInfoNotifications();
+      renderManageNotifications();
+      toast('Notificación registrada.');
+    });
+  }
+
+  function renderInfoNotifications(){
+    const body = $('infoBody');
+    if(!body) return;
+
+    if(typeof ui.infoNotifUser !== 'string') ui.infoNotifUser = '';
+    if(typeof ui.infoNotifQ !== 'string') ui.infoNotifQ = '';
+    if(typeof ui.infoNotifShowDone !== 'boolean') ui.infoNotifShowDone = false;
+
+    state.notifications = sanitizeNotifications(state.notifications, state.team);
+
+    const users = state.team.slice();
+    const userOptions = [
+      `<option value="">Todos los usuarios</option>`,
+      `<option value="${esc(NOTIF_ALL_USERS)}" ${ui.infoNotifUser===NOTIF_ALL_USERS?'selected':''}>Global (todos)</option>`,
+      ...users.map(u=>`<option value="${esc(u.id)}" ${ui.infoNotifUser===u.id?'selected':''}>${esc(u.name)}</option>`)
+    ].join('');
+
+    const filtered = filterNotifications(state.notifications, {
+      userId: ui.infoNotifUser,
+      q: ui.infoNotifQ,
+      includeDone: ui.infoNotifShowDone
+    });
+
+    const due = filtered.filter(n=>isNotificationDue(n)).length;
+    const pending = filtered.filter(n=>!n.done).length;
+
+    const cards = filtered.map(n=>{
+      const st = notificationStatus(n);
+      return `
+        <div class="notif-card ${n.done?'done':''}">
+          <div class="notif-head">
+            <div>
+              <div class="notif-title">${esc(n.title)}</div>
+              <div class="notif-target">Para: ${esc(notificationTargetName(n.userId))}</div>
+            </div>
+            <span class="notif-pill ${st.cls}">${st.label}</span>
+          </div>
+          <div class="notif-msg">${n.message ? esc(n.message) : '<span class="muted">Sin detalle</span>'}</div>
+          <div class="notif-meta-row">
+            <div class="notif-meta">Recordatorio: ${esc(formatNotificationReminder(n))}</div>
+            <div class="notif-actions">
+              <button class="btn" data-info-n-toggle="${esc(n.id)}">${n.done ? 'Reabrir' : 'Marcar atendida'}</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    body.innerHTML = `
+      <div class="info-line">Revisa, busca y gestiona recordatorios del equipo por usuario.</div>
+      <div class="notif-top">
+        <div class="notif-controls">
+          <select class="ctrl" id="infoNotifFilterUser">${userOptions}</select>
+          <input class="ctrl" id="infoNotifSearch" type="search" placeholder="Buscar..." value="${esc(ui.infoNotifQ)}" />
+          <label class="small muted" style="display:inline-flex;align-items:center;gap:6px">
+            <input type="checkbox" id="infoNotifShowDone" ${ui.infoNotifShowDone?'checked':''} />
+            Mostrar atendidas
+          </label>
+        </div>
+        <div class="small muted">Pendientes: ${pending} · Vencidas/hoy: ${due}</div>
+      </div>
+      <div class="notif-list">${cards || '<div class="muted">No hay notificaciones para el filtro seleccionado.</div>'}</div>
+    `;
+
+    const footer = $('infoFooterNote');
+    if(footer){
+      footer.textContent = due > 0
+        ? `${due} recordatorio(s) pendiente(s) por fecha`
+        : 'Sin recordatorios vencidos por ahora';
+    }
+
+    $('infoNotifFilterUser')?.addEventListener('change', e=>{
+      ui.infoNotifUser = String(e.target.value || '');
+      renderInfoNotifications();
+    });
+
+    $('infoNotifSearch')?.addEventListener('input', e=>{
+      ui.infoNotifQ = String(e.target.value || '');
+      renderInfoNotifications();
+    });
+
+    $('infoNotifShowDone')?.addEventListener('change', e=>{
+      ui.infoNotifShowDone = Boolean(e.target.checked);
+      renderInfoNotifications();
+    });
+
+    body.querySelectorAll('[data-info-n-toggle]').forEach(btn=>btn.addEventListener('click', ()=>{
+      const id = btn.dataset.infoNToggle;
+      const target = (state.notifications || []).find(n=>n.id===id);
+      if(!target) return;
+      upsertNotificationDone(id, !target.done);
+      renderInfoNotifications();
+      if($('manageOverlay')?.classList.contains('open') && ui.manageTab === 'notifications'){
+        renderManageNotifications();
+      }
+      toast(target.done ? 'Recordatorio reabierto.' : 'Recordatorio marcado como atendido.');
+    }));
+  }
+
   function renderManageData(){
     const adjusted = Number(ui.lastAdjustedBusinessDates || 0);
     if(adjusted > 0){
@@ -8102,7 +8668,7 @@ function buildDaySummaryText(dayISO=ui.date){
       <div class="grid2">
         <div class="card" id="dataBackupCard">
           <h3>Respaldo</h3>
-          <div class="small muted">Exporta o importa sin perder compatibilidad. Incluye proyectos, equipo, bloqueos, configuración manual de Equipo, feriados y tema visual.</div>
+          <div class="small muted">Exporta o importa sin perder compatibilidad. Incluye proyectos, equipo, bloqueos, configuración manual de Equipo, feriados, notificaciones y tema visual.</div>
           <div class="row" style="margin-top:8px;flex-wrap:wrap">
             <button class="btn" id="btnExport">Exportar JSON</button>
             <label class="btn">Importar JSON <input id="importFile" type="file" accept=".json,application/json" hidden /></label>
