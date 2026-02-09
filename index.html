@@ -233,7 +233,7 @@
     /* Day grid */
     .day-grid{
       display:grid;
-      grid-template-columns:64px repeat(var(--team-count), minmax(220px,1fr));
+      grid-template-columns:60px repeat(var(--team-count), minmax(220px,1fr));
       min-width:980px;
     }
     .grid-head{
@@ -254,7 +254,7 @@
       height:var(--hour-h);
       border-bottom:1px solid color-mix(in srgb, var(--line) 72%, transparent);
       font-size:11px;color:var(--muted);
-      text-align:right;padding:4px 8px;
+      text-align:center;padding:4px 4px;
     }
     .day-col{
       background-image:linear-gradient(to bottom, transparent calc(var(--hour-h) - 1px), color-mix(in srgb, var(--line) 65%, transparent) 1px);
@@ -1089,7 +1089,7 @@
         -webkit-overflow-scrolling:touch;
       }
       #tab_projects table{
-        min-width:980px;
+        min-width:900px;
         border-collapse:separate;
         border-spacing:0;
       }
@@ -1100,12 +1100,23 @@
         z-index:3;
         background:var(--surface);
         box-shadow:1px 0 0 color-mix(in srgb, var(--line) 80%, transparent);
-        min-width:220px;
+        width:140px;
+        min-width:140px;
+        max-width:140px;
+      }
+      #tab_projects td:first-child b,
+      #tab_projects td:first-child .small{
+        display:block;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
       }
       #tab_projects thead th:first-child{
         z-index:5;
         background:var(--surface-2);
       }
+      #tab_projects #manageProjectSearch{min-width:220px !important; width:min(72vw,280px);}
+      #tab_projects #manageProjectSort{min-width:170px !important;}
     }
   </style>
 
@@ -1615,7 +1626,7 @@
       .delta-chip.zero{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 42%, var(--line))}
 
       /* Día: tarjetas robustas y legibles */
-      .day-grid{grid-template-columns:72px repeat(var(--team-count), minmax(240px,1fr));}
+      .day-grid{grid-template-columns:60px repeat(var(--team-count), minmax(240px,1fr));}
       .grid-head{padding:12px 10px}
       .owner-head .sub{font-size:11px}
       .day-col{background-image:linear-gradient(to bottom, color-mix(in srgb,var(--line) 58%, transparent) 1px, transparent 1px);background-size:100% var(--hour-h)}
@@ -1962,7 +1973,7 @@
         .holiday-form .col-span-2{grid-column:span 2}
       }
       /* v22: Tarjetas más compactas y funcionales (día) */
-      .day-grid{grid-template-columns:68px repeat(var(--team-count), minmax(210px,1fr));}
+      .day-grid{grid-template-columns:60px repeat(var(--team-count), minmax(210px,1fr));}
       .task{border-radius:5px;box-shadow:0 2px 7px rgba(2,8,23,.10)}
       .task .h{
         padding:4px 7px;
