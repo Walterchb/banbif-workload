@@ -1,14 +1,15 @@
 {
   "meta": {
     "app": "banbif_workload",
-    "exportedAt": "2026-02-09T10:10:44.609Z",
+    "exportedAt": "2026-02-09T18:38:05.669Z",
     "version": 2,
     "schema": "full_backup",
     "counts": {
       "team": 3,
       "projects": 7,
       "activities": 19,
-      "holidays": 2
+      "holidays": 2,
+      "notifications": 2
     }
   },
   "state": {
@@ -445,7 +446,7 @@
             "name": "Ingresar Inputs",
             "startDate": "2026-02-09",
             "endDate": "2026-12-31",
-            "startHour": "17:00",
+            "startHour": "16:40",
             "endHour": "18:30",
             "ownerId": "u_zqqvadc",
             "detail": "Descarga y registro de información en archivos internos",
@@ -520,6 +521,30 @@
           }
         ]
       }
+    ],
+    "notifications": [
+      {
+        "id": "n_z3mpu54",
+        "title": "Prueba Notificación",
+        "message": "Esta es una prueba",
+        "userId": "u1",
+        "remindDate": "2026-02-09",
+        "remindTime": "13:45",
+        "done": false,
+        "createdAt": "2026-02-09T18:37:44.030Z",
+        "updatedAt": "2026-02-09T18:37:44.030Z"
+      },
+      {
+        "id": "n_nztqexc",
+        "title": "Requerimiento Covenants",
+        "message": "Nathaly Hinostroza de PWC solicita que le envíe antes del 14/02 los Covenants Trimestrales de Diciembre 2025. Correo enviado por Biagio el 30/01",
+        "userId": "u1",
+        "remindDate": "2026-02-13",
+        "remindTime": "13:00",
+        "done": false,
+        "createdAt": "2026-02-09T18:36:39.225Z",
+        "updatedAt": "2026-02-09T18:36:39.225Z"
+      }
     ]
   },
   "holidays": {
@@ -542,11 +567,17 @@
   "theme": "light",
   "ui": {
     "view": "day",
-    "date": "",
+    "date": "2026-02-09",
     "roadmapZoom": "week",
     "manageTab": "data",
     "manageProjectSort": "priority_desc",
     "manageProjectSearch": "",
+    "manageNotifUser": "",
+    "manageNotifQ": "",
+    "manageNotifShowDone": true,
+    "infoNotifUser": "",
+    "infoNotifQ": "",
+    "infoNotifShowDone": false,
     "filters": {
       "owner": "",
       "client": "",
