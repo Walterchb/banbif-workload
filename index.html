@@ -22,8 +22,10 @@
       --radius:14px;
       --shadow:0 10px 30px rgba(2,8,23,.08);
       --hour-h:56px;
-      --notif-alert-bg:color-mix(in srgb, #ef4444 12%, var(--surface));
-      --notif-alert-ring:rgba(239,68,68,.45);
+      --notif-alert-bg:color-mix(in srgb, #0ea5e9 9%, var(--surface));
+      --notif-alert-border:color-mix(in srgb, #0284c7 42%, var(--line));
+      --notif-alert-icon:color-mix(in srgb, #0369a1 78%, var(--text));
+      --notif-alert-ring:rgba(239,68,68,.34);
       --notif-alert-dot:#ef4444;
     }
     html[data-theme="dark"]{
@@ -40,9 +42,11 @@
       --ok:#22c55e;
       --chip:#1b2b4a;
       --shadow:0 10px 30px rgba(0,0,0,.28);
-      --notif-alert-bg:color-mix(in srgb, #f87171 22%, var(--surface));
-      --notif-alert-ring:rgba(248,113,113,.52);
-      --notif-alert-dot:#fb7185;
+      --notif-alert-bg:color-mix(in srgb, #1d4ed8 18%, var(--surface));
+      --notif-alert-border:color-mix(in srgb, #60a5fa 52%, var(--line));
+      --notif-alert-icon:color-mix(in srgb, #bfdbfe 86%, var(--text));
+      --notif-alert-ring:rgba(244,63,94,.38);
+      --notif-alert-dot:#f43f5e;
     }
     *{box-sizing:border-box}
     body{
@@ -525,50 +529,51 @@
     .info-meta div{font-size:12px;color:var(--muted)}
     .info-meta b{color:var(--text)}
 
+
     #btnInfo{position:relative;overflow:visible;isolation:isolate}
-    #btnInfo i{font-size:15px;line-height:1;transition:transform .2s ease, color .2s ease, filter .2s ease}
+    #btnInfo i{font-size:15px;line-height:1;transition:transform .18s ease, color .18s ease}
     #btnInfo.has-alert{
-      border-color:color-mix(in srgb,var(--danger) 62%, var(--line));
+      border-color:var(--notif-alert-border);
       background:var(--notif-alert-bg);
-      box-shadow:0 0 0 1px color-mix(in srgb,var(--danger) 18%, transparent) inset;
+      box-shadow:
+        inset 0 0 0 1px color-mix(in srgb,var(--notif-alert-border) 30%, transparent),
+        0 3px 10px color-mix(in srgb,var(--notif-alert-border) 18%, transparent);
     }
     #btnInfo.has-alert i{
-      color:color-mix(in srgb,var(--danger) 78%, var(--text));
-      filter:drop-shadow(0 0 6px color-mix(in srgb,var(--danger) 35%, transparent));
-      animation:notifBellWiggle 2.2s ease-in-out infinite;
+      color:var(--notif-alert-icon);
+      transform-origin:50% 8%;
+      animation:notifBellWiggle 1.45s cubic-bezier(.2,.7,.2,1) infinite;
     }
     #btnInfo.has-alert::after{
       content:'';
       position:absolute;
-      top:2px;
-      right:3px;
-      width:10px;
-      height:10px;
+      top:4px;
+      right:4px;
+      width:7px;
+      height:7px;
       border-radius:999px;
       background:var(--notif-alert-dot);
-      border:2px solid var(--surface);
-      box-shadow:
-        0 0 0 0 var(--notif-alert-ring),
-        0 0 14px color-mix(in srgb,var(--notif-alert-dot) 52%, transparent);
+      border:1.5px solid var(--surface);
       pointer-events:none;
-      animation:notifDotBlink 1.15s steps(2,end) infinite, notifDotGlow 1.9s ease-out infinite;
+      will-change:transform,opacity;
+      animation:notifDotBlink .72s steps(2,end) infinite, notifDotPulse 1.2s ease-out infinite;
     }
     @keyframes notifDotBlink{
       0%,100%{opacity:1}
-      50%{opacity:.28}
+      50%{opacity:.48}
     }
-    @keyframes notifDotGlow{
-      0%{transform:scale(1); box-shadow:0 0 0 0 var(--notif-alert-ring), 0 0 8px color-mix(in srgb,var(--notif-alert-dot) 40%, transparent);}
-      70%{transform:scale(1.08); box-shadow:0 0 0 7px color-mix(in srgb,var(--notif-alert-ring) 0%, transparent), 0 0 18px color-mix(in srgb,var(--notif-alert-dot) 55%, transparent);}
-      100%{transform:scale(1); box-shadow:0 0 0 0 color-mix(in srgb,var(--notif-alert-ring) 0%, transparent), 0 0 8px color-mix(in srgb,var(--notif-alert-dot) 35%, transparent);}
+    @keyframes notifDotPulse{
+      0%{transform:scale(1); box-shadow:0 0 0 0 var(--notif-alert-ring)}
+      70%{transform:scale(1.06); box-shadow:0 0 0 5px color-mix(in srgb,var(--notif-alert-ring) 0%, transparent)}
+      100%{transform:scale(1); box-shadow:0 0 0 0 color-mix(in srgb,var(--notif-alert-ring) 0%, transparent)}
     }
     @keyframes notifBellWiggle{
-      0%,100%{transform:rotate(0)}
-      12%{transform:rotate(14deg)}
-      24%{transform:rotate(-10deg)}
-      36%{transform:rotate(7deg)}
-      48%{transform:rotate(-4deg)}
-      60%{transform:rotate(0)}
+      0%,65%,100%{transform:rotate(0)}
+      8%{transform:rotate(13deg)}
+      16%{transform:rotate(-9deg)}
+      24%{transform:rotate(7deg)}
+      32%{transform:rotate(-5deg)}
+      40%{transform:rotate(2deg)}
     }
     @media (prefers-reduced-motion: reduce){
       #btnInfo.has-alert i,
@@ -8462,6 +8467,46 @@ function buildDaySummaryText(dayISO=ui.date){
     return (Array.isArray(list) ? list : []).filter(n=>!n.done).length;
   }
 
+  function normalizeNotifQuery(v){
+    return String(v || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '')
+      .trim();
+  }
+
+  function applyNotificationTextFilter(scopeEl, queryText){
+    const root = (typeof scopeEl === 'string') ? $(scopeEl) : scopeEl;
+    if(!root) return { visible:0, pending:0, due:0, attended:0 };
+
+    const query = normalizeNotifQuery(queryText);
+    const cards = Array.from(root.querySelectorAll('.notif-card'));
+
+    let visible = 0;
+    let pending = 0;
+    let due = 0;
+    let attended = 0;
+
+    cards.forEach(card=>{
+      const hay = normalizeNotifQuery(card.dataset.search || card.textContent || '');
+      const match = !query || hay.includes(query);
+      card.style.display = match ? '' : 'none';
+      if(!match) return;
+
+      visible += 1;
+      const done = card.classList.contains('done');
+      if(done) attended += 1;
+      else pending += 1;
+
+      if(card.classList.contains('status-overdue') || card.classList.contains('status-today')) due += 1;
+    });
+
+    const empty = root.querySelector('.notif-empty');
+    if(empty) empty.style.display = visible === 0 ? '' : 'none';
+
+    return { visible, pending, due, attended };
+  }
+
   function updateNotificationIndicator(){
     const infoBtn = $('btnInfo');
     if(!infoBtn) return;
@@ -8532,20 +8577,28 @@ function buildDaySummaryText(dayISO=ui.date){
       ...users.map(u=>`<option value="${esc(u.id)}" ${ui.manageNotifUser===u.id?'selected':''}>${esc(u.name)}</option>`)
     ].join('');
 
-    const filtered = filterNotifications(state.notifications, {
+    const baseList = filterNotifications(state.notifications, {
       userId: ui.manageNotifUser,
-      q: ui.manageNotifQ,
+      q: '',
       includeDone: ui.manageNotifShowDone
     });
 
-    const due = filtered.filter(n=>isNotificationDue(n)).length;
-    const pending = filtered.filter(n=>!n.done).length;
-    const attended = filtered.filter(n=>n.done).length;
+    const due = baseList.filter(n=>isNotificationDue(n)).length;
+    const pending = baseList.filter(n=>!n.done).length;
+    const attended = baseList.filter(n=>n.done).length;
 
-    const cards = filtered.map(n=>{
+    const cards = baseList.map(n=>{
       const st = notificationStatus(n);
+      const searchBlob = [
+        n.title,
+        n.message,
+        notificationTargetName(n.userId),
+        formatNotificationReminder(n),
+        st.label
+      ].join(' ');
+
       return `
-        <div class="notif-card status-${st.cls} ${n.done?'done':''}">
+        <div class="notif-card status-${st.cls} ${n.done?'done':''}" data-search="${esc(searchBlob)}">
           <div class="notif-head">
             <div>
               <div class="notif-title">${esc(n.title)}</div>
@@ -8572,16 +8625,16 @@ function buildDaySummaryText(dayISO=ui.date){
           <div class="notif-toolbar-sub">Registra recordatorios por usuario, filtra rápidamente y controla vencimientos del equipo.</div>
         </div>
         <div class="notif-stats">
-          <div class="notif-stat"><b>${pending}</b><span>Pendientes</span></div>
-          <div class="notif-stat"><b>${due}</b><span>Vencidas / Hoy</span></div>
-          <div class="notif-stat"><b>${attended}</b><span>Atendidas</span></div>
+          <div class="notif-stat"><b id="manageNotifStatPending">${pending}</b><span>Pendientes</span></div>
+          <div class="notif-stat"><b id="manageNotifStatDue">${due}</b><span>Vencidas / Hoy</span></div>
+          <div class="notif-stat"><b id="manageNotifStatAttended">${attended}</b><span>Atendidas</span></div>
         </div>
       </div>
 
       <div class="notif-controls-wrap">
         <div class="notif-controls">
           <select class="ctrl" id="manageNotifFilterUser">${userOptions}</select>
-          <input class="ctrl" id="manageNotifSearch" type="search" placeholder="Buscar notificación..." value="${esc(ui.manageNotifQ)}" />
+          <input class="ctrl" id="manageNotifSearch" type="search" placeholder="Buscar notificación..." value="${esc(ui.manageNotifQ)}" autocomplete="off" enterkeyhint="search" />
           <label class="small muted" style="display:inline-flex;align-items:center;gap:6px">
             <input type="checkbox" id="manageNotifShowDone" ${ui.manageNotifShowDone?'checked':''} />
             Mostrar atendidas
@@ -8619,24 +8672,32 @@ function buildDaySummaryText(dayISO=ui.date){
         <button class="btn primary" id="notifAddBtn"><i class="fa-solid fa-plus" aria-hidden="true"></i> Agregar</button>
       </div>` : '<div class="small muted" style="margin-top:10px">Modo lectura: puedes buscar y revisar notificaciones.</div>'}
 
-      <div class="notif-list">${cards || '<div class="notif-empty">No hay notificaciones para el filtro seleccionado.</div>'}</div>
+      <div class="notif-list">${cards}${baseList.length===0 ? '<div id="manageNotifEmpty" class="notif-empty">No hay notificaciones para el filtro seleccionado.</div>' : '<div id="manageNotifEmpty" class="notif-empty" style="display:none">No hay notificaciones para tu búsqueda.</div>'}</div>
     `;
+
+    const applyManageSearch = ()=>{
+      const result = applyNotificationTextFilter(tab, ui.manageNotifQ);
+      const pendingEl = $('manageNotifStatPending');
+      const dueEl = $('manageNotifStatDue');
+      const attendedEl = $('manageNotifStatAttended');
+      if(pendingEl) pendingEl.textContent = String(result.pending);
+      if(dueEl) dueEl.textContent = String(result.due);
+      if(attendedEl) attendedEl.textContent = String(result.attended);
+    };
 
     $('manageNotifFilterUser')?.addEventListener('change', e=>{
       ui.manageNotifUser = String(e.target.value || '');
       renderManageNotifications();
     });
 
-    $('manageNotifSearch')?.addEventListener('input', e=>{
-      ui.manageNotifQ = String(e.target.value || '');
-      const caret = Number.isFinite(e.target.selectionStart) ? e.target.selectionStart : ui.manageNotifQ.length;
-      rerenderNotifWithFocus(renderManageNotifications, 'manageNotifSearch', ui.manageNotifQ, caret);
-    });
-    $('manageNotifSearch')?.addEventListener('search', e=>{
-      ui.manageNotifQ = String(e.target.value || '');
-      renderManageNotifications();
-    });
-
+    const manageSearchInput = $('manageNotifSearch');
+    if(manageSearchInput){
+      const onManageSearchEvent = ()=>{
+        ui.manageNotifQ = String(manageSearchInput.value || '');
+        applyManageSearch();
+      };
+      ['input','keyup','search','change'].forEach(evt=> manageSearchInput.addEventListener(evt, onManageSearchEvent));
+    }
 
     $('manageNotifShowDone')?.addEventListener('change', e=>{
       ui.manageNotifShowDone = Boolean(e.target.checked);
@@ -8696,6 +8757,8 @@ function buildDaySummaryText(dayISO=ui.date){
       renderManageNotifications();
       toast('Notificación registrada.');
     });
+
+    applyManageSearch();
   }
 
   function renderInfoNotifications(){
@@ -8715,20 +8778,28 @@ function buildDaySummaryText(dayISO=ui.date){
       ...users.map(u=>`<option value="${esc(u.id)}" ${ui.infoNotifUser===u.id?'selected':''}>${esc(u.name)}</option>`)
     ].join('');
 
-    const filtered = filterNotifications(state.notifications, {
+    const baseList = filterNotifications(state.notifications, {
       userId: ui.infoNotifUser,
-      q: ui.infoNotifQ,
+      q: '',
       includeDone: ui.infoNotifShowDone
     });
 
-    const due = filtered.filter(n=>isNotificationDue(n)).length;
-    const pending = filtered.filter(n=>!n.done).length;
-    const attended = filtered.filter(n=>n.done).length;
+    const due = baseList.filter(n=>isNotificationDue(n)).length;
+    const pending = baseList.filter(n=>!n.done).length;
+    const attended = baseList.filter(n=>n.done).length;
 
-    const cards = filtered.map(n=>{
+    const cards = baseList.map(n=>{
       const st = notificationStatus(n);
+      const searchBlob = [
+        n.title,
+        n.message,
+        notificationTargetName(n.userId),
+        formatNotificationReminder(n),
+        st.label
+      ].join(' ');
+
       return `
-        <div class="notif-card status-${st.cls} ${n.done?'done':''}">
+        <div class="notif-card status-${st.cls} ${n.done?'done':''}" data-search="${esc(searchBlob)}">
           <div class="notif-head">
             <div>
               <div class="notif-title">${esc(n.title)}</div>
@@ -8754,16 +8825,16 @@ function buildDaySummaryText(dayISO=ui.date){
           <div class="notif-toolbar-sub">Visualiza alertas por usuario y marca recordatorios como atendidos desde este panel.</div>
         </div>
         <div class="notif-stats">
-          <div class="notif-stat"><b>${pending}</b><span>Pendientes</span></div>
-          <div class="notif-stat"><b>${due}</b><span>Vencidas / Hoy</span></div>
-          <div class="notif-stat"><b>${attended}</b><span>Atendidas</span></div>
+          <div class="notif-stat"><b id="infoNotifStatPending">${pending}</b><span>Pendientes</span></div>
+          <div class="notif-stat"><b id="infoNotifStatDue">${due}</b><span>Vencidas / Hoy</span></div>
+          <div class="notif-stat"><b id="infoNotifStatAttended">${attended}</b><span>Atendidas</span></div>
         </div>
       </div>
 
       <div class="notif-controls-wrap">
         <div class="notif-controls">
           <select class="ctrl" id="infoNotifFilterUser">${userOptions}</select>
-          <input class="ctrl" id="infoNotifSearch" type="search" placeholder="Buscar..." value="${esc(ui.infoNotifQ)}" />
+          <input class="ctrl" id="infoNotifSearch" type="search" placeholder="Buscar..." value="${esc(ui.infoNotifQ)}" autocomplete="off" enterkeyhint="search" />
           <label class="small muted" style="display:inline-flex;align-items:center;gap:6px">
             <input type="checkbox" id="infoNotifShowDone" ${ui.infoNotifShowDone?'checked':''} />
             Mostrar atendidas
@@ -8771,31 +8842,41 @@ function buildDaySummaryText(dayISO=ui.date){
         </div>
       </div>
 
-      <div class="notif-list">${cards || '<div class="notif-empty">No hay notificaciones para el filtro seleccionado.</div>'}</div>
+      <div class="notif-list">${cards}${baseList.length===0 ? '<div id="infoNotifEmpty" class="notif-empty">No hay notificaciones para el filtro seleccionado.</div>' : '<div id="infoNotifEmpty" class="notif-empty" style="display:none">No hay notificaciones para tu búsqueda.</div>'}</div>
     `;
 
     const footer = $('infoFooterNote');
-    if(footer){
-      footer.textContent = due > 0
-        ? `${due} recordatorio(s) pendiente(s) por fecha`
-        : (pending > 0 ? `${pending} recordatorio(s) pendiente(s)` : 'Sin recordatorios pendientes por ahora');
-    }
+
+    const applyInfoSearch = ()=>{
+      const result = applyNotificationTextFilter(body, ui.infoNotifQ);
+
+      const pendingEl = $('infoNotifStatPending');
+      const dueEl = $('infoNotifStatDue');
+      const attendedEl = $('infoNotifStatAttended');
+      if(pendingEl) pendingEl.textContent = String(result.pending);
+      if(dueEl) dueEl.textContent = String(result.due);
+      if(attendedEl) attendedEl.textContent = String(result.attended);
+
+      if(footer){
+        footer.textContent = result.due > 0
+          ? `${result.due} recordatorio(s) pendiente(s) por fecha`
+          : (result.pending > 0 ? `${result.pending} recordatorio(s) pendiente(s)` : 'Sin recordatorios pendientes por ahora');
+      }
+    };
 
     $('infoNotifFilterUser')?.addEventListener('change', e=>{
       ui.infoNotifUser = String(e.target.value || '');
       renderInfoNotifications();
     });
 
-    $('infoNotifSearch')?.addEventListener('input', e=>{
-      ui.infoNotifQ = String(e.target.value || '');
-      const caret = Number.isFinite(e.target.selectionStart) ? e.target.selectionStart : ui.infoNotifQ.length;
-      rerenderNotifWithFocus(renderInfoNotifications, 'infoNotifSearch', ui.infoNotifQ, caret);
-    });
-    $('infoNotifSearch')?.addEventListener('search', e=>{
-      ui.infoNotifQ = String(e.target.value || '');
-      renderInfoNotifications();
-    });
-
+    const infoSearchInput = $('infoNotifSearch');
+    if(infoSearchInput){
+      const onInfoSearchEvent = ()=>{
+        ui.infoNotifQ = String(infoSearchInput.value || '');
+        applyInfoSearch();
+      };
+      ['input','keyup','search','change'].forEach(evt=> infoSearchInput.addEventListener(evt, onInfoSearchEvent));
+    }
 
     $('infoNotifShowDone')?.addEventListener('change', e=>{
       ui.infoNotifShowDone = Boolean(e.target.checked);
@@ -8813,6 +8894,8 @@ function buildDaySummaryText(dayISO=ui.date){
       }
       toast(target.done ? 'Recordatorio reabierto.' : 'Recordatorio marcado como atendido.');
     }));
+
+    applyInfoSearch();
   }
 
   function renderManageData(){
