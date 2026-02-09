@@ -579,8 +579,8 @@
     .login-sub{font-size:12px;color:var(--muted);margin-top:4px}
     .login-body{padding:14px 16px 16px}
     .code-wrap{display:flex;gap:8px;align-items:center}
-    .code-wrap .ctrl{height:42px;font-size:20px}
-    .access-code{letter-spacing:8px;text-align:center;font-weight:900}
+    .code-wrap .ctrl{height:42px;font-size:18px}
+    .access-code{letter-spacing:8px;text-align:center;font-weight:700}
     .role-hint{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
     .role-chip{border:1px solid var(--line);border-radius:10px;padding:8px;background:var(--surface-2)}
     .role-chip b{display:block;font-size:11px}
@@ -629,7 +629,7 @@
       .panel > .footer-strip{min-height:64px;padding:12px}
       .footer-strip .line1{font-size:13px;line-height:1.25}
       .footer-strip .line2{font-size:11px}
-      #accessOverlay .access-code{letter-spacing:6px;font-size:22px}
+      #accessOverlay .access-code{letter-spacing:6px;font-size:18px}
     }
 
   
@@ -1568,7 +1568,7 @@
       .status-Ajustar_fecha{color:var(--warn);border-color:color-mix(in srgb, var(--warn) 40%, var(--line));}
       .access-wrap{width:min(420px,94vw)}
       .access-row{display:flex;gap:8px;align-items:center}
-      .access-code{letter-spacing:4px;text-align:center;font-weight:900}
+      .access-code{letter-spacing:4px;text-align:center;font-weight:700}
       .readonly-lock{opacity:.62;pointer-events:none;filter:grayscale(.12)}
       .mini-help{font-size:11px;color:var(--muted);margin-top:8px}
       .dim{opacity:.75}
@@ -2905,8 +2905,8 @@ function openAccessGate(){
           <div class="login-title">
             <div class="login-badge">BIF</div>
             <div>
-              <div style="font-size:17px;font-weight:900;letter-spacing:-.2px">Acceso seguro</div>
-              <div class="login-sub">Tablero de flujo del equipo · BanBif</div>
+              <div style="font-size:17px;font-weight:800;letter-spacing:-.2px">PROYECTOS</div>
+              <div class="login-sub">Mercado de Capitales &amp; Control de Gestión.</div>
             </div>
           </div>
         </div>
@@ -2916,7 +2916,7 @@ function openAccessGate(){
             <input id="accessCode" class="ctrl access-code" type="text" inputmode="numeric" maxlength="4" placeholder="****" style="flex:1" autocomplete="off" aria-label="Código de acceso" />
             <button id="accessBtn" class="btn primary">Entrar</button>
           </div>
-          <div class="mini-help dim" style="margin-top:10px">Acceso por perfil habilitado por Seguridad.</div>
+          <div class="mini-help dim" style="margin-top:10px">Ingrese el código de acceso</div>
           <div id="accessErr" class="lock-msg">Código inválido</div>
           <div id="accessLockMsg" class="mini-help" style="margin-top:8px;display:none;color:var(--warn)"></div>
         </div>
