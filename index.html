@@ -3219,7 +3219,15 @@ function openAccessGate(){
 
 
   async function copySelectedDaySummary(){
-    const text = buildDaySummaryText(ui.date);
+    let text = '';
+    try{
+      text = buildDaySummaryText(ui.date).replace(/\n/g, "\r\n");
+    }catch(err){
+      console.error(err);
+      toast('No se pudo generar el resumen');
+      return;
+    }
+
     try{
       if(navigator.clipboard && typeof navigator.clipboard.writeText === 'function'){
         await navigator.clipboard.writeText(text);
@@ -3253,24 +3261,109 @@ function buildDaySummaryText(dayISO=ui.date){
     const dd = String(dateObj.getDate()).padStart(2,'0');
     const mm = String(dateObj.getMonth()+1).padStart(2,'0');
     const yyyy = dateObj.getFullYear();
-    const weekdayRaw = dateObj.toLocaleDateString(APP_LOCALE,{weekday:'long'});
-    const weekday = weekdayRaw ? weekdayRaw.charAt(0).toUpperCase() + weekdayRaw.slice(1) : '';
+    const weekday = dateObj.toLocaleDateString(APP_LOCALE, { weekday:'long' })
+      .replace(/^./, c=>c.toUpperCase());
 
-    const team = getFilteredTeam();
-    const teamById = new Map(team.map(p=>[p.id,p]));
-    const ownerOrder = new Map(team.map((p,i)=>[p.id,i]));
+    const teamList = Array.isArray(state?.team) ? state.team.slice() : [];
+    const teamById = new Map(teamList.map(p=>[String(p.id), p]));
+    const ownerOrder = new Map(teamList.map((p,i)=>[String(p.id), i]));
+
+    const normalizeKey = (v='') => String(v || '')
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '')
+      .trim()
+      .toLowerCase();
+
+    const ownerNameById = new Map(teamList.map(t => [String(t.id), String(t.name || '').trim()]));
+    const ownerNameFor = (ownerId) => ownerNameById.get(String(ownerId || '').trim()) || '';
+
+    const weekScope = teamModalWeekBounds(selectedDate, Number(ui.teamWeekOffset || 0));
+
+    const focusCandidateRows = [];
+    (state.projects || []).forEach((p)=>{
+      const acts = Array.isArray(p?.activities) ? p.activities : [];
+      const hasExplicitFocus = acts.some(a=>Boolean(a?.primaryFocus));
+
+      acts.forEach((a)=>{
+        if(!a?.primaryFocus) return;
+        const ownerId = String(a?.ownerId || '').trim();
+        if(!ownerId) return;
+
+        const s = normalizeISO(a.startDate) || normalizeISO(p?.startDate) || weekScope.start;
+        const e = normalizeISO(a.endDate) || normalizeISO(p?.endDate) || s;
+        focusCandidateRows.push({
+          ownerId,
+          projectId: String(p?.id || ''),
+          projectName: String(p?.name || ''),
+          inWeek: (e >= weekScope.start && s <= weekScope.end) ? 1 : 0,
+          priority: priorityRank(p?.priority || 'Media'),
+          startDate: s
+        });
+      });
+
+      // Compatibilidad retroactiva: foco legado a nivel proyecto.
+      if(!hasExplicitFocus && Boolean(p?.isPrimaryFocus)){
+        const fallbackOwner = String(p?.leaderId || acts?.[0]?.ownerId || '').trim();
+        if(fallbackOwner){
+          const s = normalizeISO(p?.startDate) || weekScope.start;
+          const e = normalizeISO(p?.endDate) || s;
+          focusCandidateRows.push({
+            ownerId: fallbackOwner,
+            projectId: String(p?.id || ''),
+            projectName: String(p?.name || ''),
+            inWeek: (e >= weekScope.start && s <= weekScope.end) ? 1 : 0,
+            priority: priorityRank(p?.priority || 'Media'),
+            startDate: s
+          });
+        }
+      }
+    });
+
+    focusCandidateRows.sort((a,b)=>
+      (b.inWeek - a.inWeek) ||
+      (a.priority - b.priority) ||
+      String(a.startDate).localeCompare(String(b.startDate))
+    );
+
+    const focusProjectByOwner = new Map();
+    focusCandidateRows.forEach(row=>{
+      if(!row.ownerId || !row.projectName) return;
+      if(!focusProjectByOwner.has(row.ownerId)){
+        focusProjectByOwner.set(row.ownerId, {
+          projectId: String(row.projectId || ''),
+          projectName: String(row.projectName || '')
+        });
+      }
+    });
+
+    const resolveFocusLabel = (ownerId, ownerName='') => {
+      const oid = String(ownerId || '').trim();
+      const byId = focusProjectByOwner.get(oid);
+      if(byId?.projectName) return byId.projectName;
+
+      const memberNameKey = normalizeKey(ownerName || ownerNameFor(oid));
+      if(memberNameKey){
+        for(const [id, focusData] of focusProjectByOwner.entries()){
+          const ownerNameKey = normalizeKey(ownerNameFor(id));
+          if(ownerNameKey && (ownerNameKey === memberNameKey || ownerNameKey.includes(memberNameKey) || memberNameKey.includes(ownerNameKey))){
+            return focusData?.projectName || 'Sin foco principal definido';
+          }
+        }
+      }
+      return 'Sin foco principal definido';
+    };
 
     const activities = getVisibleActivityInstances(selectedDate)
       .slice()
       .sort((a,b)=>{
-        const idxA = ownerOrder.has(a.ownerId) ? ownerOrder.get(a.ownerId) : Number.MAX_SAFE_INTEGER;
-        const idxB = ownerOrder.has(b.ownerId) ? ownerOrder.get(b.ownerId) : Number.MAX_SAFE_INTEGER;
+        const idxA = ownerOrder.has(String(a.ownerId || '')) ? ownerOrder.get(String(a.ownerId || '')) : Number.MAX_SAFE_INTEGER;
+        const idxB = ownerOrder.has(String(b.ownerId || '')) ? ownerOrder.get(String(b.ownerId || '')) : Number.MAX_SAFE_INTEGER;
         return (
           idxA - idxB ||
-          a.startHour.localeCompare(b.startHour) ||
-          a.endHour.localeCompare(b.endHour) ||
-          a.projectName.localeCompare(b.projectName, APP_LOCALE) ||
-          a.taskName.localeCompare(b.taskName, APP_LOCALE)
+          String(a.startHour || '').localeCompare(String(b.startHour || '')) ||
+          String(a.endHour || '').localeCompare(String(b.endHour || '')) ||
+          String(a.projectName || '').localeCompare(String(b.projectName || ''), APP_LOCALE) ||
+          String(a.taskName || '').localeCompare(String(b.taskName || ''), APP_LOCALE)
         );
       });
 
@@ -3284,61 +3377,65 @@ function buildDaySummaryText(dayISO=ui.date){
     });
 
     const byOwnerActs = new Map();
-    team.forEach(person=>byOwnerActs.set(person.id, []));
+    teamList.forEach(person=>byOwnerActs.set(String(person.id), []));
 
     activities.forEach(a=>{
-      if(!byOwnerActs.has(a.ownerId)) byOwnerActs.set(a.ownerId, []);
-      byOwnerActs.get(a.ownerId).push(a);
+      const oid = String(a.ownerId || '').trim();
+      const key = oid || `__name__:${normalizeKey(a.ownerName || 'Sin responsable')}`;
+      if(!byOwnerActs.has(key)) byOwnerActs.set(key, []);
+      byOwnerActs.get(key).push(a);
     });
 
     for(const arr of byOwnerActs.values()){
       arr.sort((x,y)=>
-        x.startHour.localeCompare(y.startHour) ||
-        x.endHour.localeCompare(y.endHour) ||
-        x.projectName.localeCompare(y.projectName, APP_LOCALE) ||
-        x.taskName.localeCompare(y.taskName, APP_LOCALE)
+        String(x.startHour || '').localeCompare(String(y.startHour || '')) ||
+        String(x.endHour || '').localeCompare(String(y.endHour || '')) ||
+        String(x.projectName || '').localeCompare(String(y.projectName || ''), APP_LOCALE) ||
+        String(x.taskName || '').localeCompare(String(y.taskName || ''), APP_LOCALE)
       );
     }
 
     const ownerEntries = Array.from(byOwnerActs.entries())
-      .map(([ownerId, acts])=>({
-        ownerId,
-        acts,
-        ownerName: teamById.get(ownerId)?.name || acts[0]?.ownerName || 'Sin responsable'
-      }));
+      .map(([ownerKey, acts])=>{
+        const ownerId = String(ownerKey).startsWith('__name__:') ? '' : String(ownerKey);
+        const fallbackName = acts[0]?.ownerName || 'Sin responsable';
+        const ownerName = teamById.get(ownerId)?.name || fallbackName;
+        const ord = ownerOrder.has(ownerId) ? ownerOrder.get(ownerId) : Number.MAX_SAFE_INTEGER;
+        return { ownerId, acts, ownerName, ord };
+      })
+      .sort((a,b)=> a.ord - b.ord || String(a.ownerName || '').localeCompare(String(b.ownerName || ''), APP_LOCALE));
 
+    const SEP = '────────────────────────';
     const lines = [];
+
     lines.push('*ACTIVIDADES | RESUMEN DIARIO*');
     lines.push(`Fecha: ${dd}/${mm}/${yyyy}${weekday ? ` (${weekday})` : ''}`);
-    lines.push('────────────────────────');
-    lines.push('');
+    lines.push(SEP);
     lines.push('*PANORAMA*');
-    lines.push('');
     lines.push(`• Actividades programadas: ${activities.length}`);
     lines.push(`• Prioridad: Alta ${prioCount.Alta} | Media ${prioCount.Media} | Baja ${prioCount.Baja}`);
     lines.push(`• Estatus: Programado ${statusCount['Programado']} | En curso ${statusCount['En curso']} | Demorado ${statusCount['Demorado']} | Finalizado ${statusCount['Finalizado']}`);
-    lines.push('────────────────────────');
-    lines.push('');
+    lines.push(SEP);
     lines.push('*DETALLE POR RESPONSABLE*');
-    lines.push('');
 
     if(!ownerEntries.length){
-      lines.push('• SIN RESPONSABLES — Foco:');
+      lines.push('• SIN RESPONSABLES — Foco: Sin foco principal definido');
       lines.push('- Sin actividades asignadas');
-      return lines.join('\n').replace(/\n+$/,'');
+      return lines.join('\n').replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
     }
 
-    ownerEntries.forEach(({acts, ownerName}, idx)=>{
+    ownerEntries.forEach(({acts, ownerName, ownerId}, idx)=>{
       const owner = String(ownerName || 'Sin responsable').toUpperCase();
-      lines.push(`• ${owner} — Foco:`);
+      const focusLabel = resolveFocusLabel(ownerId, ownerName);
+      lines.push(`• ${owner} — Foco: ${focusLabel}`);
 
       if(!acts.length){
         lines.push('- Sin actividades asignadas');
       }else{
         acts.forEach(a=>{
           const pri = PRIORITIES.includes(a.priority) ? a.priority : 'Media';
-          const proj = a.projectName || 'Proyecto sin nombre';
-          const task = a.taskName || 'Actividad';
+          const proj = String(a.projectName || 'Proyecto sin nombre').replace(/\s*\|\s*/g, ' / ');
+          const task = String(a.taskName || 'Actividad').replace(/\s*\|\s*/g, ' / ');
           lines.push(`- ${a.startHour}-${a.endHour} | ${proj} | ${task} | Prioridad: ${pri}`);
         });
       }
@@ -3346,8 +3443,9 @@ function buildDaySummaryText(dayISO=ui.date){
       if(idx < ownerEntries.length - 1) lines.push('');
     });
 
-    return lines.join('\n').replace(/\n+$/,'');
+    return lines.join('\n').replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
   }
+
 
 
   function updateRoleUI(){
@@ -3381,6 +3479,7 @@ function buildDaySummaryText(dayISO=ui.date){
       copyBtn.title = 'Copiar resumen diario';
       copyBtn.addEventListener('click', copySelectedDaySummary);
     }
+    copyBtn.onclick = copySelectedDaySummary;
 
     const manageBtn = $('btnManage');
     const addBtn = $('btnAdd');
