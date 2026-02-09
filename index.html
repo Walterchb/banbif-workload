@@ -1080,6 +1080,35 @@
     }
   </style>
 
+
+  <style id="manage-projects-sticky-mobile-v92">
+    /* v92 - Proyectos (Configuración) en móvil: primera columna fija */
+    @media (max-width:860px){
+      #tab_projects .table-wrap{
+        overflow:auto;
+        -webkit-overflow-scrolling:touch;
+      }
+      #tab_projects table{
+        min-width:980px;
+        border-collapse:separate;
+        border-spacing:0;
+      }
+      #tab_projects th:first-child,
+      #tab_projects td:first-child{
+        position:sticky;
+        left:0;
+        z-index:3;
+        background:var(--surface);
+        box-shadow:1px 0 0 color-mix(in srgb, var(--line) 80%, transparent);
+        min-width:220px;
+      }
+      #tab_projects thead th:first-child{
+        z-index:5;
+        background:var(--surface-2);
+      }
+    }
+  </style>
+
 </head>
 <body>
   <div class="app">
@@ -5101,7 +5130,7 @@ function buildDaySummaryText(dayISO=ui.date){
     $('kpiBand').innerHTML = `
       <div class="kpi">
         <div>
-          <div class="label">FLUJO</div>
+          <div class="label">${esc(flowDayLabel(day))}</div>
           <div class="val">${util}%</div>
           <div class="sub">${fmtH(totalMin)} de ${fmtH(capMin)}</div>
         </div>
@@ -7305,9 +7334,9 @@ function buildDaySummaryText(dayISO=ui.date){
     return byStartAsc() || byName();
   }
 
-  function renderManageProjects(options = {}){
-    const keepSearchFocus = !!options.keepSearchFocus;
-    const searchSelectionStart = Number.isFinite(options.searchSelectionStart) ? options.searchSelectionStart : null;
+    function renderManageProjects(options = {}){
+    // En móvil, evitar reconstruir todo el panel en cada tecla para no perder foco/teclado.
+    const partial = !!options.partial;
     const ref = todayISO();
     const sortMode = ui.manageProjectSort || 'priority_desc';
     const searchQuery = String(ui.manageProjectSearch || '').trim().toLowerCase();
@@ -7359,10 +7388,41 @@ function buildDaySummaryText(dayISO=ui.date){
       ? `No se encontraron proyectos para "${esc(ui.manageProjectSearch)}".`
       : 'No hay proyectos.';
 
+    const metaText = `Portafolio actual ${isAdmin()?'':'· modo lectura'} · Mostrando ${shown} de ${total}`;
+
+    const bindManageProjectRowActions = ()=>{
+      if(isAdmin()){
+        $('manageNewProject')?.addEventListener('click',()=>openProjectEditor());
+        $('tab_projects').querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>openProjectEditor(b.dataset.edit)));
+        $('tab_projects').querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>{
+          const id = b.dataset.del;
+          if(!confirm('¿Eliminar proyecto?')) return;
+          state.projects = state.projects.filter(p=>p.id!==id);
+          render();
+          renderManageProjects();
+          toast('Proyecto eliminado');
+        }));
+      }
+      $('tab_projects').querySelectorAll('[data-view-detail]').forEach(b=>b.addEventListener('click',()=>{
+        openProjectDetail(b.dataset.viewDetail);
+      }));
+    };
+
+    // Render parcial: solo meta + filas (mantiene el input vivo y evita pérdida de foco en móvil).
+    if(partial && $('manageProjectsTbody')){
+      const metaNode = $('manageProjectsMeta');
+      if(metaNode) metaNode.textContent = metaText;
+      const tbody = $('manageProjectsTbody');
+      if(tbody) tbody.innerHTML = rows || `<tr><td colspan="8" class="muted">${emptyMessage}</td></tr>`;
+      bindManageProjectRowActions();
+      return;
+    }
+
+    // Render completo (primera carga o cuando cambian estructuras de cabecera).
     $('tab_projects').innerHTML = `
       <div class="row" style="justify-content:space-between;margin-bottom:8px;gap:10px;align-items:center;flex-wrap:wrap">
         <div class="row" style="gap:8px;align-items:center;flex-wrap:wrap">
-          <div class="small muted">Portafolio actual ${isAdmin()?'':'· modo lectura'} · Mostrando ${shown} de ${total}</div>
+          <div class="small muted" id="manageProjectsMeta">${metaText}</div>
           <input class="ctrl" id="manageProjectSearch" type="search" placeholder="Buscar: proyecto, equipo, líder, estado..." value="${esc(ui.manageProjectSearch||'')}" style="min-width:290px" />
           <select class="ctrl" id="manageProjectSort" title="Ordenar proyectos" style="min-width:230px">
             <option value="priority_desc" ${sortMode==='priority_desc'?'selected':''}>Prioridad: Alta → Baja</option>
@@ -7375,52 +7435,21 @@ function buildDaySummaryText(dayISO=ui.date){
       </div>
       <div class="table-wrap"><table>
         <thead><tr><th>Proyecto</th><th>Fechas base</th><th>Recurrencia</th><th>Prioridad</th><th>Estatus</th><th>Líder</th><th>Actividades</th><th>Acciones</th></tr></thead>
-        <tbody>${rows || `<tr><td colspan="8" class="muted">${emptyMessage}</td></tr>`}</tbody>
+        <tbody id="manageProjectsTbody">${rows || `<tr><td colspan="8" class="muted">${emptyMessage}</td></tr>`}</tbody>
       </table></div>
     `;
 
     $('manageProjectSearch')?.addEventListener('input', e=>{
-      const input = e.target;
-      ui.manageProjectSearch = input.value || '';
-      const pos = typeof input.selectionStart === 'number'
-        ? input.selectionStart
-        : String(ui.manageProjectSearch || '').length;
-      renderManageProjects({ keepSearchFocus:true, searchSelectionStart:pos });
+      ui.manageProjectSearch = e.target.value || '';
+      renderManageProjects({ partial:true });
     });
 
     $('manageProjectSort')?.addEventListener('change', e=>{
       ui.manageProjectSort = e.target.value || 'priority_desc';
-      renderManageProjects();
+      renderManageProjects({ partial:true });
     });
 
-    if(isAdmin()){
-      $('manageNewProject')?.addEventListener('click',()=>openProjectEditor());
-      $('tab_projects').querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>openProjectEditor(b.dataset.edit)));
-      $('tab_projects').querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>{
-        const id = b.dataset.del;
-        if(!confirm('¿Eliminar proyecto?')) return;
-        state.projects = state.projects.filter(p=>p.id!==id);
-        render();
-        renderManageProjects();
-        toast('Proyecto eliminado');
-      }));
-    }
-    $('tab_projects').querySelectorAll('[data-view-detail]').forEach(b=>b.addEventListener('click',()=>{
-      openProjectDetail(b.dataset.viewDetail);
-    }));
-
-    if(keepSearchFocus){
-      requestAnimationFrame(()=>{
-        const input = $('manageProjectSearch');
-        if(!input) return;
-        input.focus({ preventScroll:true });
-        const fallbackPos = String(ui.manageProjectSearch || '').length;
-        const safePos = searchSelectionStart===null
-          ? fallbackPos
-          : Math.max(0, Math.min(searchSelectionStart, input.value.length));
-        try{ input.setSelectionRange(safePos, safePos); }catch(_){}
-      });
-    }
+    bindManageProjectRowActions();
   }
 
   function renderManageTeam(){
@@ -8618,9 +8647,9 @@ function buildDaySummaryText(dayISO=ui.date){
   }
 
   function severity(util){
-    if(util >= 100) return {label:'Crítica', className:'danger'};
-    if(util >= 85) return {label:'Alta', className:'warn'};
-    if(util >= 60) return {label:'Media', className:'warn'};
+    if(util >= 100) return {label:'Crítico', className:'danger'};
+    if(util >= 85) return {label:'Alto', className:'warn'};
+    if(util >= 60) return {label:'Medio', className:'warn'};
     return {label:'Equilibrado', className:'ok'};
   }
 
@@ -8748,6 +8777,11 @@ function buildDaySummaryText(dayISO=ui.date){
   function dayLabel(iso){
     const d = parseISO(iso);
     return d.toLocaleDateString(APP_LOCALE,{weekday:'short',day:'2-digit',month:'short'});
+  }
+
+  function flowDayLabel(iso){
+    const d = parseISO(iso);
+    return `FLUJO ${d.toLocaleDateString(APP_LOCALE,{weekday:'long'}).toLocaleUpperCase(APP_LOCALE)}`;
   }
 
   function isoWeekday(iso){
