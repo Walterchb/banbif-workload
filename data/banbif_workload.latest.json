@@ -1,13 +1,13 @@
 {
   "meta": {
     "app": "banbif_workload",
-    "exportedAt": "2026-02-09T08:48:50.712Z",
+    "exportedAt": "2026-02-09T09:20:02.192Z",
     "version": 2,
     "schema": "full_backup",
     "counts": {
       "team": 3,
       "projects": 6,
-      "activities": 8,
+      "activities": 13,
       "holidays": 2
     }
   },
@@ -29,8 +29,8 @@
         "id": "u1",
         "name": "WALTER",
         "startHour": 8,
-        "endHour": 19,
-        "capacityHoursPerDay": 10,
+        "endHour": 22,
+        "capacityHoursPerDay": 14,
         "blocks": [
           {
             "id": "b_u1_lunch",
@@ -58,7 +58,7 @@
         "id": "u2",
         "name": "DIEGO",
         "startHour": 8,
-        "endHour": 19,
+        "endHour": 22,
         "capacityHoursPerDay": 10,
         "blocks": [
           {
@@ -78,7 +78,7 @@
             "endDate": "2026-02-17",
             "allDay": true,
             "startHour": "08:00",
-            "endHour": "19:00",
+            "endHour": "22:00",
             "note": ""
           }
         ]
@@ -260,7 +260,7 @@
         "objective": "",
         "deliverable": "",
         "notes": "",
-        "isPrimaryFocus": true,
+        "isPrimaryFocus": false,
         "activities": [
           {
             "id": "a_uup9r21",
@@ -272,7 +272,7 @@
             "ownerId": "u1",
             "detail": "Revisión y seguimientos de la información solicitada por Moodys y PCR",
             "done": false,
-            "primaryFocus": true
+            "primaryFocus": false
           }
         ]
       },
@@ -291,7 +291,68 @@
         "deliverable": "",
         "notes": "",
         "isPrimaryFocus": false,
-        "activities": []
+        "activities": [
+          {
+            "id": "a_3tok2jk",
+            "name": "Validación Resultados Posición",
+            "startDate": "2026-02-09",
+            "endDate": "2026-02-09",
+            "startHour": "12:00",
+            "endHour": "13:00",
+            "ownerId": "u1",
+            "detail": "Revisar los resultados de Trading y enviar para la conformidad",
+            "done": false,
+            "primaryFocus": false
+          },
+          {
+            "id": "a_7golrbg",
+            "name": "Cálculo BXI",
+            "startDate": "2026-02-09",
+            "endDate": "2026-02-09",
+            "startHour": "13:00",
+            "endHour": "14:00",
+            "ownerId": "u1",
+            "detail": "Calcular los resultados de la BXI y reportar.",
+            "done": false,
+            "primaryFocus": false
+          },
+          {
+            "id": "a_t3w0jvw",
+            "name": "Preparar Archivo Distribución",
+            "startDate": "2026-02-09",
+            "endDate": "2026-02-09",
+            "startHour": "16:00",
+            "endHour": "17:30",
+            "ownerId": "u1",
+            "detail": "Setear el archivo para el nuevo año",
+            "done": false,
+            "primaryFocus": false
+          },
+          {
+            "id": "a_ntx6slj",
+            "name": "Asignar Hola Cambios",
+            "startDate": "2026-02-09",
+            "endDate": "2026-02-09",
+            "startHour": "17:30",
+            "endHour": "19:00",
+            "ownerId": "u1",
+            "detail": "Asignar las operaciones de Hola Cambios según el sector.",
+            "done": false,
+            "primaryFocus": false
+          },
+          {
+            "id": "a_9qqlaqg",
+            "name": "Validación Resultados Distribución",
+            "startDate": "2026-02-09",
+            "endDate": "2026-02-09",
+            "startHour": "19:00",
+            "endHour": "22:00",
+            "ownerId": "u1",
+            "detail": "Revisar los resultados de Distribución y enviar para la conformidad",
+            "done": false,
+            "primaryFocus": false
+          }
+        ]
       },
       {
         "id": "p_2uawlm5",
@@ -329,7 +390,7 @@
             "startHour": "13:30",
             "endHour": "14:15",
             "ownerId": "u_zqqvadc",
-            "detail": "Esta es una prueba",
+            "detail": "Reportar resultados preliminares de Derivados y RF.",
             "done": false,
             "primaryFocus": false
           },
@@ -382,7 +443,7 @@
   "ui": {
     "view": "day",
     "date": "2026-02-09",
-    "roadmapZoom": "month",
+    "roadmapZoom": "week",
     "manageTab": "data",
     "manageProjectSort": "priority_desc",
     "manageProjectSearch": "",
