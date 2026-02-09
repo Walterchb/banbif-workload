@@ -6805,38 +6805,51 @@ function buildDaySummaryText(dayISO=ui.date){
 
     const simulation = buildAutoReplanSimulation(payload, ui.editingProjectId);
 
+    let appliedAutoReplan = false;
     if(simulation.hasImpact){
       const accepted = await showImpactConfirmation(simulation);
-      if(!accepted){
-        toast('Guardado cancelado. No se aplicaron cambios.');
+      if(accepted){
+        state = sanitizeState(simulation.proposedState);
+        appliedAutoReplan = true;
+
+        closeOverlay('projectOverlay');
+        render();
+
+        const moved = simulation.items.filter(x=>x.changed).length;
+        const unresolved = simulation.unresolved.length;
+        const msg = unresolved
+          ? `Replanificación aplicada: ${moved} ajustadas, ${unresolved} con ajuste manual pendiente.`
+          : `Replanificación aplicada: ${moved} actividades ajustadas.`;
+        toast(msg);
         return;
       }
-
-      state = sanitizeState(simulation.proposedState);
-      closeOverlay('projectOverlay');
-      render();
-
-      const moved = simulation.items.filter(x=>x.changed).length;
-      const unresolved = simulation.unresolved.length;
-      const msg = unresolved
-        ? `Replanificación aplicada: ${moved} ajustadas, ${unresolved} con ajuste manual pendiente.`
-        : `Replanificación aplicada: ${moved} actividades ajustadas.`;
-      toast(msg);
-      return;
     }
 
     if(ui.editingProjectId){
       const idx = state.projects.findIndex(p=>p.id===ui.editingProjectId);
       if(idx>=0) state.projects[idx] = payload;
-      toast('Proyecto actualizado');
     }else{
       state.projects.push(payload);
-      toast('Proyecto creado');
     }
 
     state = sanitizeState(state);
     closeOverlay('projectOverlay');
     render();
+
+    const hasCapacityWarning = (simulation.anchorWarnings || []).some(w=>String(w).includes('supera su capacidad'));
+    const hasBlockWarning = (simulation.anchorWarnings || []).some(w=>String(w).includes('cruza un bloqueo'));
+
+    if(appliedAutoReplan){
+      // no-op: covered by early return
+    }else if(simulation.hasImpact){
+      toast(ui.editingProjectId ? 'Proyecto actualizado sin reprogramar otros proyectos no afectados directamente.' : 'Proyecto creado sin reprogramar otros proyectos no afectados directamente.');
+    }else if(hasCapacityWarning){
+      toast(ui.editingProjectId ? 'Proyecto actualizado. Nota: el miembro supera su capacidad planificada.' : 'Proyecto creado. Nota: el miembro supera su capacidad planificada.');
+    }else if(hasBlockWarning){
+      toast(ui.editingProjectId ? 'Proyecto actualizado. Nota: hay cruce con bloqueos.' : 'Proyecto creado. Nota: hay cruce con bloqueos.');
+    }else{
+      toast(ui.editingProjectId ? 'Proyecto actualizado' : 'Proyecto creado');
+    }
   }
 
   function activityKey(projectId, activityId){
@@ -6949,37 +6962,23 @@ function buildDaySummaryText(dayISO=ui.date){
         const cap = getDailyCapacityMin(owner, day);
         const total = dayRefs.reduce((acc,r)=>acc + durationMinutes(r.activity.startHour, r.activity.endHour), 0);
 
+        // Regla solicitada:
+        // - Permitir guardar aunque se exceda la capacidad.
+        // - No reprogramar por capacidad a proyectos no afectados directamente.
         if(total > cap){
-          let excess = total - cap;
-          const movableDay = dayRefs
-            .filter(r=>!anchorKeys.has(r.key))
-            .sort((a,b)=>{
-              const pr = priorityRank(b.project.priority) - priorityRank(a.project.priority);
-              if(pr !== 0) return pr;
-              return b.activity.endDate.localeCompare(a.activity.endDate);
-            });
-
-          for(const r of movableDay){
-            if(excess <= 0) break;
-            if(!impacted.has(r.key)) impacted.add(r.key);
-            addReason(r.key, `Exceso de capacidad ${fmtDate(day)}`);
-            excess -= durationMinutes(r.activity.startHour, r.activity.endHour);
-          }
-
-          if(excess > 0){
-            anchorWarningsSet.add(`El día <b>${esc(fmtDate(day))}</b> de <b>${esc(owner.name)}</b> supera su capacidad incluso moviendo tareas no ancla.`);
-          }
+          anchorWarningsSet.add(`El día <b>${esc(fmtDate(day))}</b> de <b>${esc(owner.name)}</b> supera su capacidad planificada.`);
         }
       }
     }
 
-    if(!impacted.size && !anchorWarningsSet.size){
+    // Solo hay impacto si existe afectación directa (solape horario real).
+    if(!impacted.size){
       return {
         hasImpact:false,
         proposedState: normalized,
         items: [],
         unresolved: [],
-        anchorWarnings: [],
+        anchorWarnings: [...anchorWarningsSet],
         summary:{ direct:0, moved:0, unresolved:0, impacted:0 }
       };
     }
