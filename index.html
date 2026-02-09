@@ -2809,6 +2809,25 @@
         #projectOverlay .m-head b{font-size:14px}
       }
 
+      /* Móvil: columna Hora fija en vista Día */
+      @media (max-width:768px){
+        #mainView .day-grid{position:relative}
+        #mainView .day-grid > .grid-head:first-child{
+          position:sticky;
+          left:0;
+          z-index:24;
+          background:var(--surface-2);
+          box-shadow:1px 0 0 color-mix(in srgb,var(--line) 78%, transparent);
+        }
+        #mainView .day-grid > .time-col{
+          position:sticky;
+          left:0;
+          z-index:22;
+          background:var(--surface);
+          box-shadow:1px 0 0 color-mix(in srgb,var(--line) 78%, transparent);
+        }
+        #mainView .day-grid > .time-col .time-cell{background:var(--surface)}
+      }
 
 
     `;
@@ -3217,7 +3236,7 @@ function openAccessGate(){
         document.execCommand('copy');
         ta.remove();
       }
-      toast(`Resumen del ${fmtDate(ui.date)} copiado`);
+      toast(`Resumen listo para WhatsApp/Teams (${fmtDate(ui.date)})`);
     }catch(err){
       console.error(err);
       window.prompt('No se pudo copiar automáticamente. Copia este resumen:', text);
@@ -3230,6 +3249,8 @@ function buildDaySummaryText(dayISO=ui.date){
     const prettyDate = fmtDate(selectedDate);
     const weekdayRaw = parseISO(selectedDate).toLocaleDateString(APP_LOCALE,{weekday:'long'});
     const weekday = weekdayRaw ? weekdayRaw.charAt(0).toUpperCase() + weekdayRaw.slice(1) : '';
+    const now = new Date();
+    const generatedAt = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
 
     const activities = getVisibleActivityInstances(selectedDate)
       .slice()
@@ -3262,105 +3283,151 @@ function buildDaySummaryText(dayISO=ui.date){
     });
 
     const team = getFilteredTeam();
-    const ownerSummaries = team.map(person=>{
-      const personActs = activities
-        .filter(a=>a.ownerId===person.id)
-        .slice()
-        .sort((a,b)=>
-          a.startHour.localeCompare(b.startHour) ||
-          a.projectName.localeCompare(b.projectName, APP_LOCALE) ||
-          a.taskName.localeCompare(b.taskName, APP_LOCALE)
-        );
-
-      const personMin = personActs.reduce((acc,a)=>acc + durationMinutes(a.startHour,a.endHour),0);
-      const capHours = Number(person.capacityHoursPerDay || state.settings.defaultCapacityHoursPerDay || 8);
-      const utilPct = capHours>0 ? Math.round(((personMin/60)/capHours)*100) : 0;
-
-      if(!personActs.length){
-        return {
-          name: person.name,
-          utilPct,
-          projects: []
-        };
-      }
-
-      const projectMap = new Map();
-      personActs.forEach(a=>{
-        const projectName = a.projectName || 'Proyecto sin nombre';
-        const client = a.client || '';
-        const key = `${projectName}||${client}`;
-
-        if(!projectMap.has(key)){
-          projectMap.set(key, {
-            projectName,
-            client,
-            rows: []
-          });
-        }
-
-        projectMap.get(key).rows.push(`      - ${a.startHour}-${a.endHour} ${a.taskName || 'Actividad'}`);
-      });
-
-      return {
-        name: person.name,
-        utilPct,
-        projects: Array.from(projectMap.values())
-      };
+    const teamById = new Map(team.map(p=>[p.id,p]));
+    const byOwnerActs = new Map();
+    team.forEach(person=>byOwnerActs.set(person.id, []));
+    activities.forEach(a=>{
+      if(!byOwnerActs.has(a.ownerId)) byOwnerActs.set(a.ownerId, []);
+      byOwnerActs.get(a.ownerId).push(a);
     });
 
-    const overloaded = ownerSummaries.filter(o=>o.utilPct>=100).map(o=>o.name);
+    for(const arr of byOwnerActs.values()){
+      arr.sort((x,y)=>
+        x.startHour.localeCompare(y.startHour) ||
+        x.projectName.localeCompare(y.projectName, APP_LOCALE) ||
+        x.taskName.localeCompare(y.taskName, APP_LOCALE)
+      );
+    }
+
+    const risksRaw = getRiskMetrics(selectedDate) || {};
+    const conflicts = Number(risksRaw.conflicts ?? 0) || 0;
+    const blockedConflicts = Number(risksRaw.blocked ?? risksRaw.bloqueado ?? 0) || 0;
+
     const teamCapMin = team.reduce((acc,p)=> acc + (Number(p.capacityHoursPerDay || state.settings.defaultCapacityHoursPerDay || 8)*60),0);
     const teamUtilPct = teamCapMin>0 ? Math.round((totalMin/teamCapMin)*100) : 0;
+    const activeOwners = Array.from(byOwnerActs.values()).filter(arr=>arr.length>0).length;
+
+    const projectMap = new Map();
+    activities.forEach(a=>{
+      const key = `${a.projectName || 'Proyecto sin nombre'}||${a.client || ''}`;
+      if(!projectMap.has(key)){
+        projectMap.set(key, {
+          projectName: a.projectName || 'Proyecto sin nombre',
+          client: a.client || '',
+          minutes: 0,
+          activities: 0,
+          owners: new Set()
+        });
+      }
+      const row = projectMap.get(key);
+      row.minutes += Number.isFinite(a.minutes) ? a.minutes : durationMinutes(a.startHour,a.endHour);
+      row.activities += 1;
+      row.owners.add(a.ownerName || 'Sin dueño');
+    });
+
+    const projectRows = Array.from(projectMap.values())
+      .sort((a,b)=> b.minutes - a.minutes || b.activities - a.activities || a.projectName.localeCompare(b.projectName, APP_LOCALE));
 
     const lines = [];
-    lines.push(`🌅 RESUMEN DIARIO DEL EQUIPO`);
-    lines.push(`📅 ${prettyDate}${weekday ? ` (${weekday})` : ''}`);
-    if(filterParts.length) lines.push(`🔎 Filtros aplicados: ${filterParts.join(' | ')}`);
+    lines.push(`*PROYECTOS | RESUMEN DIARIO*`);
+    lines.push(`Fecha: ${prettyDate}${weekday ? ` (${weekday})` : ''}`);
+    lines.push(`Generado: ${generatedAt}`);
+    if(filterParts.length) lines.push(`Filtros: ${filterParts.join(' | ')}`);
     lines.push('');
+    lines.push('────────────────────────');
+    lines.push('*PANORAMA*');
+    lines.push(`• Proyectos activos: ${uniqueProjects.size}`);
+    lines.push(`• Actividades programadas: ${activities.length}`);
+    lines.push(`• Horas planificadas: ${fmtH(totalMin)}`);
+    lines.push(`• Responsables activos: ${activeOwners}/${team.length}`);
+    lines.push(`• Ocupación estimada del equipo: ${teamUtilPct}%`);
+    lines.push(`• Prioridad: Alta ${prioCount.Alta} | Media ${prioCount.Media} | Baja ${prioCount.Baja}`);
+    lines.push(`• Estatus: Programado ${statusCount['Programado']} | En curso ${statusCount['En curso']} | Demorado ${statusCount['Demorado']} | Finalizado ${statusCount['Finalizado']}`);
+    lines.push(`• Alertas: Solapes ${conflicts} | Cruces con bloqueos ${blockedConflicts}`);
 
     if(!activities.length){
-      lines.push(`1) PANORAMA GENERAL`);
-      lines.push(`• No hay actividades programadas para esta fecha con los filtros actuales.`);
       lines.push('');
-      lines.push(`2) MENSAJE LISTO PARA ENVIAR`);
-      lines.push(`Buenos días equipo, hoy no tenemos actividades registradas en el tablero. Quedamos disponibles para requerimientos ad hoc y cierre de pendientes.`);
+      lines.push('────────────────────────');
+      lines.push('*DETALLE POR RESPONSABLE*');
+
+      const owners = team.slice().sort((a,b)=> String(a.name||'').localeCompare(String(b.name||''), APP_LOCALE));
+      owners.forEach(person=>{
+        const capMin = Math.max(0, Number(person.capacityHoursPerDay || state.settings.defaultCapacityHoursPerDay || 8) * 60);
+        const blockedMin = Math.max(0, Number(sumBlockedMinutes(person, selectedDate)) || 0);
+        const availableMin = Math.max(0, capMin - blockedMin);
+        const detail = blockedMin>0
+          ? `Disponibilidad ${fmtH(availableMin)} (bloqueos ${fmtH(blockedMin)})`
+          : `Disponibilidad ${fmtH(availableMin)}`;
+
+        lines.push(`• ${person.name}: Sin actividades asignadas. ${detail}.`);
+      });
+
+      lines.push('');
+      lines.push('────────────────────────');
+      lines.push('*MENSAJE LISTO PARA ENVIAR*');
+      lines.push(`Equipo, para ${prettyDate} no hay actividades planificadas en el tablero. Quedamos atentos a requerimientos y ajustes de prioridad.`);
       return lines.join('\n');
     }
 
-    lines.push(`1) PANORAMA GENERAL`);
-    lines.push(`• Proyectos activos: ${uniqueProjects.size}`);
-    lines.push(`• Actividades programadas: ${activities.length}`);
-    lines.push(`• Horas planificadas del día: ${fmtH(totalMin)}`);
-    lines.push(`• Ocupación estimada del equipo: ${teamUtilPct}%`);
-    lines.push(`• Prioridades: Alta ${prioCount.Alta} | Media ${prioCount.Media} | Baja ${prioCount.Baja}`);
-    lines.push(`• Estatus: Programado ${statusCount['Programado']} | En curso ${statusCount['En curso']} | Demorado ${statusCount['Demorado']} | Finalizado ${statusCount['Finalizado']}`);
-    if(overloaded.length){
-      lines.push(`• Atención (flujo ≥100%): ${overloaded.join(', ')}`);
-    }
     lines.push('');
+    lines.push('────────────────────────');
+    lines.push('*DETALLE POR RESPONSABLE*');
 
-    lines.push(`2) AGENDA POR RESPONSABLE`);
-    ownerSummaries.forEach((o)=>{
-      lines.push(`• ${o.name}`);
+    const ownerEntries = Array.from(byOwnerActs.entries())
+      .map(([ownerId, acts])=>({
+        ownerId,
+        acts,
+        ownerName: teamById.get(ownerId)?.name || acts[0]?.ownerName || 'Sin dueño'
+      }))
+      .sort((a,b)=> a.ownerName.localeCompare(b.ownerName, APP_LOCALE));
 
-      if(!o.projects.length){
-        lines.push(`   - Sin actividades programadas`);
-        lines.push('');
+    ownerEntries.forEach(({ownerId, acts, ownerName})=>{
+      const person = teamById.get(ownerId);
+      const personMin = acts.reduce((acc,a)=>acc + (Number.isFinite(a.minutes) ? a.minutes : durationMinutes(a.startHour,a.endHour)),0);
+      const capMin = Math.max(0, Number(person?.capacityHoursPerDay || state.settings.defaultCapacityHoursPerDay || 8) * 60);
+      const blockedMin = person ? Math.max(0, Number(sumBlockedMinutes(person, selectedDate)) || 0) : 0;
+      const availableMin = Math.max(0, capMin - blockedMin);
+      const utilPct = capMin>0 ? Math.round((personMin/capMin)*100) : 0;
+      const utilAvailPct = availableMin>0 ? Math.round((personMin/availableMin)*100) : (personMin>0 ? 999 : 0);
+
+      const loadTxt = blockedMin>0
+        ? `Ocupación ${utilPct}% (${fmtH(personMin)} de ${fmtH(capMin)}) | Bloqueos ${fmtH(blockedMin)} | Sobre disponibilidad ${utilAvailPct}%`
+        : `Ocupación ${utilPct}% (${fmtH(personMin)} de ${fmtH(capMin)})`;
+
+      lines.push(``);
+      lines.push(`• ${ownerName} — ${loadTxt}`);
+
+      if(!acts.length){
+        lines.push(`  - Sin actividades asignadas`);
         return;
       }
 
-      o.projects.forEach((p)=>{
-        lines.push(`   ▸ Proyecto: ${p.projectName}${p.client ? ` · Equipo: ${p.client}` : ''}`);
-        p.rows.forEach(r=>lines.push(r));
+      acts.forEach(a=>{
+        const pri = PRIORITIES.includes(a.priority) ? a.priority : 'Media';
+        const proj = a.projectName || 'Proyecto sin nombre';
+        const task = a.taskName || 'Actividad';
+        const client = a.client || 'Interno';
+        lines.push(`  - ${a.startHour}-${a.endHour} | ${proj} | ${task} | Equipo: ${client} | Estatus: ${a.status} | Prioridad: ${pri}`);
       });
-
-      lines.push('');
     });
 
-    lines.push(`3) MENSAJE LISTO PARA ENVIAR`);
-    lines.push(`Buenos días equipo, comparto el plan de hoy: ${uniqueProjects.size} proyectos activos, ${activities.length} actividades y ${fmtH(totalMin)} planificadas. Si hay cruces de horario o ajustes de prioridad, los revisamos en el primer bloque de coordinación.`);
+    lines.push('');
+    lines.push('────────────────────────');
+    lines.push('*RESUMEN POR PROYECTO*');
+
+    projectRows.forEach(p=>{
+      const ownersTxt = Array.from(p.owners).sort((a,b)=>a.localeCompare(b, APP_LOCALE)).join(', ');
+      lines.push(`• ${p.projectName}${p.client ? ` (Equipo: ${p.client})` : ''} -> ${p.activities} actividad(es), ${fmtH(p.minutes)}, Responsable(s): ${ownersTxt}`);
+    });
+
+    lines.push('');
+    lines.push('────────────────────────');
+    lines.push('*MENSAJE LISTO PARA ENVIAR*');
+    lines.push(`Equipo, comparto la agenda del ${prettyDate}: ${uniqueProjects.size} proyectos activos, ${activities.length} actividades y ${fmtH(totalMin)} planificadas. Alertas actuales: ${conflicts} solape(s) y ${blockedConflicts} cruce(s) con bloqueos. Si hay cambios de prioridad, los ajustamos en el primer bloque de coordinación.`);
+
     return lines.join('\n');
   }
+
 
   function updateRoleUI(){
 
@@ -3390,7 +3457,7 @@ function buildDaySummaryText(dayISO=ui.date){
       copyBtn.className = 'btn';
       copyBtn.type = 'button';
       copyBtn.textContent = 'Resumen';
-      copyBtn.title = 'Copiar resumen formateado del día seleccionado';
+      copyBtn.title = 'Copiar resumen claro y listo para WhatsApp/Teams';
       copyBtn.addEventListener('click', copySelectedDaySummary);
     }
 
@@ -4894,7 +4961,73 @@ function buildDaySummaryText(dayISO=ui.date){
     renderTodayCards();
     renderPriorityRadar();
     renderView();
+    applyStatTooltips(document);
     $('lastUpdate').textContent = `${formatDateTime(new Date())} · ${labelView(ui.view)} · ${rangeLabel()}`;
+  }
+
+
+  function statTooltipByLabel(labelText=''){
+    const label = String(labelText || '').trim();
+    const key = label.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+
+    if(!key) return 'Indicador estadístico del tablero.';
+    if(key.includes('utilizacion') || key==='flujo' || key.includes('flujo')) return 'Ritmo de trabajo del equipo en el período visible: porcentaje de capacidad ya planificada respecto a la capacidad disponible.';
+    if(key.includes('capacidad libre')) return 'Horas disponibles que aún no tienen asignaciones para el período visible.';
+    if(key.includes('capacidad')) return 'Capacidad total disponible según horario y bloqueos del período visible.';
+    if(key.includes('alertas')) return 'Cantidad de alertas de ejecución detectadas (demoras, vencimientos próximos o riesgos).';
+    if(key.includes('conflictos')) return 'Cantidad de choques de agenda: solapes de actividades y asignaciones en horas bloqueadas.';
+    if(key.includes('proyectos')) return 'Número de proyectos considerados en la vista y filtros actuales.';
+    if(key.includes('ventana')) return 'Rango de fechas actualmente visible en la vista.';
+    if(key.includes('vista')) return 'Tipo de vista activa para calcular estas métricas.';
+    if(key.includes('alta') || key.includes('media') || key.includes('baja')) return 'Conteo de actividades por nivel de prioridad en el período visible.';
+    if(key.includes('libre')) return 'Tiempo disponible sin asignaciones para la persona o equipo en el período visible.';
+    if(key.includes('carga')) return 'Nivel de carga de trabajo respecto a la capacidad disponible.';
+    if(key.includes('avance')) return 'Avance del período en función del tiempo transcurrido.';
+    return `Indicador: ${label}.`;
+  }
+
+  function applyStatTooltips(root = document){
+    const scope = root || document;
+    const statSelectors = [
+      '.kpi',
+      '.day-kpi',
+      '.month-kpi',
+      '.road-kpi',
+      '.impact-kpi',
+      '.eq-kpi',
+      '.eq-leader-stat',
+      '.month-day-prio-kpi'
+    ];
+
+    scope.querySelectorAll(statSelectors.join(',')).forEach(card=>{
+      const labelEl = card.querySelector('.label,.k,.t');
+      const valueEl = card.querySelector('.val,.v');
+      const label = (labelEl?.textContent || '').replace(/\s+/g,' ').trim();
+      const value = (valueEl?.textContent || '').replace(/\s+/g,' ').trim();
+
+      const base = statTooltipByLabel(label);
+      const tip = value ? `${base} Valor actual: ${value}.` : base;
+
+      card.setAttribute('title', tip);
+      if(labelEl && !labelEl.getAttribute('title')) labelEl.setAttribute('title', base);
+      if(valueEl && !valueEl.getAttribute('title')) valueEl.setAttribute('title', value ? `${label || 'Indicador'}: ${value}` : (label || 'Indicador'));
+    });
+
+    scope.querySelectorAll('.person').forEach(card=>{
+      const personName = (card.querySelector('.n span')?.textContent || '').trim();
+      const meta = (card.querySelector('.meta')?.textContent || '').replace(/\s+/g,' ').trim();
+      if(personName || meta){
+        const tip = `Resumen de carga${personName ? ` de ${personName}` : ''}. ${meta || 'Incluye flujo, capacidad y tiempo libre.'}`;
+        card.setAttribute('title', tip);
+      }
+    });
+
+    scope.querySelectorAll('.kpi .pill,.month-kpi .s,.eq-kpi .s,.impact-kpi .s').forEach(el=>{
+      if(!el.getAttribute('title')){
+        const txt = (el.textContent || '').replace(/\s+/g,' ').trim();
+        if(txt) el.setAttribute('title', txt);
+      }
+    });
   }
 
   function renderHeaderControls(){
@@ -4948,7 +5081,7 @@ function buildDaySummaryText(dayISO=ui.date){
     $('kpiBand').innerHTML = `
       <div class="kpi">
         <div>
-          <div class="label">Utilización</div>
+          <div class="label">FLUJO</div>
           <div class="val">${util}%</div>
           <div class="sub">${fmtH(totalMin)} de ${fmtH(capMin)}</div>
         </div>
@@ -8392,6 +8525,7 @@ function buildDaySummaryText(dayISO=ui.date){
     if(!o) return;
     o.classList.add('open');
     document.body.style.overflow = 'hidden';
+    requestAnimationFrame(()=>applyStatTooltips(o));
   }
 
   function closeOverlay(id){
@@ -8468,7 +8602,7 @@ function buildDaySummaryText(dayISO=ui.date){
     if(util >= 100) return {label:'Crítica', className:'danger'};
     if(util >= 85) return {label:'Alta', className:'warn'};
     if(util >= 60) return {label:'Media', className:'warn'};
-    return {label:'Saludable', className:'ok'};
+    return {label:'Equilibrado', className:'ok'};
   }
 
   function findTeam(id){ return state.team.find(t=>t.id===id); }
