@@ -655,7 +655,7 @@
     .notif-card.status-done{border-color:color-mix(in srgb,var(--ok) 35%, var(--line))}
 
     .notif-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-    .notif-title{font-size:13px;font-weight:800;line-height:1.35}
+    .notif-title{font-size:13px;font-weight:700;line-height:1.35;text-transform:uppercase;letter-spacing:.2px}
     .notif-target{font-size:11px;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:6px}
     .notif-target i{font-size:10px;opacity:.9}
     .notif-msg{font-size:12px;line-height:1.45;white-space:pre-wrap}
@@ -670,7 +670,7 @@
       border-radius:999px;
       border:1px solid var(--line);
       font-size:10px;
-      font-weight:800;
+      font-weight:700;
       letter-spacing:.2px;
       text-transform:uppercase;
       white-space:nowrap;
@@ -708,6 +708,15 @@
       color:var(--muted);
       background:color-mix(in srgb,var(--surface-2) 70%, transparent);
       font-size:12px;
+    }
+    /* Notificaciones: acabado uniforme */
+    #tab_notifications :is(.notif-top,.notif-stat,.notif-controls-wrap,.notif-form,.notif-card,.notif-pill,.notif-empty,.ctrl,.btn),
+    #infoNotifBody :is(.notif-top,.notif-stat,.notif-controls-wrap,.notif-form,.notif-card,.notif-pill,.notif-empty,.ctrl,.btn){
+      border-radius:5px !important;
+    }
+    #tab_notifications .notif-action-btn,
+    #infoNotifBody .notif-action-btn{
+      font-weight:600;
     }
     .detail-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:12px}
     .detail-card{border:1px solid var(--line);border-radius:0;background:var(--surface);padding:10px}
@@ -8610,7 +8619,7 @@ function buildDaySummaryText(dayISO=ui.date){
           <div class="notif-meta-row">
             <div class="notif-meta"><i class="fa-regular fa-calendar" aria-hidden="true"></i> Recordatorio: ${esc(formatNotificationReminder(n))}</div>
             <div class="notif-actions">
-              <button class="btn" data-n-toggle="${esc(n.id)}">${n.done ? 'Reabrir' : 'Marcar atendida'}</button>
+              <button class="btn notif-action-btn" data-n-toggle="${esc(n.id)}">${n.done ? 'Reabrir' : 'Atender'}</button>
               ${isAdmin() ? `<button class="btn danger" data-n-del="${esc(n.id)}">Eliminar</button>` : ''}
             </div>
           </div>
@@ -8811,7 +8820,7 @@ function buildDaySummaryText(dayISO=ui.date){
           <div class="notif-meta-row">
             <div class="notif-meta"><i class="fa-regular fa-calendar" aria-hidden="true"></i> Recordatorio: ${esc(formatNotificationReminder(n))}</div>
             <div class="notif-actions">
-              <button class="btn" data-info-n-toggle="${esc(n.id)}">${n.done ? 'Reabrir' : 'Marcar atendida'}</button>
+              <button class="btn notif-action-btn" data-info-n-toggle="${esc(n.id)}">${n.done ? 'Reabrir' : 'Atender'}</button>
             </div>
           </div>
         </div>
