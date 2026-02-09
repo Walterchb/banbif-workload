@@ -2346,6 +2346,7 @@
       .eq-week-range{font-size:13px;font-weight:900;letter-spacing:-.12px}
       .eq-week-actions{display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
       .eq-week-nav .btn{white-space:nowrap}
+      .eq-week-label-short{display:none}
 
       .eq-hero-grid{
         display:grid;
@@ -2724,6 +2725,41 @@
         .eq-manual-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
       }
       @media (max-width:680px){
+        .eq-week-nav{
+          grid-template-columns:repeat(3,minmax(0,1fr));
+          gap:8px;
+          padding:10px;
+          align-items:stretch;
+        }
+        .eq-week-center{
+          grid-column:1 / -1;
+          order:1;
+          justify-items:center;
+          text-align:center;
+        }
+        .eq-week-nav > #eqWeekPrev{
+          order:2;
+          width:100%;
+          min-width:0;
+        }
+        .eq-week-actions{
+          order:3;
+          grid-column:2 / 4;
+          display:grid;
+          grid-template-columns:1fr 1fr;
+          gap:8px;
+          width:100%;
+          justify-content:stretch;
+          min-width:0;
+        }
+        .eq-week-actions .btn,
+        .eq-week-nav > #eqWeekPrev{
+          width:100%;
+          min-width:0;
+          white-space:nowrap;
+        }
+        .eq-week-label-long{display:none;}
+        .eq-week-label-short{display:inline;}
         .eq-manual-grid{grid-template-columns:1fr;}
         .eq-leader-name{font-size:17px}
         .eq-leader-card{padding:10px}
@@ -3750,14 +3786,14 @@ function buildDaySummaryText(dayISO=ui.date){
     mount.innerHTML = `
       <section class="eq-shell">
         <section class="eq-week-nav">
-          <button class="btn" id="eqWeekPrev" type="button">← Semana anterior</button>
+          <button class="btn" id="eqWeekPrev" type="button"><span class="eq-week-label-long">← Semana anterior</span><span class="eq-week-label-short">← Anterior</span></button>
           <div class="eq-week-center">
             <div class="eq-week-kicker">Semana visible</div>
             <div class="eq-week-range">${weekLabel}</div>
           </div>
           <div class="eq-week-actions">
-            <button class="btn" id="eqWeekToday" type="button">Semana actual</button>
-            <button class="btn" id="eqWeekNext" type="button">Semana siguiente →</button>
+            <button class="btn" id="eqWeekToday" type="button"><span class="eq-week-label-long">Semana actual</span><span class="eq-week-label-short">Hoy</span></button>
+            <button class="btn" id="eqWeekNext" type="button"><span class="eq-week-label-long">Semana siguiente →</span><span class="eq-week-label-short">Siguiente →</span></button>
           </div>
         </section>
 
@@ -7872,7 +7908,7 @@ function buildDaySummaryText(dayISO=ui.date){
 
     tab.innerHTML = `
       <div class="grid2">
-        <div class="card">
+        <div class="card" id="dataBackupCard">
           <h3>Respaldo</h3>
           <div class="small muted">Exporta o importa sin perder compatibilidad. Incluye proyectos, equipo, bloqueos, configuración manual de Equipo, feriados y tema visual.</div>
           <div class="row" style="margin-top:8px;flex-wrap:wrap">
@@ -7883,7 +7919,7 @@ function buildDaySummaryText(dayISO=ui.date){
           <div class="small muted" style="margin-top:8px">Al importar, se crea automáticamente un respaldo previo para reversión inmediata.</div>
         </div>
         <div class="card">
-          <h3>GitHub Pages (JSON remoto)</h3>
+          <h3>Sincronizar Datos</h3>
           <div class="small muted">Ruta configurada: <code>${esc(REMOTE_JSON_URL)}</code></div>
           <div class="row" style="margin-top:8px;flex-wrap:wrap">
             <button class="btn" id="btnSyncRemote">Actualizar desde JSON remoto</button>
@@ -7897,8 +7933,13 @@ function buildDaySummaryText(dayISO=ui.date){
           <button class="btn danger" id="btnResetAll">Reiniciar todo</button>
         </div>
       </div>
-      <div class="small muted" style="margin-top:8px">Tip: guarda backups antes de cambios masivos.</div>
+      ${isAdmin() ? '<div class="small muted" style="margin-top:8px">Tip: guarda backups antes de cambios masivos.</div>' : ''}
     `;
+
+    if(!isAdmin()){
+      const backupCard = $('dataBackupCard');
+      if(backupCard) backupCard.remove();
+    }
 
     const btnExport = $('btnExport');
     if(btnExport){
