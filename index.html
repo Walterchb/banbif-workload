@@ -531,7 +531,7 @@
 
 
     #btnInfo{position:relative;overflow:visible;isolation:isolate}
-    #btnInfo i{font-size:15px;line-height:1;transition:transform .18s ease, color .18s ease}
+    #btnInfo i{font-size: 13px;line-height:1;transition:transform .18s ease, color .18s ease}
     #btnInfo.has-alert{
       border-color:var(--notif-alert-border);
       background:var(--notif-alert-bg);
@@ -641,7 +641,7 @@
     .notif-list{display:grid;gap:10px;margin-top:10px}
     .notif-card{
       border:1px solid var(--line);
-      border-radius:12px;
+      border-radius:5px !important;
       background:var(--surface);
       padding:11px;
       display:grid;
@@ -667,7 +667,7 @@
       display:inline-flex;
       align-items:center;
       padding:3px 8px;
-      border-radius:999px;
+      border-radius:5px !important;
       border:1px solid var(--line);
       font-size:10px;
       font-weight:700;
@@ -724,6 +724,10 @@
     ){
       border-radius:5px !important;
     }
+
+    /* Compatibilidad: variantes "notify-*" */
+    .notify-card{border-radius:5px !important;}
+    .notify-pill{border-radius:5px !important;}
     #tab_notifications .notif-action-btn,
     #infoNotifBody .notif-action-btn{
       font-weight:600;
