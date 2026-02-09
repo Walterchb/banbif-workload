@@ -1,14 +1,14 @@
 {
   "meta": {
     "app": "banbif_workload",
-    "exportedAt": "2026-02-09T03:39:43.209Z",
+    "exportedAt": "2026-02-09T08:48:50.712Z",
     "version": 2,
     "schema": "full_backup",
     "counts": {
       "team": 3,
       "projects": 6,
-      "activities": 6,
-      "holidays": 0
+      "activities": 8,
+      "holidays": 2
     }
   },
   "state": {
@@ -96,8 +96,8 @@
             "startDate": "2026-01-01",
             "endDate": "2026-12-31",
             "allDay": false,
-            "startHour": "14:00",
-            "endHour": "15:00",
+            "startHour": "14:15",
+            "endHour": "15:30",
             "note": ""
           },
           {
@@ -125,8 +125,7 @@
           "role": "ESPECIALISTA",
           "area": "General",
           "responsibilities": [
-            "Prueba 1",
-            "Prueba 2"
+            "Por definir"
           ]
         },
         {
@@ -135,8 +134,11 @@
           "role": "ANALISTA",
           "area": "General",
           "responsibilities": [
-            "Prueba 1",
-            "Prueba 2"
+            "Reportar la concentración de Depositantes del Banco.",
+            "Analizar y reportar el movimiento de la posición USD.",
+            "Revisión contable ROF.",
+            "Presentación de Resultados.",
+            "Proyectos a demanda."
           ]
         },
         {
@@ -145,8 +147,10 @@
           "role": "PRACTICANTE",
           "area": "General",
           "responsibilities": [
-            "Prueba 1",
-            "Prueba 2"
+            "Alistar archivos de valorización.",
+            "Valorizar portafolios de RF.",
+            "Valorizar portafolios de FX.",
+            "Cálculo y reporte del P&L de la Tesorería."
           ]
         }
       ]
@@ -291,43 +295,67 @@
       },
       {
         "id": "p_2uawlm5",
-        "name": "Prueba Diana",
-        "client": "Distribución",
+        "name": "Reportes Diarios",
+        "client": "Interno",
         "reqDate": "2026-02-09",
         "startDate": "2026-02-09",
-        "endDate": "2026-02-13",
-        "priority": "Baja",
-        "recurrenceFrequency": "Ninguna",
+        "endDate": "2026-12-31",
+        "priority": "Media",
+        "recurrenceFrequency": "Diaria",
         "leaderId": "u_zqqvadc",
-        "importance": 2,
+        "importance": 3,
         "objective": "",
         "deliverable": "",
         "notes": "",
-        "isPrimaryFocus": false,
+        "isPrimaryFocus": true,
         "activities": [
           {
             "id": "a_4zgesuh",
             "name": "Presetear Archivos",
             "startDate": "2026-02-09",
-            "endDate": "2026-02-11",
+            "endDate": "2026-12-31",
             "startHour": "11:00",
-            "endHour": "13:00",
+            "endHour": "13:30",
             "ownerId": "u_zqqvadc",
-            "detail": "Prueba 1",
+            "detail": "Alistar y formatear archivos para las valorizaciones.",
             "done": false,
             "primaryFocus": false
           },
           {
             "id": "a_62hea17",
-            "name": "Implementar",
-            "startDate": "2026-02-12",
-            "endDate": "2026-02-13",
-            "startHour": "11:00",
-            "endHour": "13:00",
+            "name": "Enviar preliminares",
+            "startDate": "2026-02-09",
+            "endDate": "2026-12-31",
+            "startHour": "13:30",
+            "endHour": "14:15",
             "ownerId": "u_zqqvadc",
             "detail": "Esta es una prueba",
             "done": false,
             "primaryFocus": false
+          },
+          {
+            "id": "a_umvvsm6",
+            "name": "Ingresar Inputs",
+            "startDate": "2026-02-09",
+            "endDate": "2026-12-31",
+            "startHour": "17:00",
+            "endHour": "18:30",
+            "ownerId": "u_zqqvadc",
+            "detail": "Descarga y registro de información en archivos internos",
+            "done": false,
+            "primaryFocus": false
+          },
+          {
+            "id": "a_quqi59c",
+            "name": "Reportar Resultados",
+            "startDate": "2026-02-09",
+            "endDate": "2026-12-31",
+            "startHour": "18:30",
+            "endHour": "19:00",
+            "ownerId": "u_zqqvadc",
+            "detail": "Envío del P&L de todos los portafolios a la Tesorería",
+            "done": false,
+            "primaryFocus": true
           }
         ]
       }
@@ -335,7 +363,20 @@
   },
   "holidays": {
     "version": 1,
-    "items": []
+    "items": [
+      {
+        "id": "h_v7fsg5w",
+        "date": "2026-04-02",
+        "name": "Jueves Santo",
+        "active": true
+      },
+      {
+        "id": "h_c68aklv",
+        "date": "2026-04-03",
+        "name": "Viernes Santo",
+        "active": true
+      }
+    ]
   },
   "theme": "light",
   "ui": {
