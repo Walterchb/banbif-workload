@@ -709,9 +709,19 @@
       background:color-mix(in srgb,var(--surface-2) 70%, transparent);
       font-size:12px;
     }
-    /* Notificaciones: acabado uniforme */
-    #tab_notifications :is(.notif-top,.notif-stat,.notif-controls-wrap,.notif-form,.notif-card,.notif-pill,.notif-empty,.ctrl,.btn),
-    #infoNotifBody :is(.notif-top,.notif-stat,.notif-controls-wrap,.notif-form,.notif-card,.notif-pill,.notif-empty,.ctrl,.btn){
+    /* Notificaciones: radio uniforme (todo el contenido visual del modal) */
+    #tab_notifications :is(
+      .notif-top,.notif-toolbar-title,.notif-toolbar-sub,.notif-stats,.notif-stat,
+      .notif-controls-wrap,.notif-controls,.notif-form,.notif-list,.notif-card,
+      .notif-pill,.notif-empty,.notif-head,.notif-meta-row,.notif-meta,.notif-actions,
+      .ctrl,.btn,label,input,select,textarea,button,.row
+    ),
+    #infoNotifBody :is(
+      .notif-top,.notif-toolbar-title,.notif-toolbar-sub,.notif-stats,.notif-stat,
+      .notif-controls-wrap,.notif-controls,.notif-form,.notif-list,.notif-card,
+      .notif-pill,.notif-empty,.notif-head,.notif-meta-row,.notif-meta,.notif-actions,
+      .ctrl,.btn,label,input,select,textarea,button,.row
+    ){
       border-radius:5px !important;
     }
     #tab_notifications .notif-action-btn,
