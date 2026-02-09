@@ -22,6 +22,9 @@
       --radius:14px;
       --shadow:0 10px 30px rgba(2,8,23,.08);
       --hour-h:56px;
+      --notif-alert-bg:color-mix(in srgb, #ef4444 12%, var(--surface));
+      --notif-alert-ring:rgba(239,68,68,.45);
+      --notif-alert-dot:#ef4444;
     }
     html[data-theme="dark"]{
       --bg:#0b1220;
@@ -37,6 +40,9 @@
       --ok:#22c55e;
       --chip:#1b2b4a;
       --shadow:0 10px 30px rgba(0,0,0,.28);
+      --notif-alert-bg:color-mix(in srgb, #f87171 22%, var(--surface));
+      --notif-alert-ring:rgba(248,113,113,.52);
+      --notif-alert-dot:#fb7185;
     }
     *{box-sizing:border-box}
     body{
@@ -519,28 +525,56 @@
     .info-meta div{font-size:12px;color:var(--muted)}
     .info-meta b{color:var(--text)}
 
-    #btnInfo{position:relative;overflow:visible}
-    #btnInfo i{font-size:15px;line-height:1}
+    #btnInfo{position:relative;overflow:visible;isolation:isolate}
+    #btnInfo i{font-size:15px;line-height:1;transition:transform .2s ease, color .2s ease, filter .2s ease}
     #btnInfo.has-alert{
-      border-color:color-mix(in srgb,var(--danger) 45%, var(--line));
-      background:color-mix(in srgb,var(--danger) 12%, var(--surface));
+      border-color:color-mix(in srgb,var(--danger) 62%, var(--line));
+      background:var(--notif-alert-bg);
+      box-shadow:0 0 0 1px color-mix(in srgb,var(--danger) 18%, transparent) inset;
+    }
+    #btnInfo.has-alert i{
+      color:color-mix(in srgb,var(--danger) 78%, var(--text));
+      filter:drop-shadow(0 0 6px color-mix(in srgb,var(--danger) 35%, transparent));
+      animation:notifBellWiggle 2.2s ease-in-out infinite;
     }
     #btnInfo.has-alert::after{
       content:'';
       position:absolute;
-      top:4px;
-      right:5px;
-      width:9px;
-      height:9px;
+      top:2px;
+      right:3px;
+      width:10px;
+      height:10px;
       border-radius:999px;
-      background:var(--danger);
-      box-shadow:0 0 0 2px var(--surface);
+      background:var(--notif-alert-dot);
+      border:2px solid var(--surface);
+      box-shadow:
+        0 0 0 0 var(--notif-alert-ring),
+        0 0 14px color-mix(in srgb,var(--notif-alert-dot) 52%, transparent);
       pointer-events:none;
-      animation:notifPulse 1.7s ease-in-out infinite;
+      animation:notifDotBlink 1.15s steps(2,end) infinite, notifDotGlow 1.9s ease-out infinite;
     }
-    @keyframes notifPulse{
-      0%,100%{transform:scale(1);opacity:1}
-      50%{transform:scale(1.16);opacity:.86}
+    @keyframes notifDotBlink{
+      0%,100%{opacity:1}
+      50%{opacity:.28}
+    }
+    @keyframes notifDotGlow{
+      0%{transform:scale(1); box-shadow:0 0 0 0 var(--notif-alert-ring), 0 0 8px color-mix(in srgb,var(--notif-alert-dot) 40%, transparent);}
+      70%{transform:scale(1.08); box-shadow:0 0 0 7px color-mix(in srgb,var(--notif-alert-ring) 0%, transparent), 0 0 18px color-mix(in srgb,var(--notif-alert-dot) 55%, transparent);}
+      100%{transform:scale(1); box-shadow:0 0 0 0 color-mix(in srgb,var(--notif-alert-ring) 0%, transparent), 0 0 8px color-mix(in srgb,var(--notif-alert-dot) 35%, transparent);}
+    }
+    @keyframes notifBellWiggle{
+      0%,100%{transform:rotate(0)}
+      12%{transform:rotate(14deg)}
+      24%{transform:rotate(-10deg)}
+      36%{transform:rotate(7deg)}
+      48%{transform:rotate(-4deg)}
+      60%{transform:rotate(0)}
+    }
+    @media (prefers-reduced-motion: reduce){
+      #btnInfo.has-alert i,
+      #btnInfo.has-alert::after{
+        animation:none !important;
+      }
     }
 
     .notif-top{
@@ -1295,7 +1329,7 @@
           <button class="btn" id="btnManage">Administrar</button>
           <button class="btn primary" id="btnAdd">+ Proyecto</button>
           <button class="btn icon" id="btnTheme" title="Tema">☾</button>
-          <button class="btn icon" id="btnInfo" title="Notificaciones" aria-label="Notificaciones"><i class="fa-regular fa-bell" aria-hidden="true"></i></button>
+          <button class="btn icon" id="btnInfo" title="Notificaciones" aria-label="Notificaciones"><i class="fa-solid fa-bell" aria-hidden="true"></i></button>
         </div>
       </div>
 
@@ -8450,6 +8484,19 @@ function buildDaySummaryText(dayISO=ui.date){
     infoBtn.setAttribute('aria-label', tooltip);
   }
 
+  function rerenderNotifWithFocus(renderFn, inputId, value = '', caretPos = null){
+    renderFn();
+    requestAnimationFrame(()=>{
+      const input = $(inputId);
+      if(!input) return;
+      if(String(input.value || '') !== String(value || '')) input.value = String(value || '');
+      input.focus();
+      const len = input.value.length;
+      const pos = Number.isFinite(caretPos) ? Math.max(0, Math.min(caretPos, len)) : len;
+      try{ input.setSelectionRange(pos, pos); }catch(_){/* noop */}
+    });
+  }
+
   function upsertNotificationDone(id, doneValue){
     const nowIso = new Date().toISOString();
     state.notifications = sanitizeNotifications(
@@ -8582,8 +8629,14 @@ function buildDaySummaryText(dayISO=ui.date){
 
     $('manageNotifSearch')?.addEventListener('input', e=>{
       ui.manageNotifQ = String(e.target.value || '');
+      const caret = Number.isFinite(e.target.selectionStart) ? e.target.selectionStart : ui.manageNotifQ.length;
+      rerenderNotifWithFocus(renderManageNotifications, 'manageNotifSearch', ui.manageNotifQ, caret);
+    });
+    $('manageNotifSearch')?.addEventListener('search', e=>{
+      ui.manageNotifQ = String(e.target.value || '');
       renderManageNotifications();
     });
+
 
     $('manageNotifShowDone')?.addEventListener('change', e=>{
       ui.manageNotifShowDone = Boolean(e.target.checked);
@@ -8735,8 +8788,14 @@ function buildDaySummaryText(dayISO=ui.date){
 
     $('infoNotifSearch')?.addEventListener('input', e=>{
       ui.infoNotifQ = String(e.target.value || '');
+      const caret = Number.isFinite(e.target.selectionStart) ? e.target.selectionStart : ui.infoNotifQ.length;
+      rerenderNotifWithFocus(renderInfoNotifications, 'infoNotifSearch', ui.infoNotifQ, caret);
+    });
+    $('infoNotifSearch')?.addEventListener('search', e=>{
+      ui.infoNotifQ = String(e.target.value || '');
       renderInfoNotifications();
     });
+
 
     $('infoNotifShowDone')?.addEventListener('change', e=>{
       ui.infoNotifShowDone = Boolean(e.target.checked);
