@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Proyectos | Capitales &amp; Control de Gestión</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   <style>
     :root{
       --bg:#f3f5f8;
@@ -505,62 +506,124 @@
 
     /* Detail modal + availability */
     #detailOverlay .modal{width:min(980px,96vw)}
-    #infoOverlay .modal{width:min(520px,92vw)}
-    .info-body{display:grid;gap:10px}
+    #infoOverlay .modal{width:min(760px,94vw)}
+    .info-modal .m-head{
+      background:linear-gradient(180deg, color-mix(in srgb,var(--primary) 12%, var(--surface-2)), var(--surface-2));
+    }
+    .info-modal .m-head b{display:inline-flex;align-items:center;gap:8px;font-size:15px}
+    .info-modal .m-head b i{font-size:14px;color:var(--primary)}
+    .info-modal .m-body{padding:14px}
+    .info-body{display:grid;gap:12px}
     .info-line{font-size:13px;line-height:1.45}
-    .info-meta{border:1px solid var(--line);border-radius:10px;background:var(--surface-2);padding:10px;display:grid;gap:8px}
+    .info-meta{border:1px solid var(--line);border-radius:12px;background:var(--surface-2);padding:10px;display:grid;gap:8px}
     .info-meta div{font-size:12px;color:var(--muted)}
     .info-meta b{color:var(--text)}
-    #btnInfo{position:relative}
-    #btnInfo.has-alert{border-color:color-mix(in srgb,var(--danger) 55%, var(--line));}
+
+    #btnInfo{position:relative;overflow:visible}
+    #btnInfo i{font-size:15px;line-height:1}
+    #btnInfo.has-alert{
+      border-color:color-mix(in srgb,var(--danger) 45%, var(--line));
+      background:color-mix(in srgb,var(--danger) 12%, var(--surface));
+    }
     #btnInfo.has-alert::after{
-      content:attr(data-badge);
+      content:'';
       position:absolute;
-      top:-5px;
-      right:-5px;
-      min-width:16px;
-      height:16px;
-      padding:0 4px;
+      top:4px;
+      right:5px;
+      width:9px;
+      height:9px;
       border-radius:999px;
-      font-size:10px;
-      font-weight:800;
-      line-height:16px;
-      text-align:center;
-      color:#fff;
       background:var(--danger);
       box-shadow:0 0 0 2px var(--surface);
       pointer-events:none;
+      animation:notifPulse 1.7s ease-in-out infinite;
     }
-    .notif-top{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-    .notif-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    .notif-controls .ctrl{min-width:180px}
-    .notif-form{
+    @keyframes notifPulse{
+      0%,100%{transform:scale(1);opacity:1}
+      50%{transform:scale(1.16);opacity:.86}
+    }
+
+    .notif-top{
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      justify-content:space-between;
+      flex-wrap:wrap;
       border:1px solid var(--line);
-      border-radius:10px;
-      background:var(--surface-2);
-      padding:10px;
-      display:grid;
-      grid-template-columns:1.1fr 1fr .8fr .7fr auto;
-      gap:8px;
-      align-items:end;
+      border-radius:12px;
+      background:linear-gradient(180deg, color-mix(in srgb,var(--surface-2) 92%, transparent), var(--surface));
+      padding:12px;
     }
-    .notif-list{display:grid;gap:8px}
-    .notif-card{
+    .notif-toolbar-title{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:14px;
+      font-weight:800;
+      letter-spacing:.1px;
+    }
+    .notif-toolbar-title i{color:var(--primary);font-size:13px}
+    .notif-toolbar-sub{margin-top:4px;font-size:12px;color:var(--muted);line-height:1.4}
+    .notif-stats{display:flex;gap:8px;flex-wrap:wrap}
+    .notif-stat{
+      min-width:94px;
+      padding:8px 10px;
       border:1px solid var(--line);
       border-radius:10px;
       background:var(--surface);
+      text-align:center;
+    }
+    .notif-stat b{display:block;font-size:15px;line-height:1.1}
+    .notif-stat span{font-size:11px;color:var(--muted)}
+
+    .notif-controls-wrap{
+      margin-top:10px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:var(--surface);
       padding:10px;
       display:grid;
-      gap:8px;
+      gap:10px;
     }
-    .notif-card.done{opacity:.78}
+    .notif-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .notif-controls .ctrl{min-width:180px}
+
+    .notif-form{
+      margin-top:10px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:linear-gradient(180deg, color-mix(in srgb,var(--surface-2) 94%, transparent), var(--surface));
+      padding:12px;
+      display:grid;
+      grid-template-columns:1.1fr 1fr .85fr .8fr auto;
+      gap:8px;
+      align-items:end;
+    }
+    .notif-list{display:grid;gap:10px;margin-top:10px}
+    .notif-card{
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:var(--surface);
+      padding:11px;
+      display:grid;
+      gap:8px;
+      box-shadow:0 8px 20px rgba(2,8,23,.06);
+    }
+    .notif-card.done{opacity:.82}
+    .notif-card.status-overdue{border-color:color-mix(in srgb,var(--danger) 45%, var(--line))}
+    .notif-card.status-today{border-color:color-mix(in srgb,var(--warn) 45%, var(--line))}
+    .notif-card.status-scheduled{border-color:color-mix(in srgb,var(--primary) 35%, var(--line))}
+    .notif-card.status-done{border-color:color-mix(in srgb,var(--ok) 35%, var(--line))}
+
     .notif-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
     .notif-title{font-size:13px;font-weight:800;line-height:1.35}
-    .notif-target{font-size:11px;color:var(--muted);margin-top:2px}
+    .notif-target{font-size:11px;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:6px}
+    .notif-target i{font-size:10px;opacity:.9}
     .notif-msg{font-size:12px;line-height:1.45;white-space:pre-wrap}
     .notif-meta-row{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-    .notif-meta{font-size:11px;color:var(--muted)}
+    .notif-meta{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px}
     .notif-actions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
+
     .notif-pill{
       display:inline-flex;
       align-items:center;
@@ -597,6 +660,15 @@
       color:var(--muted);
       border-color:var(--line);
       background:transparent;
+    }
+    .notif-empty{
+      border:1px dashed var(--line);
+      border-radius:12px;
+      padding:16px;
+      text-align:center;
+      color:var(--muted);
+      background:color-mix(in srgb,var(--surface-2) 70%, transparent);
+      font-size:12px;
     }
     .detail-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:12px}
     .detail-card{border:1px solid var(--line);border-radius:0;background:var(--surface);padding:10px}
@@ -1223,7 +1295,7 @@
           <button class="btn" id="btnManage">Administrar</button>
           <button class="btn primary" id="btnAdd">+ Proyecto</button>
           <button class="btn icon" id="btnTheme" title="Tema">☾</button>
-          <button class="btn icon" id="btnInfo" title="Información" aria-label="Información">i</button>
+          <button class="btn icon" id="btnInfo" title="Notificaciones" aria-label="Notificaciones"><i class="fa-regular fa-bell" aria-hidden="true"></i></button>
         </div>
       </div>
 
@@ -1480,7 +1552,7 @@
   <div class="overlay" id="infoOverlay">
     <div class="modal info-modal">
       <div class="m-head">
-        <b>Notificaciones</b>
+        <b><i class="fa-solid fa-bell" aria-hidden="true"></i> Notificaciones</b>
         <button class="btn" data-close="infoOverlay">✕</button>
       </div>
       <div class="m-body info-body" id="infoBody"></div>
@@ -2068,6 +2140,9 @@
         .notif-form button{grid-column:span 2}
       }
       @media (max-width:760px){
+        .notif-top{padding:10px}
+        .notif-stats{width:100%}
+        .notif-stat{flex:1 1 30%}
         .notif-controls{width:100%}
         .notif-controls .ctrl{min-width:100%}
         .notif-form{grid-template-columns:1fr}
@@ -8357,15 +8432,22 @@ function buildDaySummaryText(dayISO=ui.date){
     const infoBtn = $('btnInfo');
     if(!infoBtn) return;
 
-    const pending = countPendingNotifications(state.notifications || []);
-    const badge = pending > 99 ? '99+' : String(pending);
+    const dueCount = (state.notifications || []).filter(n=>isNotificationDue(n)).length;
+    const pendingCount = countPendingNotifications(state.notifications || []);
 
-    infoBtn.classList.toggle('has-alert', pending > 0);
-    if(pending > 0) infoBtn.setAttribute('data-badge', badge);
-    else infoBtn.removeAttribute('data-badge');
+    infoBtn.classList.toggle('has-alert', dueCount > 0);
 
-    const suffix = pending > 0 ? ` · ${pending} recordatorio(s) pendiente(s)` : '';
-    infoBtn.title = `Notificaciones${suffix}`;
+    let tooltip = 'Notificaciones';
+    if(dueCount > 0){
+      tooltip += ` · ${dueCount} recordatorio(s) por fecha`;
+    } else if(pendingCount > 0){
+      tooltip += ` · ${pendingCount} pendiente(s)`;
+    } else {
+      tooltip += ' · Sin pendientes';
+    }
+
+    infoBtn.title = tooltip;
+    infoBtn.setAttribute('aria-label', tooltip);
   }
 
   function upsertNotificationDone(id, doneValue){
@@ -8411,21 +8493,22 @@ function buildDaySummaryText(dayISO=ui.date){
 
     const due = filtered.filter(n=>isNotificationDue(n)).length;
     const pending = filtered.filter(n=>!n.done).length;
+    const attended = filtered.filter(n=>n.done).length;
 
     const cards = filtered.map(n=>{
       const st = notificationStatus(n);
       return `
-        <div class="notif-card ${n.done?'done':''}">
+        <div class="notif-card status-${st.cls} ${n.done?'done':''}">
           <div class="notif-head">
             <div>
               <div class="notif-title">${esc(n.title)}</div>
-              <div class="notif-target">Para: ${esc(notificationTargetName(n.userId))}</div>
+              <div class="notif-target"><i class="fa-regular fa-user" aria-hidden="true"></i> Para: ${esc(notificationTargetName(n.userId))}</div>
             </div>
             <span class="notif-pill ${st.cls}">${st.label}</span>
           </div>
-          <div class="notif-msg">${n.message ? esc(n.message) : '<span class="muted">Sin detalle</span>'}</div>
+          <div class="notif-msg">${n.message ? esc(n.message) : '<span class="muted">Sin detalle adicional</span>'}</div>
           <div class="notif-meta-row">
-            <div class="notif-meta">Recordatorio: ${esc(formatNotificationReminder(n))}</div>
+            <div class="notif-meta"><i class="fa-regular fa-calendar" aria-hidden="true"></i> Recordatorio: ${esc(formatNotificationReminder(n))}</div>
             <div class="notif-actions">
               <button class="btn" data-n-toggle="${esc(n.id)}">${n.done ? 'Reabrir' : 'Marcar atendida'}</button>
               ${isAdmin() ? `<button class="btn danger" data-n-del="${esc(n.id)}">Eliminar</button>` : ''}
@@ -8436,7 +8519,19 @@ function buildDaySummaryText(dayISO=ui.date){
     }).join('');
 
     tab.innerHTML = `
-      <div class="notif-top" style="margin-bottom:8px">
+      <div class="notif-top">
+        <div>
+          <div class="notif-toolbar-title"><i class="fa-solid fa-bell" aria-hidden="true"></i> Centro de notificaciones</div>
+          <div class="notif-toolbar-sub">Registra recordatorios por usuario, filtra rápidamente y controla vencimientos del equipo.</div>
+        </div>
+        <div class="notif-stats">
+          <div class="notif-stat"><b>${pending}</b><span>Pendientes</span></div>
+          <div class="notif-stat"><b>${due}</b><span>Vencidas / Hoy</span></div>
+          <div class="notif-stat"><b>${attended}</b><span>Atendidas</span></div>
+        </div>
+      </div>
+
+      <div class="notif-controls-wrap">
         <div class="notif-controls">
           <select class="ctrl" id="manageNotifFilterUser">${userOptions}</select>
           <input class="ctrl" id="manageNotifSearch" type="search" placeholder="Buscar notificación..." value="${esc(ui.manageNotifQ)}" />
@@ -8445,11 +8540,10 @@ function buildDaySummaryText(dayISO=ui.date){
             Mostrar atendidas
           </label>
         </div>
-        <div class="small muted">Pendientes: ${pending} · Vencidas/hoy: ${due}</div>
       </div>
 
       ${isAdmin() ? `
-      <div class="notif-form" style="margin-bottom:10px">
+      <div class="notif-form">
         <div>
           <label class="label">Título</label>
           <input class="ctrl" id="notifTitle" maxlength="120" placeholder="Ej. Enviar reporte de concentración" />
@@ -8475,10 +8569,10 @@ function buildDaySummaryText(dayISO=ui.date){
             <input class="ctrl" id="notifTime" type="time" />
           </div>
         </div>
-        <button class="btn primary" id="notifAddBtn">Agregar</button>
-      </div>` : '<div class="small muted" style="margin-bottom:10px">Modo lectura: puedes buscar y revisar notificaciones.</div>'}
+        <button class="btn primary" id="notifAddBtn"><i class="fa-solid fa-plus" aria-hidden="true"></i> Agregar</button>
+      </div>` : '<div class="small muted" style="margin-top:10px">Modo lectura: puedes buscar y revisar notificaciones.</div>'}
 
-      <div class="notif-list">${cards || '<div class="muted">No hay notificaciones para el filtro seleccionado.</div>'}</div>
+      <div class="notif-list">${cards || '<div class="notif-empty">No hay notificaciones para el filtro seleccionado.</div>'}</div>
     `;
 
     $('manageNotifFilterUser')?.addEventListener('change', e=>{
@@ -8576,21 +8670,22 @@ function buildDaySummaryText(dayISO=ui.date){
 
     const due = filtered.filter(n=>isNotificationDue(n)).length;
     const pending = filtered.filter(n=>!n.done).length;
+    const attended = filtered.filter(n=>n.done).length;
 
     const cards = filtered.map(n=>{
       const st = notificationStatus(n);
       return `
-        <div class="notif-card ${n.done?'done':''}">
+        <div class="notif-card status-${st.cls} ${n.done?'done':''}">
           <div class="notif-head">
             <div>
               <div class="notif-title">${esc(n.title)}</div>
-              <div class="notif-target">Para: ${esc(notificationTargetName(n.userId))}</div>
+              <div class="notif-target"><i class="fa-regular fa-user" aria-hidden="true"></i> Para: ${esc(notificationTargetName(n.userId))}</div>
             </div>
             <span class="notif-pill ${st.cls}">${st.label}</span>
           </div>
-          <div class="notif-msg">${n.message ? esc(n.message) : '<span class="muted">Sin detalle</span>'}</div>
+          <div class="notif-msg">${n.message ? esc(n.message) : '<span class="muted">Sin detalle adicional</span>'}</div>
           <div class="notif-meta-row">
-            <div class="notif-meta">Recordatorio: ${esc(formatNotificationReminder(n))}</div>
+            <div class="notif-meta"><i class="fa-regular fa-calendar" aria-hidden="true"></i> Recordatorio: ${esc(formatNotificationReminder(n))}</div>
             <div class="notif-actions">
               <button class="btn" data-info-n-toggle="${esc(n.id)}">${n.done ? 'Reabrir' : 'Marcar atendida'}</button>
             </div>
@@ -8600,8 +8695,19 @@ function buildDaySummaryText(dayISO=ui.date){
     }).join('');
 
     body.innerHTML = `
-      <div class="info-line">Revisa, busca y gestiona recordatorios del equipo por usuario.</div>
       <div class="notif-top">
+        <div>
+          <div class="notif-toolbar-title"><i class="fa-solid fa-bell" aria-hidden="true"></i> Recordatorios del equipo</div>
+          <div class="notif-toolbar-sub">Visualiza alertas por usuario y marca recordatorios como atendidos desde este panel.</div>
+        </div>
+        <div class="notif-stats">
+          <div class="notif-stat"><b>${pending}</b><span>Pendientes</span></div>
+          <div class="notif-stat"><b>${due}</b><span>Vencidas / Hoy</span></div>
+          <div class="notif-stat"><b>${attended}</b><span>Atendidas</span></div>
+        </div>
+      </div>
+
+      <div class="notif-controls-wrap">
         <div class="notif-controls">
           <select class="ctrl" id="infoNotifFilterUser">${userOptions}</select>
           <input class="ctrl" id="infoNotifSearch" type="search" placeholder="Buscar..." value="${esc(ui.infoNotifQ)}" />
@@ -8610,16 +8716,16 @@ function buildDaySummaryText(dayISO=ui.date){
             Mostrar atendidas
           </label>
         </div>
-        <div class="small muted">Pendientes: ${pending} · Vencidas/hoy: ${due}</div>
       </div>
-      <div class="notif-list">${cards || '<div class="muted">No hay notificaciones para el filtro seleccionado.</div>'}</div>
+
+      <div class="notif-list">${cards || '<div class="notif-empty">No hay notificaciones para el filtro seleccionado.</div>'}</div>
     `;
 
     const footer = $('infoFooterNote');
     if(footer){
       footer.textContent = due > 0
         ? `${due} recordatorio(s) pendiente(s) por fecha`
-        : 'Sin recordatorios vencidos por ahora';
+        : (pending > 0 ? `${pending} recordatorio(s) pendiente(s)` : 'Sin recordatorios pendientes por ahora');
     }
 
     $('infoNotifFilterUser')?.addEventListener('change', e=>{
