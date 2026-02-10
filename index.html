@@ -2818,8 +2818,9 @@
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   const rid = (p='id') => `${p}_${Math.random().toString(36).slice(2,9)}`;
 
-  let state = sanitizeState(loadState());
-  let holidaysState = sanitizeHolidayStore(loadHolidays(state));
+  const _loadedState = loadState();
+  let holidaysState = sanitizeHolidayStore(loadHolidays(_loadedState));
+  let state = sanitizeState(_loadedState);
   let impactDecisionResolver = null;
 
   function init(){
