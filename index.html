@@ -154,7 +154,46 @@
       display:grid;grid-template-columns:repeat(4, minmax(180px, 1fr));gap:10px;
     }
     @media (max-width:1200px){ .kpi-band{grid-template-columns:repeat(2, minmax(180px, 1fr));} }
-    @media (max-width:700px){ .kpi-band{grid-template-columns:1fr;} }
+    @media (max-width:700px){
+      .kpi-band{
+        grid-template-columns:repeat(2, minmax(0, 1fr));
+        gap:8px;
+        align-items:stretch;
+      }
+      .kpi{
+        padding:10px;
+        min-height:96px;
+        height:100%;
+        display:grid;
+        grid-template-columns:minmax(0,1fr) auto;
+        column-gap:8px;
+        align-items:start;
+      }
+      .kpi > div{min-width:0}
+      .kpi .label{
+        font-size:10px;
+        letter-spacing:.25px;
+        min-height:22px;
+        line-height:1.12;
+        display:flex;
+        align-items:flex-start;
+      }
+      .kpi .val{font-size:20px;line-height:1;margin-top:2px}
+      .kpi .sub{
+        font-size:10px;
+        min-height:20px;
+        line-height:1.12;
+        display:flex;
+        align-items:flex-end;
+      }
+      .kpi .pill{
+        font-size:10px;
+        padding:3px 6px;
+        white-space:nowrap;
+        justify-self:end;
+        align-self:start;
+      }
+    }
 
     .kpi{
       padding:12px;
@@ -7639,17 +7678,17 @@ function buildDaySummaryText(dayISO=ui.date){
       </div>
       <div class="kpi">
         <div>
-          <div class="label">Capacidad libre</div>
+          <div class="label">Disponible</div>
           <div class="val">${fmtH(freeMin)}</div>
           <div class="sub">${team.length} recurso(s)</div>
         </div>
-        <span class="pill">bloqueada: ${fmtH(team.reduce((a,t)=>a+sumBlockedMinutes(t,day),0))}</span>
+        <span class="pill">Restricción: ${fmtH(team.reduce((a,t)=>a+sumBlockedMinutes(t,day),0))}</span>
       </div>
       <div class="kpi">
         <div>
           <div class="label">Alertas ejecución</div>
           <div class="val">${alertTotal}</div>
-          <div class="sub">demoradas ${risks.overdue} · vencen ≤2d ${risks.dueSoon}</div>
+          <div class="sub">Demoras ${risks.overdue} · vencen ≤2d ${risks.dueSoon}</div>
         </div>
         <span class="pill ${alertTotal>=6?'danger':alertTotal>=3?'warn':'ok'}">${alertTotal>=6?'Alta':'Normal'}</span>
       </div>
@@ -7657,7 +7696,7 @@ function buildDaySummaryText(dayISO=ui.date){
         <div>
           <div class="label">Conflictos agenda</div>
           <div class="val">${risks.conflicts + risks.blocked}</div>
-          <div class="sub">solapes: ${risks.conflicts} · en bloqueos: ${risks.blocked}</div>
+          <div class="sub">Cruces: ${risks.conflicts} · En restricción: ${risks.blocked}</div>
         </div>
         <span class="pill ${(risks.conflicts+risks.blocked)>0?'warn':'ok'}">${(risks.conflicts+risks.blocked)>0?'Revisar':'OK'}</span>
       </div>
