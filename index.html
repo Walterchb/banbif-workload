@@ -802,6 +802,16 @@
   display:flex;
   gap:7px;
   flex-wrap:wrap;
+  align-items:center;
+}
+.summary-reset-inline{
+  margin-left:auto;
+  height:29px;
+  border-radius:5px;
+  padding:0 11px;
+  font-size:10.8px;
+  font-weight:800;
+  white-space:nowrap;
 }
 .summary-preset{
   border:1px solid var(--line);
@@ -1069,6 +1079,18 @@
   display:grid;
   gap:6px;
 }
+.brief-scroll{
+  max-height:248px;
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding-right:2px;
+  -webkit-mask-image:linear-gradient(to bottom, transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%);
+  mask-image:linear-gradient(to bottom, transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%);
+}
+.brief-scroll-activities .brief-list{
+  padding-top:2px;
+  padding-bottom:2px;
+}
 .brief-item{
   border:1px solid color-mix(in srgb,var(--line) 75%, transparent);
   border-radius:5px;
@@ -1187,6 +1209,8 @@
   }
   .summary-preset-strip::-webkit-scrollbar{height:4px}
   .summary-preset{flex:0 0 auto}
+  .summary-reset-inline{flex:0 0 auto;margin-left:auto}
+  #summaryOverlay #summaryQuery.ctrl{font-size:16px !important}
   .summary-layout{grid-template-columns:1fr}
   .summary-panel{
     order:1;
@@ -4510,6 +4534,16 @@ function openAccessGate(){
 
   function collectSummaryRows(startDate, endDate){
     const today = todayISO();
+    const observedDate = normalizeISO(endDate) || today;
+    const statusByObserved = (startISO, endISO, isDone=false)=>{
+      const s = normalizeISO(startISO);
+      const e = normalizeISO(endISO) || s;
+      if(!s || !e) return 'Programado';
+      if(isDone) return 'Finalizado';
+      if(observedDate < s) return 'Programado';
+      if(observedDate > e) return 'Demorado';
+      return 'En curso';
+    };
     const activityRows = [];
     const projectRows = [];
 
@@ -4521,7 +4555,7 @@ function openAccessGate(){
       const allDone = activities.length > 0 && activities.every(a=>Boolean(a.done));
 
       occurrences.forEach(occ=>{
-        const status = allDone ? 'Finalizado' : autoStatusByDates(occ.startDate, occ.endDate, false, today);
+        const status = statusByObserved(occ.startDate, occ.endDate, allDone);
         const ownerIds = Array.from(new Set(activities.map(a=>String(a.ownerId || '')).filter(Boolean)));
         const ownerNames = ownerIds.map(id=>findTeam(id)?.name).filter(Boolean);
 
@@ -4532,7 +4566,7 @@ function openAccessGate(){
           client: String(project.client || 'Interno').trim() || 'Interno',
           priority: PRIORITIES.includes(project.priority) ? project.priority : 'Media',
           status,
-          pending: status !== 'Finalizado',
+          pending: !allDone && (status === 'En curso' || status === 'Demorado'),
           overdue: status === 'Demorado',
           startDate: occ.startDate,
           endDate: occ.endDate,
@@ -4567,8 +4601,8 @@ function openAccessGate(){
           if(occEnd < startDate || occStart > endDate) return;
 
           const enriched = { ...activity, startDate:occStart, endDate:occEnd, done:Boolean(activity.done) };
-          const status = activityStatus(enriched, today, project);
-          const done = Boolean(enriched.done || status === 'Finalizado');
+          const done = Boolean(enriched.done);
+          const status = statusByObserved(occStart, occEnd, done);
 
           activityRows.push({
             id: `${project.id}::${activity.id}::${occ.index}`,
@@ -4581,7 +4615,7 @@ function openAccessGate(){
             priority: PRIORITIES.includes(project.priority) ? project.priority : 'Media',
             status,
             done,
-            pending: !done && status !== 'Finalizado',
+            pending: !done && (status === 'En curso' || status === 'Demorado'),
             overdue: status === 'Demorado',
             startDate: occStart,
             endDate: occEnd,
@@ -4973,6 +5007,7 @@ function openAccessGate(){
           notifications: Boolean(filters.includeNotifications)
         },
         selectedOutputLabels: selectedOutputLabels.slice(),
+        visibleActivities: visibleActivities.slice(),
         topActivities: criticalActivities.slice(0, 8),
         topProjects: visibleProjects
           .filter(p=>p.overdue || p.pending)
@@ -5059,44 +5094,25 @@ function renderSummaryReadable(result, filters){
 
   const outputText = selectedOutputs.length ? selectedOutputs.join(', ') : 'Ninguna';
 
-  const topActs = Array.isArray(details.topActivities) ? details.topActivities.slice(0, 6) : [];
-  const topProjects = Array.isArray(details.topProjects) ? details.topProjects.slice(0, 6) : [];
+  const allFilteredActivities = Array.isArray(details.visibleActivities) ? details.visibleActivities : [];
   const topNotifs = Array.isArray(details.topNotifications) ? details.topNotifications.slice(0, 6) : [];
   const groups = Array.isArray(details.groupBreakdown) ? details.groupBreakdown.slice(0, 6) : [];
 
-  const overdueActivities = topActs.filter(a=>a.overdue);
-  const pendingActivities = topActs.filter(a=>!a.overdue);
-  const overdueProjects = topProjects.filter(p=>p.overdue);
-  const pendingProjects = topProjects.filter(p=>!p.overdue && p.pending);
-  const urgentList = overdueActivities.length ? overdueActivities : pendingActivities;
-  const urgentProjectList = overdueProjects.length ? overdueProjects : pendingProjects;
-
   const urgentHtml = outputFlags.activities
-    ? (urgentList.length
-      ? urgentList.map(a=>{
+    ? (allFilteredActivities.length
+      ? allFilteredActivities.map(a=>{
           const range = a.startDate === a.endDate ? fmtDate(a.startDate) : `${fmtDate(a.startDate)} → ${fmtDate(a.endDate)}`;
           const hour = a.startHour && a.endHour ? ` · ${a.startHour}-${a.endHour}` : '';
-          const cls = a.overdue ? 'urgent' : 'warn';
+          const cls = a.overdue ? 'urgent' : (a.pending ? 'warn' : 'ok');
+          const statusLabel = a.done ? 'Finalizado' : (a.status || (a.pending ? 'Pendiente' : 'Programado'));
           return `<li class="brief-item ${cls}">
             <div class="t">${esc(a.taskName || 'Actividad')}</div>
             <div class="m">${esc(a.ownerName || 'Sin responsable')} · ${esc(a.projectName || 'Sin proyecto')}</div>
-            <div class="m">${esc(range + hour)}</div>
+            <div class="m">${esc(range + hour)} · ${esc(statusLabel)}</div>
           </li>`;
         }).join('')
-      : `<li class="brief-empty">No hay actividades críticas en este rango.</li>`)
-    : (outputFlags.projects
-      ? (urgentProjectList.length
-        ? urgentProjectList.map(p=>{
-            const range = p.startDate === p.endDate ? fmtDate(p.startDate) : `${fmtDate(p.startDate)} → ${fmtDate(p.endDate)}`;
-            const cls = p.overdue ? 'urgent' : 'warn';
-            return `<li class="brief-item ${cls}">
-              <div class="t">${esc(p.projectName || 'Proyecto')}</div>
-              <div class="m">${esc(p.leaderName || 'Sin líder')} · ${esc(p.priority || '')}</div>
-              <div class="m">${esc(range)}</div>
-            </li>`;
-          }).join('')
-        : `<li class="brief-empty">No hay proyectos críticos en este rango.</li>`)
-      : `<li class="brief-empty">Bloque Actividades/Proyectos no incluido en SALIDA.</li>`);
+      : `<li class="brief-empty">No hay actividades para este criterio.</li>`)
+    : `<li class="brief-empty">Bloque Actividades no incluido en SALIDA.</li>`;
 
   const notifHtml = !outputFlags.notifications
     ? `<li class="brief-empty">Bloque Notificaciones no incluido en SALIDA.</li>`
@@ -5159,7 +5175,7 @@ function renderSummaryReadable(result, filters){
     <section class="brief-grid">
       <article class="brief-card">
         <h5><i class="fa-solid fa-bolt" aria-hidden="true"></i> Atención inmediata</h5>
-        <ul class="brief-list">${urgentHtml}</ul>
+        <div class="brief-scroll brief-scroll-activities"><ul class="brief-list">${urgentHtml}</ul></div>
       </article>
 
       <article class="brief-card">
@@ -5314,15 +5330,13 @@ function getSummaryFiltersFromControls(){
           <div class="summary-command-title"><i class="fa-solid fa-gauge-high" aria-hidden="true"></i> Centro de reporte</div>
           <div class="summary-command-sub">Ajusta filtros si hace falta. El reporte se actualiza en automático.</div>
         </div>
-        <div class="summary-command-actions">
-          <button class="btn" id="btnSummaryResetFilters">Limpiar filtros</button>
-        </div>
       </div>
 
       <div class="summary-preset-strip">
         <button class="summary-preset ${activePreset==='week'?'active':''}" data-summary-preset="week">Semana</button>
         <button class="summary-preset ${activePreset==='today'?'active':''}" data-summary-preset="today">Hoy</button>
         <button class="summary-preset ${activePreset==='high'?'active':''}" data-summary-preset="high">ALTA</button>
+        <button class="btn summary-reset-inline" id="btnSummaryResetFilters">Limpiar filtros</button>
       </div>
     </section>
 
