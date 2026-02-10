@@ -6914,8 +6914,12 @@ function buildDaySummaryText(dayISO=ui.date){
       out.projects = s.projects.map((p,idx)=>{
         const sDate = normalizeISO(p?.startDate) || toISO(new Date());
         const eDate = normalizeISO(p?.endDate) || sDate;
-        const startDate = minISO(sDate, eDate);
-        const endDate = maxISO(sDate, eDate);
+        let startDate = minISO(sDate, eDate);
+        let endDate = maxISO(sDate, eDate);
+
+        if(isNonWorkingDayISO(startDate)) startDate = nextBusinessDayISO(startDate);
+        if(isNonWorkingDayISO(endDate)) endDate = nextBusinessDayISO(endDate);
+        if(startDate > endDate) endDate = startDate;
 
         const leaderId = teamIds.has(p?.leaderId) ? p.leaderId : out.team[0].id;
 
@@ -6923,8 +6927,11 @@ function buildDaySummaryText(dayISO=ui.date){
         const activities = acts.map((a,i)=>{
           const as = normalizeISO(a?.startDate) || startDate;
           const ae = normalizeISO(a?.endDate) || as;
-          const aStart = minISO(as,ae);
-          const aEnd = maxISO(as,ae);
+          let aStart = minISO(as,ae);
+          let aEnd = maxISO(as,ae);
+
+          if(isNonWorkingDayISO(aStart)) aStart = nextBusinessDayISO(aStart);
+          if(isNonWorkingDayISO(aEnd)) aEnd = nextBusinessDayISO(aEnd);
 
           let sh = normalizeHHMM(a?.startHour, '09:00');
           let eh = normalizeHHMM(a?.endHour, '10:00');
@@ -6933,8 +6940,8 @@ function buildDaySummaryText(dayISO=ui.date){
           return {
             id: String(a?.id || rid('a')),
             name: String(a?.name || `Actividad ${i+1}`).slice(0,120),
-            startDate: clampISO(aStart, startDate, endDate),
-            endDate: clampISO(aEnd, startDate, endDate),
+            startDate: (()=>{ const s = clampISO(aStart, startDate, endDate); const e = clampISO(aEnd, startDate, endDate); return s > e ? e : s; })(),
+            endDate: (()=>{ const s = clampISO(aStart, startDate, endDate); const e = clampISO(aEnd, startDate, endDate); return e < s ? s : e; })(),
             startHour: sh,
             endHour: eh,
             ownerId: teamIds.has(a?.ownerId) ? a.ownerId : leaderId,
@@ -7101,16 +7108,23 @@ function buildDaySummaryText(dayISO=ui.date){
     if(!baseStart || !baseEnd) return [];
 
     if(meta.step <= 0){
-      if(baseEnd < rangeStartISO || baseStart > rangeEndISO) return [];
+      const startDate = coerceBusinessDateISO(baseStart);
+      const endDate = coerceBusinessDateISO(baseEnd);
+      if(!startDate || !endDate) return [];
+      const safeStart = minISO(startDate, endDate);
+      const safeEnd = maxISO(startDate, endDate);
+
+      if(safeEnd < rangeStartISO || safeStart > rangeEndISO) return [];
+
       return [{
         index: 0,
         offsetMonths: 0,
         offsetDays: 0,
         offsetBusinessDays: 0,
         useBusinessCalendar: true,
-        startDate: baseStart,
-        endDate: baseEnd,
-        reqDate: normalizeISO(project.reqDate) || baseStart
+        startDate: safeStart,
+        endDate: safeEnd,
+        reqDate: coerceBusinessDateISO(normalizeISO(project.reqDate) || safeStart) || safeStart
       }];
     }
 
@@ -9402,6 +9416,7 @@ function buildDaySummaryText(dayISO=ui.date){
   }
 
   function activityActiveOn(activity, dayISO){
+    if(isNonWorkingDayISO(dayISO)) return false;
     return activity.startDate <= dayISO && activity.endDate >= dayISO;
   }
 
@@ -10399,7 +10414,7 @@ function buildDaySummaryText(dayISO=ui.date){
       theme,
       ui: {
         view: ui.view,
-        date: ui.date,
+        date: '',
         roadmapZoom: ui.roadmapZoom,
         manageTab: ui.manageTab,
         manageProjectSort: ui.manageProjectSort,
@@ -10466,8 +10481,8 @@ function buildDaySummaryText(dayISO=ui.date){
       if(bundle.ui.view === 'day' || bundle.ui.view === 'week' || bundle.ui.view === 'month' || bundle.ui.view === 'roadmap'){
         ui.view = bundle.ui.view;
       }
-      const importedDate = normalizeISO(bundle.ui.date);
-      if(importedDate) ui.date = importedDate;
+      // Mantener siempre la fecha real del día al importar JSON.
+      ui.date = todayISO();
       if(bundle.ui.roadmapZoom === 'week' || bundle.ui.roadmapZoom === 'month' || bundle.ui.roadmapZoom === 'year'){
         ui.roadmapZoom = bundle.ui.roadmapZoom;
       }
@@ -10496,6 +10511,9 @@ function buildDaySummaryText(dayISO=ui.date){
     if(bundle?.theme === 'dark' || bundle?.theme === 'light'){
       applyTheme(bundle.theme);
     }
+
+    // Siempre abrir en la fecha real del día después de importar/restaurar.
+    ui.date = todayISO();
 
     saveState();
     saveHolidays();
@@ -11281,6 +11299,7 @@ function buildDaySummaryText(dayISO=ui.date){
   }
 
   function getVisibleActivityInstances(dayISO){
+    if(isNonWorkingDayISO(dayISO)) return [];
     const list = [];
     state.projects.forEach(p=>{
       if(!projectVisible(p, dayISO)) return;
