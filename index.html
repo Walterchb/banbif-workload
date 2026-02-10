@@ -732,7 +732,490 @@
     #infoNotifBody .notif-action-btn{
       font-weight:600;
     }
-    .detail-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:12px}
+
+    /* Reportes a demanda (botón Resumen) */
+#summaryOverlay{z-index:98}
+#summaryOverlay .summary-modal{
+  width:min(1180px,97vw);
+  max-height:min(94dvh,980px);
+  border-radius:5px;
+  overflow:hidden;
+  box-shadow:0 20px 56px rgba(0,0,0,.30);
+}
+#summaryOverlay .m-head{
+  padding:9px 12px;
+  border-bottom:1px solid var(--line);
+  background:var(--surface);
+}
+#summaryOverlay .m-head b{
+  display:flex;align-items:center;gap:8px;
+  font-size:18px;letter-spacing:.15px;
+}
+#summaryOverlay .m-body{padding:9px 10px;background:var(--surface)}
+#summaryOverlay .m-foot{
+  padding:9px 10px;
+  border-top:1px solid var(--line);
+  background:color-mix(in srgb,var(--surface-2) 72%, var(--surface));
+}
+
+.summary-workspace{display:grid;gap:10px}
+.summary-command{
+  border:1px solid var(--line);
+  border-radius:5px;
+  background:var(--surface);
+  padding:10px;
+  display:grid;
+  gap:9px;
+}
+.summary-command-top{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:9px;
+  align-items:start;
+}
+.summary-command-title{
+  font-size:14px;
+  font-weight:900;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.summary-command-title i{color:var(--primary);font-size:13px}
+.summary-command-sub{
+  margin-top:2px;
+  color:var(--muted);
+  font-size:11.2px;
+  line-height:1.26;
+}
+.summary-command-actions{
+  display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end;
+}
+.summary-command-actions .btn{
+  height:32px;
+  border-radius:5px;
+  font-size:12px;
+  font-weight:700;
+  padding:0 12px;
+}
+
+.summary-preset-strip{
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+}
+.summary-preset{
+  border:1px solid var(--line);
+  background:var(--surface);
+  color:var(--muted);
+  border-radius:5px;
+  height:29px;
+  padding:0 11px;
+  font-size:10.5px;
+  font-weight:700;
+  letter-spacing:.2px;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:border-color .12s ease, background .12s ease, color .12s ease;
+}
+.summary-preset:hover{
+  transform:translateY(-1px);
+  border-color:color-mix(in srgb,var(--primary) 40%, var(--line));
+}
+.summary-preset:active{transform:translateY(0)}
+.summary-preset.active{
+  color:var(--primary);
+  border-color:color-mix(in srgb,var(--primary) 50%, var(--line));
+  background:color-mix(in srgb,var(--primary) 12%, transparent);
+}
+
+.summary-layout{
+  display:grid;
+  grid-template-columns:minmax(300px,360px) minmax(0,1fr);
+  gap:10px;
+  min-height:0;
+}
+.summary-panel{
+  border:1px solid var(--line);
+  border-radius:5px;
+  background:var(--surface);
+  overflow:hidden;
+  min-height:0;
+  box-shadow:0 8px 20px rgba(2,8,23,.06);
+}
+.summary-panel details{
+  display:grid;
+}
+.summary-panel summary{
+  list-style:none;
+  cursor:pointer;
+  user-select:none;
+  padding:10px 11px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  font-size:12px;
+  font-weight:850;
+  background:color-mix(in srgb,var(--surface-2) 72%, var(--surface));
+  border-bottom:1px solid var(--line);
+}
+.summary-panel summary::-webkit-details-marker{display:none}
+.summary-panel summary::after{
+  content:'▾';
+  color:var(--muted);
+  font-size:12px;
+  transition:transform .15s ease;
+}
+.summary-panel details[open] summary::after{transform:rotate(180deg)}
+.summary-panel-hint{
+  font-size:10.5px;
+  color:var(--muted);
+  font-weight:700;
+}
+
+.summary-panel-body{
+  padding:9px;
+  display:grid;
+  gap:9px;
+}
+.summary-filter-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+}
+.sum-field{
+  display:grid;
+  gap:4px;
+  align-content:start;
+}
+.sum-field span{
+  font-size:10.2px;
+  font-weight:900;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:.2px;
+}
+.sum-field.wide{grid-column:span 2}
+#summaryOverlay .ctrl{
+  height:33px;
+  border-radius:5px;
+  font-size:12px;
+  padding:6px 9px;
+}
+#summaryOverlay select.ctrl{padding-right:30px}
+
+.summary-checkgroups{
+  display:grid;
+  gap:8px;
+}
+.summary-checkgroup{
+  border:1px solid var(--line);
+  border-radius:5px;
+  padding:7px;
+  background:var(--surface);
+}
+.summary-checkgroup .title{
+  margin-bottom:6px;
+  font-size:10.3px;
+  font-weight:900;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:.18px;
+}
+.summary-checkline{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+}
+.summary-checkline label{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  border:1px solid var(--line);
+  border-radius:5px;
+  background:var(--surface);
+  font-size:11px;
+  padding:4px 8px;
+}
+.summary-checkline input[type="checkbox"]{accent-color:var(--primary)}
+
+.summary-main{
+  display:grid;
+  gap:9px;
+  min-width:0;
+  min-height:0;
+}
+.summary-kpis{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:7px;
+}
+.summary-kpi{
+  border:1px solid var(--line);
+  border-radius:5px;
+  background:var(--surface);
+  padding:8px;
+  box-shadow:0 6px 16px rgba(2,8,23,.04);
+}
+.summary-kpi .k{
+  font-size:10px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.2px;
+  color:var(--muted);
+}
+.summary-kpi .v{
+  font-size:22px;
+  font-weight:900;
+  letter-spacing:-.25px;
+  line-height:1;
+  margin-top:2px;
+}
+.summary-kpi .s{
+  font-size:10.8px;
+  color:var(--muted);
+  margin-top:3px;
+  line-height:1.2;
+}
+
+.summary-readable{
+  border:1px solid var(--line);
+  border-radius:5px;
+  background:var(--surface);
+  padding:8px;
+  display:grid;
+  gap:8px;
+  box-shadow:0 8px 20px rgba(2,8,23,.06);
+}
+.brief-hero{
+  border:1px solid var(--line);
+  border-radius:5px;
+  background:var(--surface);
+  padding:9px;
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:8px;
+  align-items:center;
+}
+.brief-hero h4{
+  margin:0;
+  font-size:14px;
+  line-height:1.2;
+}
+.brief-meta{
+  margin-top:2px;
+  font-size:10.8px;
+  color:var(--muted);
+  line-height:1.25;
+}
+.brief-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.brief-tag{
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:2px 8px;
+  font-size:10px;
+  font-weight:800;
+  color:var(--muted);
+  background:var(--surface);
+}
+.brief-score{
+  border:1px solid var(--line);
+  border-radius:5px;
+  background:var(--surface);
+  padding:7px 9px;
+  text-align:center;
+  min-width:110px;
+}
+.brief-score .n{
+  font-size:26px;
+  font-weight:950;
+  line-height:1;
+  letter-spacing:-.3px;
+}
+.brief-score .l{
+  margin-top:3px;
+  font-size:10.2px;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:.2px;
+}
+
+.brief-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:7px;
+}
+.brief-card{
+  border:1px solid var(--line);
+  border-radius:5px;
+  background:var(--surface);
+  padding:8px;
+  min-height:130px;
+  box-shadow:0 8px 20px rgba(2,8,23,.05);
+}
+.brief-card h5{
+  margin:0 0 7px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.2px;
+}
+.brief-list{
+  margin:0;
+  padding:0;
+  list-style:none;
+  display:grid;
+  gap:6px;
+}
+.brief-item{
+  border:1px solid color-mix(in srgb,var(--line) 75%, transparent);
+  border-radius:5px;
+  background:color-mix(in srgb,var(--surface-2) 72%, var(--surface));
+  padding:6px;
+}
+.brief-item .t{
+  font-size:11.5px;
+  font-weight:850;
+  line-height:1.2;
+}
+.brief-item .m{
+  margin-top:2px;
+  font-size:10.4px;
+  color:var(--muted);
+  line-height:1.25;
+}
+.brief-item.urgent{border-color:color-mix(in srgb,var(--danger) 50%, var(--line))}
+.brief-item.warn{border-color:color-mix(in srgb,var(--warn) 52%, var(--line))}
+.brief-item.ok{border-color:color-mix(in srgb,var(--ok) 55%, var(--line))}
+.brief-empty{
+  border:1px dashed color-mix(in srgb,var(--line) 70%, transparent);
+  border-radius:5px;
+  padding:8px;
+  color:var(--muted);
+  font-size:10.8px;
+}
+
+.brief-bars{display:grid;gap:6px}
+.brief-bar{
+  display:grid;
+  gap:3px;
+}
+.brief-bar-head{
+  display:flex;justify-content:space-between;gap:8px;
+  font-size:10.7px;
+}
+.brief-bar-track{
+  height:7px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  overflow:hidden;
+  background:color-mix(in srgb,var(--line) 28%, transparent);
+}
+.brief-bar-track span{
+  display:block;height:100%;
+  background:linear-gradient(90deg,color-mix(in srgb,var(--primary) 62%, transparent),color-mix(in srgb,var(--primary) 88%, transparent));
+}
+.brief-next{
+  border:1px solid var(--line);
+  border-radius:5px;
+  background:color-mix(in srgb,var(--surface-2) 72%, var(--surface));
+  padding:8px;
+}
+.brief-next .t{
+  font-size:11.6px;
+  font-weight:850;
+  line-height:1.2;
+}
+.brief-next .m{
+  font-size:10.5px;
+  color:var(--muted);
+  margin-top:3px;
+  line-height:1.25;
+}
+
+.summary-plain-wrap{
+  border:1px solid var(--line);
+  border-radius:5px;
+  background:var(--surface);
+  overflow:hidden;
+}
+.summary-plain-wrap > summary{
+  list-style:none;
+  cursor:pointer;
+  user-select:none;
+  padding:8px 10px;
+  font-size:11.5px;
+  font-weight:850;
+  background:color-mix(in srgb,var(--surface-2) 72%, var(--surface));
+  border-bottom:1px solid var(--line);
+}
+.summary-plain-wrap > summary::-webkit-details-marker{display:none}
+.summary-output{
+  width:100%;
+  min-height:150px;
+  max-height:28dvh;
+  resize:vertical;
+  border:none;
+  background:var(--surface);
+  color:var(--text);
+  padding:8px;
+  font:500 11.4px/1.35 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  white-space:pre;
+  overflow:auto;
+}
+
+@media (max-width:1100px){
+  .summary-layout{grid-template-columns:320px 1fr}
+  .summary-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:900px){
+  #summaryOverlay .summary-modal{
+    width:100vw;max-height:100dvh;border-radius:0;
+  }
+  #summaryOverlay .m-head,#summaryOverlay .m-foot{padding:8px 9px}
+  #summaryOverlay .m-body{padding:8px 9px}
+  .summary-command-top{grid-template-columns:1fr}
+  .summary-command-actions{justify-content:stretch}
+  .summary-command-actions .btn{flex:1}
+  .summary-preset-strip{
+    flex-wrap:nowrap;
+    overflow:auto hidden;
+    padding-bottom:2px;
+    scrollbar-width:thin;
+  }
+  .summary-preset-strip::-webkit-scrollbar{height:4px}
+  .summary-preset{flex:0 0 auto}
+  .summary-layout{grid-template-columns:1fr}
+  .summary-panel{
+    order:1;
+  }
+  .summary-main{
+    order:2;
+  }
+  .brief-hero{
+    grid-template-columns:1fr;
+  }
+  .brief-grid{grid-template-columns:1fr}
+  .summary-output{max-height:23dvh}
+}
+@media (max-width:430px){
+  #summaryOverlay .m-head b{font-size:16px}
+  .summary-command{padding:8px}
+  .summary-command-title{font-size:13px}
+  .summary-command-sub{font-size:10.5px}
+  .summary-command-actions .btn{height:31px;font-size:11.5px}
+  .summary-filter-grid{gap:7px}
+  #summaryOverlay .ctrl{height:32px;font-size:11.8px}
+  .summary-kpi{padding:7px}
+  .summary-kpi .v{font-size:20px}
+  .brief-score .n{font-size:24px}
+}
+@media (prefers-reduced-motion:reduce){
+  .summary-preset{transition:none}
+}
+.detail-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:12px}
     .detail-card{border:1px solid var(--line);border-radius:0;background:var(--surface);padding:10px}
     .detail-card h4{margin:0 0 8px;font-size:13px}
     .detail-list{display:grid;gap:8px}
@@ -1049,6 +1532,410 @@
       .road-head{grid-template-columns:240px repeat(var(--road-cols,12),minmax(34px,1fr))}
       .road-row{grid-template-columns:240px minmax(460px,1fr)}
     }
+
+      /* === Compactación móvil: Reportes a demanda (Resumen) === */
+      @media (max-width: 768px){
+        #summaryOverlay .summary-modal{
+          width:100% !important;
+          max-height:calc(100dvh - 10px) !important;
+          border-radius:10px !important;
+        }
+        #summaryOverlay .m-head{padding:8px 10px !important;}
+        #summaryOverlay .m-body{padding:8px !important;}
+        #summaryOverlay .m-foot{padding:7px 10px !important;}
+        .summary-shell{gap:6px !important;}
+        .summary-top{padding:6px !important;gap:6px !important;}
+        .summary-title{font-size:12px !important;gap:6px !important;}
+        .summary-title i{font-size:11px !important;}
+        .summary-sub{font-size:10px !important;line-height:1.2 !important;}
+        .summary-top-actions{display:grid !important;grid-template-columns:1fr 1fr !important;gap:6px !important;width:100%;}
+        .summary-top-actions .btn{
+          width:100% !important;
+          min-width:0 !important;
+          height:28px !important;
+          padding:0 8px !important;
+          font-size:11px !important;
+        }
+
+        /* Evita "espacios muertos" verticales */
+        .summary-grid{
+          grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+          gap:6px !important;
+        }
+        .summary-grid > div{
+          min-height:auto !important;
+          padding:5px !important;
+        }
+        .summary-grid .label{
+          margin-bottom:3px !important;
+          font-size:10.5px !important;
+          line-height:1.1 !important;
+        }
+        #summaryOverlay .ctrl{
+          height:29px !important;
+          font-size:11px !important;
+          padding:4px 7px !important;
+        }
+
+        .summary-options{padding:6px !important;gap:6px !important;}
+        .summary-inline{gap:5px !important;}
+        .summary-inline label{
+          padding:3px 6px !important;
+          font-size:10.5px !important;
+          line-height:1.15 !important;
+        }
+
+        .summary-kpis{
+          grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+          gap:6px !important;
+        }
+        .summary-kpi{padding:6px !important;}
+        .summary-kpi .k{font-size:10px !important;}
+        .summary-kpi .v{font-size:16px !important;}
+        .summary-kpi .s{font-size:10px !important;}
+
+        .summary-output{
+          min-height:120px !important;
+          max-height:30vh !important;
+          padding:7px !important;
+          font-size:11px !important;
+          line-height:1.3 !important;
+        }
+
+        /* Footer más compacto */
+        #summaryFooterNote{font-size:10.5px !important;}
+        #summaryOverlay .m-foot .right{gap:6px !important;}
+        #summaryOverlay .m-foot .right .btn{
+          height:29px !important;
+          padding:0 9px !important;
+          font-size:11px !important;
+        }
+      }
+
+      @media (max-width: 480px){
+        .summary-sub{display:none !important;}
+        .summary-grid{grid-template-columns:1fr !important;}
+        .summary-kpis{grid-template-columns:1fr 1fr !important;}
+        .summary-output{
+          min-height:108px !important;
+          max-height:27vh !important;
+        }
+      }
+
+      /* === v13 | Resumen móvil ultra compacto y sin espacios muertos === */
+      @media (max-width: 640px){
+        #summaryOverlay .summary-modal{
+          width:100vw !important;
+          max-width:100vw !important;
+          max-height:100dvh !important;
+          border-radius:0 !important;
+        }
+        #summaryOverlay .m-head{padding:6px 8px !important;}
+        #summaryOverlay .m-body{padding:6px !important;}
+        #summaryOverlay .m-foot{padding:6px 8px !important;}
+        .summary-shell{gap:6px !important;}
+        .summary-top{padding:6px !important;gap:6px !important;border-radius:8px !important;}
+        .summary-title{font-size:12px !important;}
+        .summary-top-actions{
+          display:grid !important;
+          grid-template-columns:1fr 1fr !important;
+          gap:6px !important;
+          width:100% !important;
+        }
+        .summary-top-actions .btn{
+          width:100% !important;
+          height:30px !important;
+          min-width:0 !important;
+          padding:0 8px !important;
+          font-size:11px !important;
+        }
+
+        .summary-shell > .summary-grid{
+          grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+          gap:6px !important;
+        }
+        .summary-shell > .summary-grid > div{
+          min-height:auto !important;
+          border:none !important;
+          background:transparent !important;
+          padding:0 !important;
+        }
+        .summary-shell > .summary-grid .label{
+          margin:0 0 2px !important;
+          font-size:10px !important;
+          line-height:1.1 !important;
+          letter-spacing:.25px !important;
+        }
+        #summaryOverlay .ctrl{
+          height:30px !important;
+          font-size:11px !important;
+          padding:4px 8px !important;
+        }
+
+        /* Primer bloque: búsqueda ocupa ancho completo */
+        .summary-shell > .summary-grid:nth-child(2) > div:nth-child(6){
+          grid-column:1 / -1 !important;
+        }
+        /* Segundo bloque: salida ocupa ancho completo */
+        .summary-shell > .summary-grid:nth-child(3) > div:nth-child(6){
+          grid-column:1 / -1 !important;
+        }
+
+        .summary-options{
+          padding:6px !important;
+          gap:5px !important;
+          border-radius:8px !important;
+        }
+        .summary-inline{gap:5px !important;}
+        .summary-inline label{
+          font-size:10.5px !important;
+          padding:3px 6px !important;
+        }
+        .summary-chip-title{font-size:10px !important;}
+
+        .summary-kpis{
+          grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+          gap:6px !important;
+        }
+        .summary-kpi{padding:6px !important;}
+        .summary-kpi .k{font-size:9.8px !important;}
+        .summary-kpi .v{font-size:15px !important;}
+        .summary-kpi .s{font-size:9.8px !important;}
+
+        .summary-output{
+          min-height:110px !important;
+          max-height:26vh !important;
+          padding:7px !important;
+          font-size:10.5px !important;
+          line-height:1.3 !important;
+        }
+
+        #summaryFooterNote{display:none !important;}
+        #summaryOverlay .m-foot .right{gap:6px !important;}
+        #summaryOverlay .m-foot .right .btn{
+          height:30px !important;
+          padding:0 9px !important;
+          font-size:11px !important;
+        }
+      }
+
+      @media (max-width: 390px){
+        .summary-sub{display:none !important;}
+        .summary-title{font-size:11.5px !important;}
+      }
+
+
+      /* === v14 | Resumen móvil ordenado (referencia visual adjunta) === */
+      @media (max-width: 640px){
+        #summaryOverlay{
+          align-items:flex-start !important;
+          justify-content:center !important;
+          padding:6px 4px !important;
+        }
+        #summaryOverlay .summary-modal{
+          width:calc(100vw - 8px) !important;
+          max-width:calc(100vw - 8px) !important;
+          max-height:calc(100dvh - 8px) !important;
+          border-radius:5px !important;
+          overflow:hidden !important;
+        }
+        #summaryOverlay .m-head{
+          padding:8px 10px !important;
+          border-bottom:1px solid color-mix(in srgb,var(--line) 85%, transparent) !important;
+        }
+        #summaryOverlay .m-head b{
+          font-size:15px !important;
+          font-weight:900 !important;
+          letter-spacing:.1px !important;
+        }
+        #summaryOverlay .m-body{
+          padding:6px !important;
+          overflow:auto !important;
+          -webkit-overflow-scrolling:touch !important;
+          overscroll-behavior:contain !important;
+        }
+        #summaryOverlay .m-foot{
+          padding:6px 8px !important;
+        }
+
+        .summary-shell{
+          gap:6px !important;
+        }
+        .summary-top{
+          grid-template-columns:1fr !important;
+          align-items:stretch !important;
+          gap:6px !important;
+          padding:6px !important;
+          border-radius:5px !important;
+        }
+        .summary-title{
+          font-size:11.5px !important;
+          gap:6px !important;
+          line-height:1.2 !important;
+          font-weight:800 !important;
+        }
+        .summary-title i{font-size:11px !important;}
+        .summary-sub{display:none !important;}
+        .summary-top-actions{
+          display:grid !important;
+          grid-template-columns:1fr 1fr !important;
+          gap:6px !important;
+          width:100% !important;
+        }
+        .summary-top-actions .btn{
+          width:100% !important;
+          min-width:0 !important;
+          height:34px !important;
+          padding:0 8px !important;
+          font-size:12px !important;
+          font-weight:800 !important;
+          border-radius:5px !important;
+        }
+
+        .summary-grid{
+          grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+          gap:6px !important;
+        }
+        .summary-grid > div{
+          border:1px solid color-mix(in srgb,var(--line) 88%, transparent) !important;
+          background:var(--surface) !important;
+          border-radius:5px !important;
+          padding:5px !important;
+          min-height:auto !important;
+        }
+        .summary-grid .label{
+          margin:0 0 4px !important;
+          font-size:10px !important;
+          font-weight:800 !important;
+          text-transform:uppercase !important;
+          letter-spacing:.35px !important;
+          line-height:1 !important;
+        }
+        #summaryOverlay .ctrl{
+          height:34px !important;
+          min-height:34px !important;
+          padding:6px 8px !important;
+          font-size:12px !important;
+          border-radius:5px !important;
+          width:100% !important;
+        }
+
+        /* Distribución exacta en móvil:
+           Grid 1 (ámbito..búsqueda) en 2 columnas sin spans forzados */
+        .summary-shell > .summary-grid:nth-child(2) > div:nth-child(6){
+          grid-column:auto !important;
+        }
+
+        /* Grid 2: "Salida" ocupa todo el ancho */
+        .summary-shell > .summary-grid:nth-child(3) > div:nth-child(6){
+          grid-column:1 / -1 !important;
+        }
+
+        /* Bloque SALIDA en 2 columnas */
+        .summary-shell > .summary-grid:nth-child(3) > div:nth-child(6) .summary-inline{
+          display:grid !important;
+          grid-template-columns:1fr 1fr !important;
+          gap:6px !important;
+          align-items:stretch !important;
+        }
+        .summary-shell > .summary-grid:nth-child(3) > div:nth-child(6) .summary-inline label{
+          width:100% !important;
+          min-height:32px !important;
+          display:flex !important;
+          align-items:center !important;
+          justify-content:flex-start !important;
+          padding:5px 7px !important;
+          border-radius:5px !important;
+          font-size:11px !important;
+          font-weight:700 !important;
+          line-height:1.15 !important;
+          margin:0 !important;
+        }
+        .summary-shell > .summary-grid:nth-child(3) > div:nth-child(6) .summary-inline label:nth-of-type(3){
+          grid-column:1 / -1 !important;
+        }
+
+        .summary-options{
+          border-radius:5px !important;
+          padding:6px !important;
+          gap:6px !important;
+        }
+        .summary-options .summary-inline{
+          display:grid !important;
+          grid-template-columns:1fr 1fr !important;
+          gap:6px !important;
+          align-items:stretch !important;
+        }
+        .summary-options .summary-chip-title{
+          grid-column:1 / -1 !important;
+          margin:0 !important;
+          font-size:10px !important;
+          font-weight:900 !important;
+        }
+        .summary-options .summary-inline label{
+          width:100% !important;
+          min-height:32px !important;
+          display:flex !important;
+          align-items:center !important;
+          justify-content:flex-start !important;
+          padding:5px 7px !important;
+          border-radius:5px !important;
+          font-size:11px !important;
+          font-weight:700 !important;
+          line-height:1.15 !important;
+          margin:0 !important;
+        }
+        .summary-options .summary-inline label:nth-of-type(3){
+          grid-column:1 / -1 !important;
+        }
+
+        .summary-kpis{
+          grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+          gap:6px !important;
+        }
+        .summary-kpi{
+          border-radius:5px !important;
+          padding:6px !important;
+        }
+        .summary-kpi .k{font-size:10px !important;line-height:1.1 !important;}
+        .summary-kpi .v{font-size:14px !important;line-height:1 !important;margin-top:2px !important;}
+        .summary-kpi .s{font-size:10px !important;line-height:1.1 !important;margin-top:3px !important;}
+
+        .summary-output{
+          min-height:108px !important;
+          max-height:24vh !important;
+          border-radius:5px !important;
+          padding:7px !important;
+          font-size:10.5px !important;
+          line-height:1.3 !important;
+        }
+
+        #summaryFooterNote{display:none !important;}
+        #summaryOverlay .m-foot .row{
+          width:100% !important;
+          display:grid !important;
+          grid-template-columns:1fr 1fr !important;
+          gap:6px !important;
+        }
+        #summaryOverlay .m-foot .row .btn{
+          width:100% !important;
+          min-width:0 !important;
+          height:32px !important;
+          font-size:11.5px !important;
+          padding:0 8px !important;
+          border-radius:5px !important;
+        }
+      }
+
+      @media (max-width: 380px){
+        #summaryOverlay .summary-modal{
+          width:calc(100vw - 6px) !important;
+          max-width:calc(100vw - 6px) !important;
+          max-height:calc(100dvh - 6px) !important;
+        }
+        .summary-title{font-size:11px !important;}
+      }
+
 </style>
 
   <style id="dark-mode-hardening-v60">
@@ -1626,6 +2513,24 @@
   </div>
 
 
+
+  <!-- Resumen / Reportes a demanda -->
+  <div class="overlay" id="summaryOverlay">
+    <div class="modal summary-modal">
+      <div class="m-head">
+        <b><i class="fa-solid fa-chart-line" aria-hidden="true"></i> Reportes a demanda</b>
+      </div>
+      <div class="m-body" id="summaryBody"></div>
+      <div class="m-foot">
+        <div class="small muted" id="summaryFooterNote">Configura variables y genera un reporte listo para copiar.</div>
+        <div class="row" style="gap:8px">
+          <button class="btn primary" id="btnSummaryCopy"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copiar reporte</button>
+          <button class="btn" data-close="summaryOverlay">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Impact Modal (auto-replan confirmation) -->
   <div class="overlay" id="impactOverlay">
     <div class="modal">
@@ -1788,6 +2693,24 @@
     infoNotifUser: '',
     infoNotifQ: '',
     infoNotifShowDone: false,
+    summaryScope: 'team',
+    summaryUser: '',
+    summaryRange: 'week',
+    summaryFrom: toISO(new Date()),
+    summaryTo: toISO(new Date()),
+    summaryGroupBy: 'owner',
+    summarySortBy: 'date',
+    summaryClient: '',
+    summaryPriority: '',
+    summaryStatus: '',
+    summaryQuery: '',
+    summaryIncludeActivities: true,
+    summaryIncludeProjects: true,
+    summaryIncludeNotifications: true,
+    summaryIncludeDoneActivities: false,
+    summaryIncludeDoneNotifications: false,
+    summaryOnlyDueNotifications: false,
+    summaryFiltersOpen: false,
     roadmapZoom: 'month',
     filters: { owner:'', client:'', status:'', priority:'', q:'' },
     lastAdjustedBusinessDates: 0,
@@ -3183,6 +4106,7 @@
         closeOverlay('manageOverlay');
         closeOverlay('teamOverlay');
         closeOverlay('infoOverlay');
+        closeOverlay('summaryOverlay');
       }
     });
   }
@@ -3496,40 +4420,1044 @@ function openAccessGate(){
   }
 
 
-  async function copySelectedDaySummary(){
-    let text = '';
-    try{
-      text = buildDaySummaryText(ui.date).replace(/\n/g, "\r\n");
-    }catch(err){
-      console.error(err);
-      toast('No se pudo generar el resumen');
-      return;
-    }
 
-    try{
-      if(navigator.clipboard && typeof navigator.clipboard.writeText === 'function'){
-        await navigator.clipboard.writeText(text);
-      }else{
-        const ta = document.createElement('textarea');
-        ta.value = text;
-        ta.setAttribute('readonly','readonly');
-        ta.style.position = 'fixed';
-        ta.style.opacity = '0';
-        ta.style.left = '-9999px';
-        document.body.appendChild(ta);
-        ta.focus();
-        ta.select();
-        document.execCommand('copy');
-        ta.remove();
-      }
-      toast('Resumen Copiado');
-    }catch(err){
-      console.error(err);
-      window.prompt('No se pudo copiar automáticamente. Copia este resumen:', text);
+  async function copySelectedDaySummary(){
+    openSummaryModal();
+  }
+
+  function ensureSummaryState(){
+    if(typeof ui.summaryScope !== 'string') ui.summaryScope = 'team';
+    if(typeof ui.summaryUser !== 'string') ui.summaryUser = '';
+    if(typeof ui.summaryRange !== 'string') ui.summaryRange = 'week';
+    if(typeof ui.summaryFrom !== 'string' || !normalizeISO(ui.summaryFrom)) ui.summaryFrom = normalizeISO(ui.date) || todayISO();
+    if(typeof ui.summaryTo !== 'string' || !normalizeISO(ui.summaryTo)) ui.summaryTo = normalizeISO(ui.date) || todayISO();
+    if(typeof ui.summaryGroupBy !== 'string') ui.summaryGroupBy = 'owner';
+    if(typeof ui.summarySortBy !== 'string') ui.summarySortBy = 'date';
+    if(typeof ui.summaryClient !== 'string') ui.summaryClient = '';
+    if(typeof ui.summaryPriority !== 'string') ui.summaryPriority = '';
+    if(typeof ui.summaryStatus !== 'string') ui.summaryStatus = '';
+    if(typeof ui.summaryQuery !== 'string') ui.summaryQuery = '';
+    if(typeof ui.summaryIncludeActivities !== 'boolean') ui.summaryIncludeActivities = true;
+    if(typeof ui.summaryIncludeProjects !== 'boolean') ui.summaryIncludeProjects = true;
+    if(typeof ui.summaryIncludeNotifications !== 'boolean') ui.summaryIncludeNotifications = true;
+    if(typeof ui.summaryIncludeDoneActivities !== 'boolean') ui.summaryIncludeDoneActivities = false;
+    if(typeof ui.summaryIncludeDoneNotifications !== 'boolean') ui.summaryIncludeDoneNotifications = false;
+    if(typeof ui.summaryOnlyDueNotifications !== 'boolean') ui.summaryOnlyDueNotifications = false;
+    if(typeof ui.summaryFiltersOpen !== 'boolean') ui.summaryFiltersOpen = false;
+    if(ui.summaryScope === 'individual' && !ui.summaryUser){
+      ui.summaryUser = state.team?.[0]?.id || '';
     }
   }
 
-  
+  function openSummaryModal(){
+    ensureSummaryState();
+    try{
+      renderSummaryModal();
+      openOverlay('summaryOverlay');
+    }catch(err){
+      console.error('Error opening summary modal', err);
+      toast('No se pudo abrir el generador de reportes. Revisa consola.');
+    }
+  }
+
+  function resolveSummaryDateRange(mode = ui.summaryRange){
+    const baseDate = normalizeISO(ui.date) || todayISO();
+    if(mode === 'week'){
+      const s = startOfWeekISO(baseDate);
+      return { startDate:s, endDate:addDaysISO(s,4) };
+    }
+    if(mode === 'month'){
+      const s = startOfMonthISO(baseDate);
+      return { startDate:s, endDate:addDaysISO(addMonthsISO(s,1),-1) };
+    }
+    if(mode === 'custom'){
+      let s = normalizeISO(ui.summaryFrom) || baseDate;
+      let e = normalizeISO(ui.summaryTo) || s;
+      if(s > e){ const t = s; s = e; e = t; }
+      return { startDate:s, endDate:e };
+    }
+    return { startDate:baseDate, endDate:baseDate };
+  }
+
+  function summaryRangeLabel(startDate, endDate){
+    return startDate === endDate ? fmtDate(startDate) : `${fmtDate(startDate)} → ${fmtDate(endDate)}`;
+  }
+
+  function summarySortRows(rows, sortBy = 'date'){
+    const list = Array.isArray(rows) ? rows.slice() : [];
+    list.sort((a,b)=>{
+      if(sortBy === 'priority'){
+        return (
+          priorityRank(a.priority) - priorityRank(b.priority) ||
+          String(a.startDate || '').localeCompare(String(b.startDate || '')) ||
+          String(a.projectName || '').localeCompare(String(b.projectName || ''), APP_LOCALE, { sensitivity:'base' })
+        );
+      }
+      if(sortBy === 'owner'){
+        return (
+          String(a.ownerName || a.leaderName || '').localeCompare(String(b.ownerName || b.leaderName || ''), APP_LOCALE, { sensitivity:'base' }) ||
+          String(a.startDate || '').localeCompare(String(b.startDate || ''))
+        );
+      }
+      return (
+        String(a.startDate || '').localeCompare(String(b.startDate || '')) ||
+        String(a.startHour || '').localeCompare(String(b.startHour || '')) ||
+        priorityRank(a.priority) - priorityRank(b.priority)
+      );
+    });
+    return list;
+  }
+
+  function collectSummaryRows(startDate, endDate){
+    const today = todayISO();
+    const activityRows = [];
+    const projectRows = [];
+
+    state.projects.forEach(project=>{
+      const occurrences = enumerateProjectOccurrences(project, startDate, endDate);
+      if(!occurrences.length) return;
+
+      const activities = Array.isArray(project.activities) ? project.activities : [];
+      const allDone = activities.length > 0 && activities.every(a=>Boolean(a.done));
+
+      occurrences.forEach(occ=>{
+        const status = allDone ? 'Finalizado' : autoStatusByDates(occ.startDate, occ.endDate, false, today);
+        const ownerIds = Array.from(new Set(activities.map(a=>String(a.ownerId || '')).filter(Boolean)));
+        const ownerNames = ownerIds.map(id=>findTeam(id)?.name).filter(Boolean);
+
+        projectRows.push({
+          id: `${project.id}::${occ.index}`,
+          projectId: project.id,
+          projectName: String(project.name || 'Proyecto sin nombre'),
+          client: String(project.client || 'Interno').trim() || 'Interno',
+          priority: PRIORITIES.includes(project.priority) ? project.priority : 'Media',
+          status,
+          pending: status !== 'Finalizado',
+          overdue: status === 'Demorado',
+          startDate: occ.startDate,
+          endDate: occ.endDate,
+          reqDate: occ.reqDate || normalizeISO(project.reqDate) || occ.startDate,
+          recurrence: normalizeRecurrenceFrequency(project.recurrenceFrequency),
+          leaderId: String(project.leaderId || ''),
+          leaderName: findTeam(project.leaderId)?.name || 'Sin líder',
+          owners: ownerIds,
+          ownersLabel: ownerNames.join(', '),
+          activitiesCount: activities.length,
+          searchBlob: normalizeSearchText([
+            project.name,
+            project.client,
+            project.priority,
+            status,
+            ownerNames.join(' '),
+            findTeam(project.leaderId)?.name || '',
+            occ.startDate,
+            occ.endDate
+          ].join(' '))
+        });
+      });
+
+      activities.forEach(activity=>{
+        occurrences.forEach(occ=>{
+          const mapped = mapRecurringDateRange(activity.startDate, activity.endDate, occ);
+          if(!mapped) return;
+
+          const occStart = normalizeISO(mapped.startDate);
+          const occEnd = normalizeISO(mapped.endDate);
+          if(!occStart || !occEnd) return;
+          if(occEnd < startDate || occStart > endDate) return;
+
+          const enriched = { ...activity, startDate:occStart, endDate:occEnd, done:Boolean(activity.done) };
+          const status = activityStatus(enriched, today, project);
+          const done = Boolean(enriched.done || status === 'Finalizado');
+
+          activityRows.push({
+            id: `${project.id}::${activity.id}::${occ.index}`,
+            projectId: project.id,
+            projectName: String(project.name || 'Proyecto sin nombre'),
+            taskId: activity.id,
+            taskName: String(activity.name || 'Actividad'),
+            taskDetail: String(activity.detail || ''),
+            client: String(project.client || 'Interno').trim() || 'Interno',
+            priority: PRIORITIES.includes(project.priority) ? project.priority : 'Media',
+            status,
+            done,
+            pending: !done && status !== 'Finalizado',
+            overdue: status === 'Demorado',
+            startDate: occStart,
+            endDate: occEnd,
+            startHour: normalizeOptionalHHMM(activity.startHour) || '',
+            endHour: normalizeOptionalHHMM(activity.endHour) || '',
+            recurrence: normalizeRecurrenceFrequency(project.recurrenceFrequency),
+            ownerId: String(activity.ownerId || ''),
+            ownerName: findTeam(activity.ownerId)?.name || 'Sin responsable',
+            leaderId: String(project.leaderId || ''),
+            searchBlob: normalizeSearchText([
+              project.name,
+              activity.name,
+              activity.detail,
+              project.client,
+              project.priority,
+              status,
+              findTeam(activity.ownerId)?.name || '',
+              occStart,
+              occEnd,
+              activity.startHour || '',
+              activity.endHour || ''
+            ].join(' '))
+          });
+        });
+      });
+    });
+
+    const notifications = sanitizeNotifications(state.notifications || [], state.team).map(n=>{
+      const st = notificationStatus(n);
+      return {
+        ...n,
+        targetName: notificationTargetName(n.userId),
+        statusLabel: st.label,
+        statusClass: st.cls,
+        pending: !n.done,
+        due: isNotificationDue(n),
+        inRange: Boolean(n.remindDate) ? (n.remindDate >= startDate && n.remindDate <= endDate) : false,
+        searchBlob: normalizeSearchText([
+          n.title,
+          n.message,
+          notificationTargetName(n.userId),
+          n.remindDate || '',
+          n.remindTime || '',
+          st.label,
+          n.done ? 'atendida' : 'pendiente'
+        ].join(' '))
+      };
+    }).sort(compareNotifications);
+
+    return { activityRows, projectRows, notifications };
+  }
+
+  function applySummaryFilters(dataset, filters){
+    const q = normalizeSearchText(filters.query || '');
+
+    const matchesShared = (row)=>{
+      if(filters.client && String(row.client || '') !== filters.client) return false;
+      if(filters.priority && String(row.priority || '') !== filters.priority) return false;
+      if(filters.status && String(row.status || '') !== filters.status) return false;
+      if(q){
+        const blob = normalizeSearchText(row.searchBlob || '');
+        if(!blob.includes(q)) return false;
+      }
+      return true;
+    };
+
+    const userMatchForActivity = (row)=>{
+      if(!filters.userId) return true;
+      return row.ownerId === filters.userId;
+    };
+
+    const userMatchForProject = (row)=>{
+      if(!filters.userId) return true;
+      return row.leaderId === filters.userId || (Array.isArray(row.owners) && row.owners.includes(filters.userId));
+    };
+
+    const userMatchForNotification = (row)=>{
+      if(!filters.userId) return true;
+      return row.userId === filters.userId || row.userId === NOTIF_ALL_USERS;
+    };
+
+    const activities = summarySortRows(
+      (dataset.activityRows || []).filter(row=>{
+        if(!matchesShared(row)) return false;
+        if(filters.scope === 'individual' && !userMatchForActivity(row)) return false;
+        if(!filters.includeDoneActivities && row.done) return false;
+        return true;
+      }),
+      filters.sortBy
+    );
+
+    const projects = summarySortRows(
+      (dataset.projectRows || []).filter(row=>{
+        if(!matchesShared(row)) return false;
+        if(filters.scope === 'individual' && !userMatchForProject(row)) return false;
+        if(!filters.includeDoneActivities && row.status === 'Finalizado') return false;
+        return true;
+      }),
+      filters.sortBy
+    );
+
+    const notifications = (dataset.notifications || []).filter(row=>{
+      if(filters.scope === 'individual' && !userMatchForNotification(row)) return false;
+      if(!filters.includeDoneNotifications && row.done) return false;
+      if(filters.onlyDueNotifications && !row.due) return false;
+      if(filters.notificationRangeOnly && !row.inRange) return false;
+      if(q && !String(row.searchBlob || '').includes(q)) return false;
+      return true;
+    });
+
+    return { activities, projects, notifications };
+  }
+
+  function summarizeByGroup(rows, groupBy, type = 'activity'){
+    const safe = Array.isArray(rows) ? rows : [];
+    const groups = new Map();
+
+    const keyFn = (row)=>{
+      if(groupBy === 'project') return String(row.projectName || 'Sin proyecto');
+      if(groupBy === 'priority') return String(row.priority || 'Sin prioridad');
+      if(groupBy === 'status') return String(row.status || 'Sin estado');
+      if(type === 'project') return String(row.leaderName || 'Sin líder');
+      return String(row.ownerName || 'Sin responsable');
+    };
+
+    safe.forEach(row=>{
+      const key = keyFn(row);
+      if(!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(row);
+    });
+
+    return Array.from(groups.entries())
+      .sort((a,b)=>{
+        if(b[1].length !== a[1].length) return b[1].length - a[1].length;
+        return a[0].localeCompare(b[0], APP_LOCALE, { sensitivity:'base' });
+      });
+  }
+
+  function buildAdvancedSummaryReport(filters){
+  const { startDate, endDate } = resolveSummaryDateRange(filters.rangeMode);
+  const dataset = collectSummaryRows(startDate, endDate);
+  const scoped = applySummaryFilters(dataset, {
+    scope: filters.scope,
+    userId: filters.userId,
+    client: filters.client,
+    priority: filters.priority,
+    status: filters.status,
+    query: filters.query,
+    includeDoneActivities: filters.includeDoneActivities,
+    includeDoneNotifications: filters.includeDoneNotifications,
+    onlyDueNotifications: filters.onlyDueNotifications,
+    notificationRangeOnly: filters.notificationRangeOnly,
+    sortBy: filters.sortBy
+  });
+
+  const activities = scoped.activities;
+  const projects = scoped.projects;
+  const notifications = scoped.notifications;
+
+  const pendingActivities = activities.filter(r=>r.pending).length;
+  const overdueActivities = activities.filter(r=>r.overdue).length;
+  const pendingProjects = projects.filter(r=>r.pending).length;
+  const overdueProjects = projects.filter(r=>r.overdue).length;
+  const pendingNotifications = notifications.filter(r=>!r.done).length;
+  const dueNotifications = notifications.filter(r=>r.due).length;
+
+  const scopeLabel = filters.scope === 'individual'
+    ? `Individual (${findTeam(filters.userId)?.name || 'Sin usuario'})`
+    : 'Equipo';
+
+  const filterParts = [];
+  if(filters.client) filterParts.push(`Equipo: ${filters.client}`);
+  if(filters.priority) filterParts.push(`Prioridad: ${filters.priority}`);
+  if(filters.status) filterParts.push(`Estado: ${filters.status}`);
+  if(filters.query) filterParts.push(`Búsqueda: "${filters.query}"`);
+  if(filters.scope === 'team' && filters.userId) filterParts.push(`Usuario foco: ${findTeam(filters.userId)?.name || 'N/A'}`);
+
+  const modeLabel = filters.rangeMode === 'custom'
+    ? 'Personalizado'
+    : filters.rangeMode === 'week'
+      ? 'Semana'
+      : filters.rangeMode === 'month'
+        ? 'Mes'
+        : 'Día';
+
+  const nowText = `${fmtDate(todayISO())} ${new Date().toLocaleTimeString(APP_LOCALE, {hour:'2-digit', minute:'2-digit'})}`;
+
+  const lines = [];
+  const sep = '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━';
+  const addSection = (title)=>{
+    lines.push('');
+    lines.push(title.toUpperCase());
+    lines.push(sep);
+  };
+
+  lines.push('📌 REPORTE OPERATIVO | A DEMANDA');
+  lines.push(sep);
+  lines.push(`Generado: ${nowText}`);
+  lines.push(`Periodo: ${summaryRangeLabel(startDate, endDate)} (${modeLabel})`);
+  lines.push(`Ámbito: ${scopeLabel}`);
+  lines.push(`Vista: ${filters.groupBy === 'project' ? 'Proyecto' : filters.groupBy === 'priority' ? 'Prioridad' : filters.groupBy === 'status' ? 'Estado' : 'Responsable'} | Orden: ${filters.sortBy === 'priority' ? 'Prioridad' : filters.sortBy === 'owner' ? 'Responsable' : 'Fecha'}`);
+  if(filterParts.length) lines.push(`Filtros: ${filterParts.join(' | ')}`);
+
+  addSection('Resumen ejecutivo');
+  lines.push(`• Actividades: ${activities.length} | Pendientes: ${pendingActivities} | Demoradas: ${overdueActivities} | Finalizadas: ${Math.max(0, activities.length - pendingActivities)}`);
+  lines.push(`• Proyectos: ${projects.length} | Pendientes: ${pendingProjects} | Demorados: ${overdueProjects} | Finalizados: ${Math.max(0, projects.length - pendingProjects)}`);
+  lines.push(`• Notificaciones: ${notifications.length} | Pendientes: ${pendingNotifications} | Por fecha: ${dueNotifications} | Atendidas: ${Math.max(0, notifications.length - pendingNotifications)}`);
+
+  const pendingHighlights = [];
+  const criticalActivities = activities
+    .filter(a=>a.overdue || a.pending)
+    .sort((a,b)=>{
+      if(a.overdue !== b.overdue) return a.overdue ? -1 : 1;
+      return String(a.endDate || '').localeCompare(String(b.endDate || ''));
+    })
+    .slice(0, 10);
+
+  criticalActivities.forEach(a=>{
+    const schedule = a.startDate === a.endDate
+      ? fmtDate(a.startDate)
+      : `${fmtDate(a.startDate)}→${fmtDate(a.endDate)}`;
+    const hour = a.startHour && a.endHour ? ` ${a.startHour}-${a.endHour}` : '';
+    pendingHighlights.push(`[${a.overdue ? 'Demorada' : 'Pendiente'}] ${schedule}${hour} | ${a.ownerName} | ${a.projectName} › ${a.taskName}`);
+  });
+
+  const criticalNotifs = notifications
+    .filter(n=>n.due || (!n.done && !n.remindDate))
+    .slice(0, 6);
+
+  criticalNotifs.forEach(n=>{
+    const when = n.remindDate ? formatNotificationReminder(n) : 'Sin fecha';
+    pendingHighlights.push(`[Notif ${n.due ? 'por fecha' : 'pendiente'}] ${when} | ${n.targetName} | ${n.title}`);
+  });
+
+  addSection('Alertas prioritarias');
+  if(!pendingHighlights.length){
+    lines.push('• Sin alertas críticas para este criterio.');
+  }else{
+    pendingHighlights.forEach((item, idx)=>lines.push(`${idx + 1}. ${item}`));
+  }
+
+  if(filters.includeActivities){
+    addSection(`Actividades (${activities.length})`);
+    if(!activities.length){
+      lines.push('• Sin actividades para este criterio.');
+    }else{
+      const grouped = summarizeByGroup(activities, filters.groupBy, 'activity');
+      let printed = 0;
+      const maxItems = 70;
+      grouped.forEach(([groupName, rows])=>{
+        if(printed >= maxItems) return;
+        lines.push(`• ${String(groupName || 'Sin grupo').toUpperCase()} (${rows.length})`);
+        rows.forEach(row=>{
+          if(printed >= maxItems) return;
+          const day = row.startDate === row.endDate ? fmtDate(row.startDate) : `${fmtDate(row.startDate)}→${fmtDate(row.endDate)}`;
+          const hour = row.startHour && row.endHour ? ` ${row.startHour}-${row.endHour}` : '';
+          lines.push(`  · ${day}${hour} | ${row.projectName} | ${row.taskName} | ${row.priority} | ${row.status}`);
+          printed += 1;
+        });
+      });
+      if(activities.length > maxItems){
+        lines.push(`• ... ${activities.length - maxItems} actividad(es) adicional(es).`);
+      }
+    }
+  }
+
+  if(filters.includeProjects){
+    addSection(`Proyectos (${projects.length})`);
+    if(!projects.length){
+      lines.push('• Sin proyectos para este criterio.');
+    }else{
+      const grouped = summarizeByGroup(projects, filters.groupBy, 'project');
+      let printed = 0;
+      const maxItems = 55;
+      grouped.forEach(([groupName, rows])=>{
+        if(printed >= maxItems) return;
+        lines.push(`• ${String(groupName || 'Sin grupo').toUpperCase()} (${rows.length})`);
+        rows.forEach(row=>{
+          if(printed >= maxItems) return;
+          const day = row.startDate === row.endDate ? fmtDate(row.startDate) : `${fmtDate(row.startDate)}→${fmtDate(row.endDate)}`;
+          const owners = row.ownersLabel ? ` | Resp: ${row.ownersLabel}` : '';
+          lines.push(`  · ${day} | ${row.projectName} | ${row.priority} | ${row.status}${owners}`);
+          printed += 1;
+        });
+      });
+      if(projects.length > maxItems){
+        lines.push(`• ... ${projects.length - maxItems} proyecto(s) adicional(es).`);
+      }
+    }
+  }
+
+  if(filters.includeNotifications){
+    addSection(`Notificaciones (${notifications.length})`);
+    if(!notifications.length){
+      lines.push('• Sin notificaciones para este criterio.');
+    }else{
+      notifications.slice(0,55).forEach(n=>{
+        const when = n.remindDate ? formatNotificationReminder(n) : 'Sin fecha';
+        const stateLabel = n.done ? 'Atendida' : (n.due ? 'Por fecha' : 'Pendiente');
+        lines.push(`  · [${stateLabel}] ${when} | ${n.targetName} | ${n.title}${n.message ? ` — ${n.message}` : ''}`);
+      });
+      if(notifications.length > 55){
+        lines.push(`• ... ${notifications.length - 55} notificación(es) adicional(es).`);
+      }
+    }
+  }
+
+  addSection('Siguiente acción sugerida');
+  if(pendingHighlights.length){
+    lines.push('• Prioriza "Demoradas" y "Notif por fecha", reasigna responsables y confirma nuevo compromiso en la reunión de seguimiento.');
+  }else{
+    lines.push('• Mantener monitoreo semanal y registrar notificaciones preventivas por responsable.');
+  }
+
+  return {
+    text: lines.join('\n'),
+    stats: {
+      activities: activities.length,
+      pendingActivities,
+      projects: projects.length,
+      pendingProjects,
+      notifications: notifications.length,
+      pendingNotifications,
+      dueNotifications,
+      range: summaryRangeLabel(startDate, endDate)
+    },
+    details: {
+      scopeLabel,
+      modeLabel,
+      generatedAt: nowText,
+      filtersApplied: filterParts.slice(),
+      startDate,
+      endDate,
+      topActivities: criticalActivities.slice(0, 8),
+      topNotifications: criticalNotifs.slice(0, 8),
+      pendingHighlights: pendingHighlights.slice(0, 10),
+      groupBreakdown: summarizeByGroup(activities, filters.groupBy, 'activity')
+        .slice(0, 6)
+        .map(([name, rows])=>({
+          name,
+          total: rows.length,
+          pending: rows.filter(r=>r.pending).length,
+          overdue: rows.filter(r=>r.overdue).length
+        }))
+    }
+  };
+}
+
+  function renderSummaryKpis(stats){
+    const root = $('summaryKpis');
+    if(!root || !stats) return;
+
+    root.innerHTML = `
+      <div class="summary-kpi">
+        <div class="k">Actividades</div>
+        <div class="v">${Number(stats.activities || 0)}</div>
+        <div class="s">Pendientes: ${Number(stats.pendingActivities || 0)}</div>
+      </div>
+      <div class="summary-kpi">
+        <div class="k">Proyectos</div>
+        <div class="v">${Number(stats.projects || 0)}</div>
+        <div class="s">Pendientes: ${Number(stats.pendingProjects || 0)}</div>
+      </div>
+      <div class="summary-kpi">
+        <div class="k">Notificaciones</div>
+        <div class="v">${Number(stats.notifications || 0)}</div>
+        <div class="s">Pendientes: ${Number(stats.pendingNotifications || 0)}</div>
+      </div>
+      <div class="summary-kpi">
+        <div class="k">Alertas por fecha</div>
+        <div class="v">${Number(stats.dueNotifications || 0)}</div>
+        <div class="s">Rango: ${esc(stats.range || '-')}</div>
+      </div>
+    `;
+  }
+
+
+function renderSummaryReadable(result, filters){
+  const root = $('summaryReadable');
+  if(!root) return;
+
+  const stats = result?.stats || {};
+  const details = result?.details || {};
+
+  const totalPending =
+    Number(stats.pendingActivities || 0) +
+    Number(stats.pendingProjects || 0) +
+    Number(stats.pendingNotifications || 0);
+
+  const scopeLabel = filters?.scope === 'individual'
+    ? (findTeam(filters.userId)?.name || 'Individual')
+    : 'Equipo completo';
+
+  const periodText = (details.startDate && details.endDate)
+    ? summaryRangeLabel(details.startDate, details.endDate)
+    : (stats.range || '-');
+
+  const filterText = (details.filtersApplied || []).length
+    ? details.filtersApplied.join(' · ')
+    : 'Sin filtros adicionales';
+
+  const topActs = Array.isArray(details.topActivities) ? details.topActivities.slice(0, 6) : [];
+  const topNotifs = Array.isArray(details.topNotifications) ? details.topNotifications.slice(0, 6) : [];
+  const groups = Array.isArray(details.groupBreakdown) ? details.groupBreakdown.slice(0, 6) : [];
+
+  const overdueActivities = topActs.filter(a=>a.overdue);
+  const pendingActivities = topActs.filter(a=>!a.overdue);
+
+  const urgentList = overdueActivities.length ? overdueActivities : pendingActivities;
+
+  const urgentHtml = urgentList.length
+    ? urgentList.map(a=>{
+        const range = a.startDate === a.endDate ? fmtDate(a.startDate) : `${fmtDate(a.startDate)} → ${fmtDate(a.endDate)}`;
+        const hour = a.startHour && a.endHour ? ` · ${a.startHour}-${a.endHour}` : '';
+        const cls = a.overdue ? 'urgent' : 'warn';
+        return `<li class="brief-item ${cls}">
+          <div class="t">${esc(a.taskName || 'Actividad')}</div>
+          <div class="m">${esc(a.ownerName || 'Sin responsable')} · ${esc(a.projectName || 'Sin proyecto')}</div>
+          <div class="m">${esc(range + hour)}</div>
+        </li>`;
+      }).join('')
+    : `<li class="brief-empty">No hay actividades críticas en este rango.</li>`;
+
+  const notifHtml = topNotifs.length
+    ? topNotifs.map(n=>{
+        const when = n.remindDate ? formatNotificationReminder(n) : 'Sin fecha';
+        const cls = n.due ? 'urgent' : 'warn';
+        const st = n.done ? 'Atendida' : (n.due ? 'Por fecha' : 'Pendiente');
+        return `<li class="brief-item ${cls}">
+          <div class="t">${esc(n.title || 'Notificación')}</div>
+          <div class="m">${esc(n.targetName || 'Equipo')} · ${esc(st)}</div>
+          <div class="m">${esc(when)}</div>
+        </li>`;
+      }).join('')
+    : `<li class="brief-empty">No hay recordatorios críticos por ahora.</li>`;
+
+  const maxGroup = Math.max(1, ...groups.map(g=>Number(g.total || 0)));
+  const barsHtml = groups.length
+    ? `<div class="brief-bars">${
+      groups.map(g=>{
+        const pct = Math.max(4, Math.round((Number(g.total || 0) / maxGroup) * 100));
+        return `<div class="brief-bar">
+          <div class="brief-bar-head">
+            <span>${esc(g.name || 'Sin grupo')}</span>
+            <span>${Number(g.total || 0)} · Pend ${Number(g.pending || 0)}</span>
+          </div>
+          <div class="brief-bar-track"><span style="width:${pct}%"></span></div>
+        </div>`;
+      }).join('')
+    }</div>`
+    : `<div class="brief-empty">No hay carga agrupada para mostrar.</div>`;
+
+  const nextStep = totalPending > 0
+    ? (Number(stats.dueNotifications || 0) > 0
+        ? 'Primero atiende recordatorios por fecha. Luego libera actividades demoradas.'
+        : 'Prioriza actividades pendientes por responsable y confirma bloque de trabajo hoy.')
+    : 'Sin pendientes críticos. Mantén revisión breve diaria y control semanal.';
+
+  root.innerHTML = `
+    <section class="brief-hero">
+      <div>
+        <h4>Briefing operativo</h4>
+        <div class="brief-meta">${esc(scopeLabel)} · ${esc(periodText)} · Generado ${esc(details.generatedAt || '')}</div>
+        <div class="brief-tags">
+          <span class="brief-tag">${esc(details.modeLabel || 'Resumen')}</span>
+          <span class="brief-tag">${esc(filterText)}</span>
+        </div>
+      </div>
+      <div class="brief-score">
+        <div class="n">${Number(totalPending || 0)}</div>
+        <div class="l">pendientes activos</div>
+      </div>
+    </section>
+
+    <section class="brief-grid">
+      <article class="brief-card">
+        <h5><i class="fa-solid fa-bolt" aria-hidden="true"></i> Atención inmediata</h5>
+        <ul class="brief-list">${urgentHtml}</ul>
+      </article>
+
+      <article class="brief-card">
+        <h5><i class="fa-regular fa-bell" aria-hidden="true"></i> Recordatorios</h5>
+        <ul class="brief-list">${notifHtml}</ul>
+      </article>
+
+      <article class="brief-card">
+        <h5><i class="fa-solid fa-chart-simple" aria-hidden="true"></i> Radar de carga</h5>
+        ${barsHtml}
+      </article>
+
+      <article class="brief-card">
+        <h5><i class="fa-solid fa-compass" aria-hidden="true"></i> Siguiente paso</h5>
+        <div class="brief-next">
+          <div class="t">${esc(nextStep)}</div>
+          <div class="m">Tip: usa “Pendientes semana” para lectura rápida en el trayecto.</div>
+        </div>
+      </article>
+    </section>
+  `;
+}
+
+function getSummaryFiltersFromControls(){
+    const scope = String($('summaryScope')?.value || ui.summaryScope || 'team');
+    let userId = String($('summaryUser')?.value || ui.summaryUser || '');
+    const rangeMode = String($('summaryRange')?.value || ui.summaryRange || 'day');
+
+    ui.summaryScope = scope;
+    ui.summaryRange = rangeMode;
+    ui.summaryGroupBy = String($('summaryGroupBy')?.value || ui.summaryGroupBy || 'owner');
+    ui.summarySortBy = String($('summarySortBy')?.value || ui.summarySortBy || 'date');
+    ui.summaryClient = String($('summaryClient')?.value || ui.summaryClient || '');
+    ui.summaryPriority = String($('summaryPriority')?.value || ui.summaryPriority || '');
+    ui.summaryStatus = String($('summaryStatus')?.value || ui.summaryStatus || '');
+    ui.summaryQuery = String($('summaryQuery')?.value || ui.summaryQuery || '').trim();
+    ui.summaryIncludeActivities = Boolean($('summaryIncludeActivities')?.checked);
+    ui.summaryIncludeProjects = Boolean($('summaryIncludeProjects')?.checked);
+    ui.summaryIncludeNotifications = Boolean($('summaryIncludeNotifications')?.checked);
+    ui.summaryIncludeDoneActivities = Boolean($('summaryIncludeDoneActivities')?.checked);
+    ui.summaryIncludeDoneNotifications = Boolean($('summaryIncludeDoneNotifications')?.checked);
+    ui.summaryOnlyDueNotifications = Boolean($('summaryOnlyDueNotifications')?.checked);
+    ui.summaryFrom = normalizeISO($('summaryFrom')?.value || ui.summaryFrom || '') || (normalizeISO(ui.date) || todayISO());
+    ui.summaryTo = normalizeISO($('summaryTo')?.value || ui.summaryTo || '') || ui.summaryFrom;
+
+    if(scope === 'individual' && !userId){
+      userId = state.team?.[0]?.id || '';
+      ui.summaryUser = userId;
+    }else{
+      ui.summaryUser = userId;
+    }
+
+    return {
+      scope,
+      userId,
+      rangeMode,
+      groupBy: ui.summaryGroupBy,
+      sortBy: ui.summarySortBy,
+      client: ui.summaryClient,
+      priority: ui.summaryPriority,
+      status: ui.summaryStatus,
+      query: ui.summaryQuery,
+      includeActivities: ui.summaryIncludeActivities,
+      includeProjects: ui.summaryIncludeProjects,
+      includeNotifications: ui.summaryIncludeNotifications,
+      includeDoneActivities: ui.summaryIncludeDoneActivities,
+      includeDoneNotifications: ui.summaryIncludeDoneNotifications,
+      onlyDueNotifications: ui.summaryOnlyDueNotifications,
+      notificationRangeOnly: true
+    };
+  }
+
+  function updateSummaryPreview(){
+    const filters = getSummaryFiltersFromControls();
+    const result = buildAdvancedSummaryReport(filters);
+
+    const out = $('summaryOutput');
+    if(out) out.value = result.text;
+
+    renderSummaryKpis(result.stats);
+    renderSummaryReadable(result, filters);
+
+    const footer = $('summaryFooterNote');
+    if(footer){
+      const scopeLabel = filters.scope === 'individual'
+        ? `Individual: ${findTeam(filters.userId)?.name || 'N/A'}`
+        : 'Equipo completo';
+
+      footer.textContent = `${scopeLabel} · ${result.stats.range} · Actividades ${result.stats.activities} · Proyectos ${result.stats.projects} · Notificaciones ${result.stats.notifications}`;
+    }
+  }
+
+  function renderSummaryModal(){
+    ensureSummaryState();
+
+    const body = $('summaryBody');
+    if(!body) return;
+
+    const users = state.team.slice();
+    const clients = Array.from(new Set(
+      state.projects.map(p=>String(p?.client || 'Interno').trim() || 'Interno')
+    )).sort((a,b)=>a.localeCompare(b, APP_LOCALE, { sensitivity:'base' }));
+
+    const { startDate, endDate } = resolveSummaryDateRange(ui.summaryRange);
+    if(ui.summaryRange !== 'custom'){
+      ui.summaryFrom = startDate;
+      ui.summaryTo = endDate;
+    }
+
+    const userOpts = [
+      `<option value="">Todos</option>`,
+      ...users.map(u=>`<option value="${esc(u.id)}" ${ui.summaryUser===u.id?'selected':''}>${esc(u.name)}</option>`)
+    ].join('');
+
+    const activePreset = ui.summaryRange === 'day' ? 'today' : (ui.summaryRange === 'week' ? 'week' : '');
+
+    body.innerHTML = `
+  <div class="summary-workspace">
+    <section class="summary-command">
+      <div class="summary-command-top">
+        <div>
+          <div class="summary-command-title"><i class="fa-solid fa-gauge-high" aria-hidden="true"></i> Centro de reporte</div>
+          <div class="summary-command-sub">Ajusta filtros si hace falta. El foco es leer rápido y tener claridad.</div>
+        </div>
+        <div class="summary-command-actions">
+          <button class="btn" id="btnSummaryResetFilters">Limpiar filtros</button>
+          <button class="btn primary" id="btnSummaryBuild"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> Generar</button>
+        </div>
+      </div>
+
+      <div class="summary-preset-strip">
+        <button class="summary-preset ${activePreset==='week'?'active':''}" data-summary-preset="week">Semana</button>
+        <button class="summary-preset ${activePreset==='today'?'active':''}" data-summary-preset="today">Hoy</button>
+      </div>
+    </section>
+
+    <div class="summary-layout">
+      <aside class="summary-panel">
+        <details id="summaryFiltersDetails" ${ui.summaryFiltersOpen ? 'open' : ''}>
+          <summary>
+            <span>Filtros y parámetros</span>
+            <span class="summary-panel-hint">Despliega para ajustar</span>
+          </summary>
+          <div class="summary-panel-body">
+            <div class="summary-filter-grid">
+              <label class="sum-field">
+                <span>Ámbito</span>
+                <select class="ctrl" id="summaryScope">
+                  <option value="team" ${ui.summaryScope==='team'?'selected':''}>Equipo</option>
+                  <option value="individual" ${ui.summaryScope==='individual'?'selected':''}>Individual</option>
+                </select>
+              </label>
+
+              <label class="sum-field">
+                <span>Usuario</span>
+                <select class="ctrl" id="summaryUser">${userOpts}</select>
+              </label>
+
+              <label class="sum-field">
+                <span>Periodo</span>
+                <select class="ctrl" id="summaryRange">
+                  <option value="day" ${ui.summaryRange==='day'?'selected':''}>Día</option>
+                  <option value="week" ${ui.summaryRange==='week'?'selected':''}>Semana</option>
+                  <option value="month" ${ui.summaryRange==='month'?'selected':''}>Mes</option>
+                  <option value="custom" ${ui.summaryRange==='custom'?'selected':''}>Personalizado</option>
+                </select>
+              </label>
+
+              <label class="sum-field">
+                <span>Equipo</span>
+                <select class="ctrl" id="summaryClient">
+                  <option value="">Todos</option>
+                  ${clients.map(c=>`<option value="${esc(c)}" ${ui.summaryClient===c?'selected':''}>${esc(c)}</option>`).join('')}
+                </select>
+              </label>
+
+              <label class="sum-field">
+                <span>Desde</span>
+                <input class="ctrl" id="summaryFrom" type="date" value="${esc(ui.summaryFrom || startDate)}" ${ui.summaryRange==='custom' ? '' : 'disabled'} />
+              </label>
+
+              <label class="sum-field">
+                <span>Hasta</span>
+                <input class="ctrl" id="summaryTo" type="date" value="${esc(ui.summaryTo || endDate)}" ${ui.summaryRange==='custom' ? '' : 'disabled'} />
+              </label>
+
+              <label class="sum-field">
+                <span>Prioridad</span>
+                <select class="ctrl" id="summaryPriority">
+                  <option value="">Todas</option>
+                  ${PRIORITIES.map(p=>`<option value="${esc(p)}" ${ui.summaryPriority===p?'selected':''}>${esc(p)}</option>`).join('')}
+                </select>
+              </label>
+
+              <label class="sum-field">
+                <span>Estado</span>
+                <select class="ctrl" id="summaryStatus">
+                  <option value="">Todos</option>
+                  ${((typeof STATUSES!=='undefined' && Array.isArray(STATUSES)) ? STATUSES : AUTO_STATUSES).map(s=>`<option value="${esc(s)}" ${ui.summaryStatus===s?'selected':''}>${esc(s.replaceAll('_',' '))}</option>`).join('')}
+                </select>
+              </label>
+
+              <label class="sum-field">
+                <span>Agrupar</span>
+                <select class="ctrl" id="summaryGroupBy">
+                  <option value="owner" ${ui.summaryGroupBy==='owner'?'selected':''}>Responsable</option>
+                  <option value="project" ${ui.summaryGroupBy==='project'?'selected':''}>Proyecto</option>
+                  <option value="priority" ${ui.summaryGroupBy==='priority'?'selected':''}>Prioridad</option>
+                  <option value="status" ${ui.summaryGroupBy==='status'?'selected':''}>Estado</option>
+                </select>
+              </label>
+
+              <label class="sum-field">
+                <span>Orden</span>
+                <select class="ctrl" id="summarySortBy">
+                  <option value="date" ${ui.summarySortBy==='date'?'selected':''}>Fecha</option>
+                  <option value="priority" ${ui.summarySortBy==='priority'?'selected':''}>Prioridad</option>
+                  <option value="owner" ${ui.summarySortBy==='owner'?'selected':''}>Responsable</option>
+                </select>
+              </label>
+
+              <label class="sum-field wide">
+                <span>Búsqueda</span>
+                <input class="ctrl" id="summaryQuery" type="search" placeholder="Proyecto, tarea, detalle..." value="${esc(ui.summaryQuery || '')}" />
+              </label>
+            </div>
+
+            <div class="summary-checkgroups">
+              <div class="summary-checkgroup">
+                <div class="title">Salida</div>
+                <div class="summary-checkline">
+                  <label><input id="summaryIncludeActivities" type="checkbox" ${ui.summaryIncludeActivities?'checked':''} /> Actividades</label>
+                  <label><input id="summaryIncludeProjects" type="checkbox" ${ui.summaryIncludeProjects?'checked':''} /> Proyectos</label>
+                  <label><input id="summaryIncludeNotifications" type="checkbox" ${ui.summaryIncludeNotifications?'checked':''} /> Notificaciones</label>
+                </div>
+              </div>
+
+              <div class="summary-checkgroup">
+                <div class="title">Opciones</div>
+                <div class="summary-checkline">
+                  <label><input id="summaryIncludeDoneActivities" type="checkbox" ${ui.summaryIncludeDoneActivities?'checked':''} /> Finalizadas</label>
+                  <label><input id="summaryIncludeDoneNotifications" type="checkbox" ${ui.summaryIncludeDoneNotifications?'checked':''} /> Atendidas</label>
+                  <label><input id="summaryOnlyDueNotifications" type="checkbox" ${ui.summaryOnlyDueNotifications?'checked':''} /> Solo por fecha</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </details>
+      </aside>
+
+      <main class="summary-main">
+        <section id="summaryKpis" class="summary-kpis"></section>
+        <section id="summaryReadable" class="summary-readable"></section>
+        <details class="summary-plain-wrap">
+          <summary>Texto plano para copiar / compartir</summary>
+          <textarea id="summaryOutput" class="summary-output" spellcheck="false" aria-label="Salida del reporte"></textarea>
+        </details>
+      </main>
+    </div>
+  </div>
+`;
+
+    const controls = [
+      'summaryScope','summaryUser','summaryRange','summaryFrom','summaryTo','summaryGroupBy','summarySortBy',
+      'summaryClient','summaryPriority','summaryStatus','summaryQuery',
+      'summaryIncludeActivities','summaryIncludeProjects','summaryIncludeNotifications',
+      'summaryIncludeDoneActivities','summaryIncludeDoneNotifications','summaryOnlyDueNotifications'
+    ].map(id=>$(id)).filter(Boolean);
+
+    const detailsCtrl = $('summaryFiltersDetails');
+    if(detailsCtrl){
+      detailsCtrl.addEventListener('toggle', ()=>{
+        ui.summaryFiltersOpen = detailsCtrl.open;
+      });
+    }
+
+    let summaryDebounceTimer = null;
+    const debounced = ()=>{
+      if(summaryDebounceTimer) clearTimeout(summaryDebounceTimer);
+      summaryDebounceTimer = setTimeout(()=>updateSummaryPreview(), 90);
+    };
+
+    controls.forEach(ctrl=>{
+      const evt = (ctrl.type === 'search' || ctrl.tagName === 'INPUT') ? 'input' : 'change';
+      ctrl.addEventListener(evt, ()=>{
+        if(ctrl.id === 'summaryRange'){
+          const isCustom = ctrl.value === 'custom';
+          if($('summaryFrom')) $('summaryFrom').disabled = !isCustom;
+          if($('summaryTo')) $('summaryTo').disabled = !isCustom;
+
+          if(!isCustom){
+            const r = resolveSummaryDateRange(ctrl.value);
+            if($('summaryFrom')) $('summaryFrom').value = r.startDate;
+            if($('summaryTo')) $('summaryTo').value = r.endDate;
+            ui.summaryFrom = r.startDate;
+            ui.summaryTo = r.endDate;
+          }
+        }
+        debounced();
+      });
+
+      if(ctrl.id === 'summaryQuery'){
+        ctrl.addEventListener('change', debounced);
+        ctrl.addEventListener('search', debounced);
+        ctrl.addEventListener('keyup', debounced);
+      }
+    });
+
+    document.querySelectorAll('[data-summary-preset]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const preset = String(btn.getAttribute('data-summary-preset') || '');
+        if(!preset) return;
+
+        if(preset === 'today'){
+          ui.summaryScope = 'team';
+          ui.summaryUser = '';
+          ui.summaryRange = 'day';
+          ui.summaryGroupBy = 'owner';
+          ui.summarySortBy = 'date';
+          ui.summaryOnlyDueNotifications = false;
+          ui.summaryIncludeDoneActivities = false;
+          ui.summaryIncludeDoneNotifications = false;
+        }else if(preset === 'week'){
+          ui.summaryScope = 'team';
+          ui.summaryUser = '';
+          ui.summaryRange = 'week';
+          ui.summaryGroupBy = 'owner';
+          ui.summarySortBy = 'date';
+          ui.summaryOnlyDueNotifications = false;
+          ui.summaryIncludeDoneActivities = false;
+          ui.summaryIncludeDoneNotifications = false;
+        }
+
+        renderSummaryModal();
+      });
+    });
+
+    $('btnSummaryBuild')?.addEventListener('click', ()=>{
+      updateSummaryPreview();
+      if(window.matchMedia('(max-width:900px)').matches){
+        const det = $('summaryFiltersDetails');
+        if(det?.open){
+          det.open = false;
+          ui.summaryFiltersOpen = false;
+        }
+        $('summaryReadable')?.scrollIntoView({ behavior:'smooth', block:'start' });
+      }
+    });
+
+    $('btnSummaryResetFilters')?.addEventListener('click', ()=>{
+      ui.summaryScope = 'team';
+      ui.summaryUser = '';
+      ui.summaryRange = 'week';
+      ui.summaryFrom = normalizeISO(ui.date) || todayISO();
+      ui.summaryTo = ui.summaryFrom;
+      ui.summaryGroupBy = 'owner';
+      ui.summarySortBy = 'date';
+      ui.summaryClient = '';
+      ui.summaryPriority = '';
+      ui.summaryStatus = '';
+      ui.summaryQuery = '';
+      ui.summaryIncludeActivities = true;
+      ui.summaryIncludeProjects = true;
+      ui.summaryIncludeNotifications = true;
+      ui.summaryIncludeDoneActivities = false;
+      ui.summaryIncludeDoneNotifications = false;
+      ui.summaryOnlyDueNotifications = false;
+      ui.summaryFiltersOpen = false;
+      renderSummaryModal();
+    });
+
+    const copyBtn = $('btnSummaryCopy');
+    if(copyBtn){
+      copyBtn.onclick = async ()=>{
+        const txt = String($('summaryOutput')?.value || '').trim();
+        if(!txt){
+          toast('No hay contenido para copiar.');
+          return;
+        }
+        try{
+          await navigator.clipboard.writeText(txt);
+          toast('Reporte copiado al portapapeles.');
+        }catch(_){
+          const area = $('summaryOutput');
+          if(area){
+            area.focus();
+            area.select();
+            document.execCommand('copy');
+            toast('Reporte copiado.');
+          }else{
+            toast('No se pudo copiar automáticamente.');
+          }
+        }
+      };
+    }
+
+    updateSummaryPreview();
+  }
 
 function buildDaySummaryText(dayISO=ui.date){
     const selectedDate = normalizeISO(dayISO) || todayISO();
@@ -3754,7 +5682,7 @@ function buildDaySummaryText(dayISO=ui.date){
       copyBtn.className = 'btn';
       copyBtn.type = 'button';
       copyBtn.textContent = 'Resumen';
-      copyBtn.title = 'Copiar resumen diario';
+      copyBtn.title = 'Abrir generador de reportes';
       copyBtn.addEventListener('click', copySelectedDaySummary);
     }
     copyBtn.onclick = copySelectedDaySummary;
