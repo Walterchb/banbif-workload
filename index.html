@@ -803,6 +803,20 @@
   gap:7px;
   flex-wrap:wrap;
 }
+.summary-preset-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:7px;
+}
+.summary-preset-btn-clean{
+  height:29px;
+  border-radius:5px;
+  font-size:10.5px;
+  font-weight:700;
+  padding:0 11px;
+  white-space:nowrap;
+}
 .summary-preset{
   border:1px solid var(--line);
   background:var(--surface);
@@ -1179,11 +1193,27 @@
   .summary-command-top{grid-template-columns:1fr}
   .summary-command-actions{justify-content:stretch}
   .summary-command-actions .btn{flex:1}
+  .summary-preset-row{grid-template-columns:minmax(0,1fr) auto;gap:6px}
   .summary-preset-strip{
     flex-wrap:nowrap;
     overflow:auto hidden;
     padding-bottom:2px;
     scrollbar-width:thin;
+  }
+  .summary-preset-btn-clean{flex:0 0 auto}
+  .summary-checkline--single-row-mobile{
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:thin;
+  }
+  .summary-checkline--single-row-mobile label{
+    flex:0 0 auto;
+    white-space:nowrap;
+  }
+  #summaryOverlay input#summaryQuery.ctrl{
+    font-size:16px !important;
+    line-height:1.25;
   }
   .summary-preset-strip::-webkit-scrollbar{height:4px}
   .summary-preset{flex:0 0 auto}
@@ -2522,7 +2552,7 @@
       </div>
       <div class="m-body" id="summaryBody"></div>
       <div class="m-foot">
-        <div class="small muted" id="summaryFooterNote">Configura filtros y el reporte se actualiza automáticamente.</div>
+        <div class="small muted" id="summaryFooterNote">Configura variables y genera un reporte listo para copiar.</div>
         <div class="row" style="gap:8px">
           <button class="btn primary" id="btnSummaryCopy"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copiar reporte</button>
           <button class="btn" data-close="summaryOverlay">Cerrar</button>
@@ -4721,258 +4751,214 @@ function openAccessGate(){
   }
 
   function buildAdvancedSummaryReport(filters){
-    const { startDate, endDate } = resolveSummaryDateRange(filters.rangeMode);
-    const dataset = collectSummaryRows(startDate, endDate);
-    const scoped = applySummaryFilters(dataset, {
-      scope: filters.scope,
-      userId: filters.userId,
-      client: filters.client,
-      priority: filters.priority,
-      status: filters.status,
-      query: filters.query,
-      includeDoneActivities: filters.includeDoneActivities,
-      includeDoneNotifications: filters.includeDoneNotifications,
-      onlyDueNotifications: filters.onlyDueNotifications,
-      notificationRangeOnly: filters.notificationRangeOnly,
-      sortBy: filters.sortBy
-    });
+  const { startDate, endDate } = resolveSummaryDateRange(filters.rangeMode);
+  const dataset = collectSummaryRows(startDate, endDate);
+  const scoped = applySummaryFilters(dataset, {
+    scope: filters.scope,
+    userId: filters.userId,
+    client: filters.client,
+    priority: filters.priority,
+    status: filters.status,
+    query: filters.query,
+    includeDoneActivities: filters.includeDoneActivities,
+    includeDoneNotifications: filters.includeDoneNotifications,
+    onlyDueNotifications: filters.onlyDueNotifications,
+    notificationRangeOnly: filters.notificationRangeOnly,
+    sortBy: filters.sortBy
+  });
 
-    const allActivities = scoped.activities;
-    const allProjects = scoped.projects;
-    const allNotifications = scoped.notifications;
+  const activities = scoped.activities;
+  const projects = scoped.projects;
+  const notifications = scoped.notifications;
 
-    const visibleActivities = filters.includeActivities ? allActivities : [];
-    const visibleProjects = filters.includeProjects ? allProjects : [];
-    const visibleNotifications = filters.includeNotifications ? allNotifications : [];
+  const pendingActivities = activities.filter(r=>r.pending).length;
+  const overdueActivities = activities.filter(r=>r.overdue).length;
+  const pendingProjects = projects.filter(r=>r.pending).length;
+  const overdueProjects = projects.filter(r=>r.overdue).length;
+  const pendingNotifications = notifications.filter(r=>!r.done).length;
+  const dueNotifications = notifications.filter(r=>r.due).length;
 
-    const pendingActivities = visibleActivities.filter(r=>r.pending).length;
-    const overdueActivities = visibleActivities.filter(r=>r.overdue).length;
-    const pendingProjects = visibleProjects.filter(r=>r.pending).length;
-    const overdueProjects = visibleProjects.filter(r=>r.overdue).length;
-    const pendingNotifications = visibleNotifications.filter(r=>!r.done).length;
-    const dueNotifications = visibleNotifications.filter(r=>r.due).length;
+  const scopeLabel = filters.scope === 'individual'
+    ? `Individual (${findTeam(filters.userId)?.name || 'Sin usuario'})`
+    : 'Equipo';
 
-    const scopeLabel = filters.scope === 'individual'
-      ? `Individual (${findTeam(filters.userId)?.name || 'Sin usuario'})`
-      : 'Equipo';
+  const filterParts = [];
+  if(filters.client) filterParts.push(`Equipo: ${filters.client}`);
+  if(filters.priority) filterParts.push(`Prioridad: ${filters.priority}`);
+  if(filters.status) filterParts.push(`Estado: ${filters.status}`);
+  if(filters.query) filterParts.push(`Búsqueda: "${filters.query}"`);
+  if(filters.scope === 'team' && filters.userId) filterParts.push(`Usuario foco: ${findTeam(filters.userId)?.name || 'N/A'}`);
 
-    const filterParts = [];
-    if(filters.client) filterParts.push(`Equipo/Cliente: ${filters.client}`);
-    if(filters.priority) filterParts.push(`Prioridad: ${filters.priority}`);
-    if(filters.status) filterParts.push(`Estado: ${filters.status}`);
-    if(filters.query) filterParts.push(`Búsqueda: "${filters.query}"`);
-    if(filters.scope === 'team' && filters.userId) filterParts.push(`Usuario foco: ${findTeam(filters.userId)?.name || 'N/A'}`);
+  const modeLabel = filters.rangeMode === 'custom'
+    ? 'Personalizado'
+    : filters.rangeMode === 'week'
+      ? 'Semana'
+      : filters.rangeMode === 'month'
+        ? 'Mes'
+        : 'Día';
 
-    const modeLabel = filters.rangeMode === 'custom'
-      ? 'Personalizado'
-      : filters.rangeMode === 'week'
-        ? 'Semana'
-        : filters.rangeMode === 'month'
-          ? 'Mes'
-          : 'Día';
+  const nowText = `${fmtDate(todayISO())} ${new Date().toLocaleTimeString(APP_LOCALE, {hour:'2-digit', minute:'2-digit'})}`;
 
-    const selectedOutputLabels = [];
-    if(filters.includeActivities) selectedOutputLabels.push('Actividades');
-    if(filters.includeProjects) selectedOutputLabels.push('Proyectos');
-    if(filters.includeNotifications) selectedOutputLabels.push('Notificaciones');
-
-    const nowText = `${fmtDate(todayISO())} ${new Date().toLocaleTimeString(APP_LOCALE, {hour:'2-digit', minute:'2-digit'})}`;
-
-    const lines = [];
-    const sep = '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━';
-    const addSection = (title)=>{
-      lines.push('');
-      lines.push(title.toUpperCase());
-      lines.push(sep);
-    };
-
-    lines.push('📌 REPORTE OPERATIVO | A DEMANDA');
+  const lines = [];
+  const sep = '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━';
+  const addSection = (title)=>{
+    lines.push('');
+    lines.push(title.toUpperCase());
     lines.push(sep);
-    lines.push(`Generado: ${nowText}`);
-    lines.push(`Periodo: ${summaryRangeLabel(startDate, endDate)} (${modeLabel})`);
-    lines.push(`Ámbito: ${scopeLabel}`);
-    lines.push(`Vista: ${filters.groupBy === 'project' ? 'Proyecto' : filters.groupBy === 'priority' ? 'Prioridad' : filters.groupBy === 'status' ? 'Estado' : 'Responsable'} | Orden: ${filters.sortBy === 'priority' ? 'Prioridad' : filters.sortBy === 'owner' ? 'Responsable' : 'Fecha'}`);
-    lines.push(`Salida: ${selectedOutputLabels.length ? selectedOutputLabels.join(' | ') : 'Sin bloques seleccionados'}`);
-    if(filterParts.length) lines.push(`Filtros: ${filterParts.join(' | ')}`);
+  };
 
-    addSection('Resumen ejecutivo');
-    if(filters.includeActivities){
-      lines.push(`• Actividades: ${visibleActivities.length} | Pendientes: ${pendingActivities} | Demoradas: ${overdueActivities} | Finalizadas: ${Math.max(0, visibleActivities.length - pendingActivities)}`);
-    }else{
-      lines.push('• Actividades: no incluidas en SALIDA.');
-    }
+  lines.push('📌 REPORTE OPERATIVO | A DEMANDA');
+  lines.push(sep);
+  lines.push(`Generado: ${nowText}`);
+  lines.push(`Periodo: ${summaryRangeLabel(startDate, endDate)} (${modeLabel})`);
+  lines.push(`Ámbito: ${scopeLabel}`);
+  lines.push(`Vista: ${filters.groupBy === 'project' ? 'Proyecto' : filters.groupBy === 'priority' ? 'Prioridad' : filters.groupBy === 'status' ? 'Estado' : 'Responsable'} | Orden: ${filters.sortBy === 'priority' ? 'Prioridad' : filters.sortBy === 'owner' ? 'Responsable' : 'Fecha'}`);
+  if(filterParts.length) lines.push(`Filtros: ${filterParts.join(' | ')}`);
 
-    if(filters.includeProjects){
-      lines.push(`• Proyectos: ${visibleProjects.length} | Pendientes: ${pendingProjects} | Demorados: ${overdueProjects} | Finalizados: ${Math.max(0, visibleProjects.length - pendingProjects)}`);
-    }else{
-      lines.push('• Proyectos: no incluidos en SALIDA.');
-    }
+  addSection('Resumen ejecutivo');
+  lines.push(`• Actividades: ${activities.length} | Pendientes: ${pendingActivities} | Demoradas: ${overdueActivities} | Finalizadas: ${Math.max(0, activities.length - pendingActivities)}`);
+  lines.push(`• Proyectos: ${projects.length} | Pendientes: ${pendingProjects} | Demorados: ${overdueProjects} | Finalizados: ${Math.max(0, projects.length - pendingProjects)}`);
+  lines.push(`• Notificaciones: ${notifications.length} | Pendientes: ${pendingNotifications} | Por fecha: ${dueNotifications} | Atendidas: ${Math.max(0, notifications.length - pendingNotifications)}`);
 
-    if(filters.includeNotifications){
-      lines.push(`• Notificaciones: ${visibleNotifications.length} | Pendientes: ${pendingNotifications} | Por fecha: ${dueNotifications} | Atendidas: ${Math.max(0, visibleNotifications.length - pendingNotifications)}`);
-    }else{
-      lines.push('• Notificaciones: no incluidas en SALIDA.');
-    }
+  const pendingHighlights = [];
+  const criticalActivities = activities
+    .filter(a=>a.overdue || a.pending)
+    .sort((a,b)=>{
+      if(a.overdue !== b.overdue) return a.overdue ? -1 : 1;
+      return String(a.endDate || '').localeCompare(String(b.endDate || ''));
+    })
+    .slice(0, 10);
 
-    const pendingHighlights = [];
-    const criticalActivities = visibleActivities
-      .filter(a=>a.overdue || a.pending)
-      .sort((a,b)=>{
-        if(a.overdue !== b.overdue) return a.overdue ? -1 : 1;
-        return String(a.endDate || '').localeCompare(String(b.endDate || ''));
-      })
-      .slice(0, 10);
+  criticalActivities.forEach(a=>{
+    const schedule = a.startDate === a.endDate
+      ? fmtDate(a.startDate)
+      : `${fmtDate(a.startDate)}→${fmtDate(a.endDate)}`;
+    const hour = a.startHour && a.endHour ? ` ${a.startHour}-${a.endHour}` : '';
+    pendingHighlights.push(`[${a.overdue ? 'Demorada' : 'Pendiente'}] ${schedule}${hour} | ${a.ownerName} | ${a.projectName} › ${a.taskName}`);
+  });
 
-    criticalActivities.forEach(a=>{
-      const schedule = a.startDate === a.endDate
-        ? fmtDate(a.startDate)
-        : `${fmtDate(a.startDate)}→${fmtDate(a.endDate)}`;
-      const hour = a.startHour && a.endHour ? ` ${a.startHour}-${a.endHour}` : '';
-      pendingHighlights.push(`[${a.overdue ? 'Demorada' : 'Pendiente'}] ${schedule}${hour} | ${a.ownerName} | ${a.projectName} › ${a.taskName}`);
-    });
+  const criticalNotifs = notifications
+    .filter(n=>n.due || (!n.done && !n.remindDate))
+    .slice(0, 6);
 
-    const criticalNotifs = visibleNotifications
-      .filter(n=>n.due || (!n.done && !n.remindDate))
-      .slice(0, 6);
+  criticalNotifs.forEach(n=>{
+    const when = n.remindDate ? formatNotificationReminder(n) : 'Sin fecha';
+    pendingHighlights.push(`[Notif ${n.due ? 'por fecha' : 'pendiente'}] ${when} | ${n.targetName} | ${n.title}`);
+  });
 
-    criticalNotifs.forEach(n=>{
-      const when = n.remindDate ? formatNotificationReminder(n) : 'Sin fecha';
-      pendingHighlights.push(`[Notif ${n.due ? 'por fecha' : 'pendiente'}] ${when} | ${n.targetName} | ${n.title}`);
-    });
-
-    addSection('Alertas prioritarias');
-    if(!selectedOutputLabels.length){
-      lines.push('• Activa al menos un bloque en SALIDA para generar alertas.');
-    }else if(!pendingHighlights.length){
-      lines.push('• Sin alertas críticas para este criterio.');
-    }else{
-      pendingHighlights.forEach((item, idx)=>lines.push(`${idx + 1}. ${item}`));
-    }
-
-    if(filters.includeActivities){
-      addSection(`Actividades (${visibleActivities.length})`);
-      if(!visibleActivities.length){
-        lines.push('• Sin actividades para este criterio.');
-      }else{
-        const grouped = summarizeByGroup(visibleActivities, filters.groupBy, 'activity');
-        let printed = 0;
-        const maxItems = 70;
-        grouped.forEach(([groupName, rows])=>{
-          if(printed >= maxItems) return;
-          lines.push(`• ${String(groupName || 'Sin grupo').toUpperCase()} (${rows.length})`);
-          rows.forEach(row=>{
-            if(printed >= maxItems) return;
-            const day = row.startDate === row.endDate ? fmtDate(row.startDate) : `${fmtDate(row.startDate)}→${fmtDate(row.endDate)}`;
-            const hour = row.startHour && row.endHour ? ` ${row.startHour}-${row.endHour}` : '';
-            lines.push(`  · ${day}${hour} | ${row.projectName} | ${row.taskName} | ${row.priority} | ${row.status}`);
-            printed += 1;
-          });
-        });
-        if(visibleActivities.length > maxItems){
-          lines.push(`• ... ${visibleActivities.length - maxItems} actividad(es) adicional(es).`);
-        }
-      }
-    }
-
-    if(filters.includeProjects){
-      addSection(`Proyectos (${visibleProjects.length})`);
-      if(!visibleProjects.length){
-        lines.push('• Sin proyectos para este criterio.');
-      }else{
-        const grouped = summarizeByGroup(visibleProjects, filters.groupBy, 'project');
-        let printed = 0;
-        const maxItems = 55;
-        grouped.forEach(([groupName, rows])=>{
-          if(printed >= maxItems) return;
-          lines.push(`• ${String(groupName || 'Sin grupo').toUpperCase()} (${rows.length})`);
-          rows.forEach(row=>{
-            if(printed >= maxItems) return;
-            const day = row.startDate === row.endDate ? fmtDate(row.startDate) : `${fmtDate(row.startDate)}→${fmtDate(row.endDate)}`;
-            const owners = row.ownersLabel ? ` | Resp: ${row.ownersLabel}` : '';
-            lines.push(`  · ${day} | ${row.projectName} | ${row.priority} | ${row.status}${owners}`);
-            printed += 1;
-          });
-        });
-        if(visibleProjects.length > maxItems){
-          lines.push(`• ... ${visibleProjects.length - maxItems} proyecto(s) adicional(es).`);
-        }
-      }
-    }
-
-    if(filters.includeNotifications){
-      addSection(`Notificaciones (${visibleNotifications.length})`);
-      if(!visibleNotifications.length){
-        lines.push('• Sin notificaciones para este criterio.');
-      }else{
-        visibleNotifications.slice(0,55).forEach(n=>{
-          const when = n.remindDate ? formatNotificationReminder(n) : 'Sin fecha';
-          const stateLabel = n.done ? 'Atendida' : (n.due ? 'Por fecha' : 'Pendiente');
-          lines.push(`  · [${stateLabel}] ${when} | ${n.targetName} | ${n.title}${n.message ? ` — ${n.message}` : ''}`);
-        });
-        if(visibleNotifications.length > 55){
-          lines.push(`• ... ${visibleNotifications.length - 55} notificación(es) adicional(es).`);
-        }
-      }
-    }
-
-    addSection('Siguiente acción sugerida');
-    if(!selectedOutputLabels.length){
-      lines.push('• Define al menos un bloque en SALIDA para construir un plan de acción.');
-    }else if(pendingHighlights.length){
-      lines.push('• Prioriza "Demoradas" y "Notif por fecha", reasigna responsables y confirma nuevo compromiso en la reunión de seguimiento.');
-    }else{
-      lines.push('• Mantener monitoreo semanal y registrar notificaciones preventivas por responsable.');
-    }
-
-    let breakdownRows = [];
-    let breakdownType = 'activity';
-    if(filters.includeActivities){
-      breakdownRows = visibleActivities;
-      breakdownType = 'activity';
-    }else if(filters.includeProjects){
-      breakdownRows = visibleProjects;
-      breakdownType = 'project';
-    }
-
-    return {
-      text: lines.join('\\n'),
-      stats: {
-        activities: visibleActivities.length,
-        pendingActivities,
-        projects: visibleProjects.length,
-        pendingProjects,
-        notifications: visibleNotifications.length,
-        pendingNotifications,
-        dueNotifications,
-        range: summaryRangeLabel(startDate, endDate)
-      },
-      details: {
-        scopeLabel,
-        modeLabel,
-        generatedAt: nowText,
-        filtersApplied: filterParts.slice(),
-        startDate,
-        endDate,
-        outputFlags: {
-          activities: Boolean(filters.includeActivities),
-          projects: Boolean(filters.includeProjects),
-          notifications: Boolean(filters.includeNotifications)
-        },
-        selectedOutputLabels: selectedOutputLabels.slice(),
-        topActivities: criticalActivities.slice(0, 8),
-        topNotifications: criticalNotifs.slice(0, 8),
-        pendingHighlights: pendingHighlights.slice(0, 10),
-        groupBreakdown: summarizeByGroup(breakdownRows, filters.groupBy, breakdownType)
-          .slice(0, 6)
-          .map(([name, rows])=>({
-            name,
-            total: rows.length,
-            pending: rows.filter(r=>r.pending).length,
-            overdue: rows.filter(r=>r.overdue).length
-          }))
-      }
-    };
+  addSection('Alertas prioritarias');
+  if(!pendingHighlights.length){
+    lines.push('• Sin alertas críticas para este criterio.');
+  }else{
+    pendingHighlights.forEach((item, idx)=>lines.push(`${idx + 1}. ${item}`));
   }
+
+  if(filters.includeActivities){
+    addSection(`Actividades (${activities.length})`);
+    if(!activities.length){
+      lines.push('• Sin actividades para este criterio.');
+    }else{
+      const grouped = summarizeByGroup(activities, filters.groupBy, 'activity');
+      let printed = 0;
+      const maxItems = 70;
+      grouped.forEach(([groupName, rows])=>{
+        if(printed >= maxItems) return;
+        lines.push(`• ${String(groupName || 'Sin grupo').toUpperCase()} (${rows.length})`);
+        rows.forEach(row=>{
+          if(printed >= maxItems) return;
+          const day = row.startDate === row.endDate ? fmtDate(row.startDate) : `${fmtDate(row.startDate)}→${fmtDate(row.endDate)}`;
+          const hour = row.startHour && row.endHour ? ` ${row.startHour}-${row.endHour}` : '';
+          lines.push(`  · ${day}${hour} | ${row.projectName} | ${row.taskName} | ${row.priority} | ${row.status}`);
+          printed += 1;
+        });
+      });
+      if(activities.length > maxItems){
+        lines.push(`• ... ${activities.length - maxItems} actividad(es) adicional(es).`);
+      }
+    }
+  }
+
+  if(filters.includeProjects){
+    addSection(`Proyectos (${projects.length})`);
+    if(!projects.length){
+      lines.push('• Sin proyectos para este criterio.');
+    }else{
+      const grouped = summarizeByGroup(projects, filters.groupBy, 'project');
+      let printed = 0;
+      const maxItems = 55;
+      grouped.forEach(([groupName, rows])=>{
+        if(printed >= maxItems) return;
+        lines.push(`• ${String(groupName || 'Sin grupo').toUpperCase()} (${rows.length})`);
+        rows.forEach(row=>{
+          if(printed >= maxItems) return;
+          const day = row.startDate === row.endDate ? fmtDate(row.startDate) : `${fmtDate(row.startDate)}→${fmtDate(row.endDate)}`;
+          const owners = row.ownersLabel ? ` | Resp: ${row.ownersLabel}` : '';
+          lines.push(`  · ${day} | ${row.projectName} | ${row.priority} | ${row.status}${owners}`);
+          printed += 1;
+        });
+      });
+      if(projects.length > maxItems){
+        lines.push(`• ... ${projects.length - maxItems} proyecto(s) adicional(es).`);
+      }
+    }
+  }
+
+  if(filters.includeNotifications){
+    addSection(`Notificaciones (${notifications.length})`);
+    if(!notifications.length){
+      lines.push('• Sin notificaciones para este criterio.');
+    }else{
+      notifications.slice(0,55).forEach(n=>{
+        const when = n.remindDate ? formatNotificationReminder(n) : 'Sin fecha';
+        const stateLabel = n.done ? 'Atendida' : (n.due ? 'Por fecha' : 'Pendiente');
+        lines.push(`  · [${stateLabel}] ${when} | ${n.targetName} | ${n.title}${n.message ? ` — ${n.message}` : ''}`);
+      });
+      if(notifications.length > 55){
+        lines.push(`• ... ${notifications.length - 55} notificación(es) adicional(es).`);
+      }
+    }
+  }
+
+  addSection('Siguiente acción sugerida');
+  if(pendingHighlights.length){
+    lines.push('• Prioriza "Demoradas" y "Notif por fecha", reasigna responsables y confirma nuevo compromiso en la reunión de seguimiento.');
+  }else{
+    lines.push('• Mantener monitoreo semanal y registrar notificaciones preventivas por responsable.');
+  }
+
+  return {
+    text: lines.join('\n'),
+    stats: {
+      activities: activities.length,
+      pendingActivities,
+      projects: projects.length,
+      pendingProjects,
+      notifications: notifications.length,
+      pendingNotifications,
+      dueNotifications,
+      range: summaryRangeLabel(startDate, endDate)
+    },
+    details: {
+      scopeLabel,
+      modeLabel,
+      generatedAt: nowText,
+      filtersApplied: filterParts.slice(),
+      startDate,
+      endDate,
+      topActivities: criticalActivities.slice(0, 8),
+      topNotifications: criticalNotifs.slice(0, 8),
+      pendingHighlights: pendingHighlights.slice(0, 10),
+      groupBreakdown: summarizeByGroup(activities, filters.groupBy, 'activity')
+        .slice(0, 6)
+        .map(([name, rows])=>({
+          name,
+          total: rows.length,
+          pending: rows.filter(r=>r.pending).length,
+          overdue: rows.filter(r=>r.overdue).length
+        }))
+    }
+  };
+}
 
   function renderSummaryKpis(stats){
     const root = $('summaryKpis');
@@ -5003,17 +4989,12 @@ function openAccessGate(){
   }
 
 
-
 function renderSummaryReadable(result, filters){
   const root = $('summaryReadable');
   if(!root) return;
 
   const stats = result?.stats || {};
   const details = result?.details || {};
-  const outputFlags = details.outputFlags || { activities:true, projects:true, notifications:true };
-  const selectedOutputs = Array.isArray(details.selectedOutputLabels)
-    ? details.selectedOutputLabels.filter(Boolean)
-    : [];
 
   const totalPending =
     Number(stats.pendingActivities || 0) +
@@ -5032,71 +5013,62 @@ function renderSummaryReadable(result, filters){
     ? details.filtersApplied.join(' · ')
     : 'Sin filtros adicionales';
 
-  const outputText = selectedOutputs.length ? selectedOutputs.join(', ') : 'Ninguna';
-
   const topActs = Array.isArray(details.topActivities) ? details.topActivities.slice(0, 6) : [];
   const topNotifs = Array.isArray(details.topNotifications) ? details.topNotifications.slice(0, 6) : [];
   const groups = Array.isArray(details.groupBreakdown) ? details.groupBreakdown.slice(0, 6) : [];
 
   const overdueActivities = topActs.filter(a=>a.overdue);
   const pendingActivities = topActs.filter(a=>!a.overdue);
+
   const urgentList = overdueActivities.length ? overdueActivities : pendingActivities;
 
-  const urgentHtml = !outputFlags.activities
-    ? `<li class="brief-empty">Bloque Actividades no incluido en SALIDA.</li>`
-    : (urgentList.length
-      ? urgentList.map(a=>{
-          const range = a.startDate === a.endDate ? fmtDate(a.startDate) : `${fmtDate(a.startDate)} → ${fmtDate(a.endDate)}`;
-          const hour = a.startHour && a.endHour ? ` · ${a.startHour}-${a.endHour}` : '';
-          const cls = a.overdue ? 'urgent' : 'warn';
-          return `<li class="brief-item ${cls}">
-            <div class="t">${esc(a.taskName || 'Actividad')}</div>
-            <div class="m">${esc(a.ownerName || 'Sin responsable')} · ${esc(a.projectName || 'Sin proyecto')}</div>
-            <div class="m">${esc(range + hour)}</div>
-          </li>`;
-        }).join('')
-      : `<li class="brief-empty">No hay actividades críticas en este rango.</li>`);
+  const urgentHtml = urgentList.length
+    ? urgentList.map(a=>{
+        const range = a.startDate === a.endDate ? fmtDate(a.startDate) : `${fmtDate(a.startDate)} → ${fmtDate(a.endDate)}`;
+        const hour = a.startHour && a.endHour ? ` · ${a.startHour}-${a.endHour}` : '';
+        const cls = a.overdue ? 'urgent' : 'warn';
+        return `<li class="brief-item ${cls}">
+          <div class="t">${esc(a.taskName || 'Actividad')}</div>
+          <div class="m">${esc(a.ownerName || 'Sin responsable')} · ${esc(a.projectName || 'Sin proyecto')}</div>
+          <div class="m">${esc(range + hour)}</div>
+        </li>`;
+      }).join('')
+    : `<li class="brief-empty">No hay actividades críticas en este rango.</li>`;
 
-  const notifHtml = !outputFlags.notifications
-    ? `<li class="brief-empty">Bloque Notificaciones no incluido en SALIDA.</li>`
-    : (topNotifs.length
-      ? topNotifs.map(n=>{
-          const when = n.remindDate ? formatNotificationReminder(n) : 'Sin fecha';
-          const cls = n.due ? 'urgent' : 'warn';
-          const st = n.done ? 'Atendida' : (n.due ? 'Por fecha' : 'Pendiente');
-          return `<li class="brief-item ${cls}">
-            <div class="t">${esc(n.title || 'Notificación')}</div>
-            <div class="m">${esc(n.targetName || 'Equipo')} · ${esc(st)}</div>
-            <div class="m">${esc(when)}</div>
-          </li>`;
-        }).join('')
-      : `<li class="brief-empty">No hay recordatorios críticos por ahora.</li>`);
+  const notifHtml = topNotifs.length
+    ? topNotifs.map(n=>{
+        const when = n.remindDate ? formatNotificationReminder(n) : 'Sin fecha';
+        const cls = n.due ? 'urgent' : 'warn';
+        const st = n.done ? 'Atendida' : (n.due ? 'Por fecha' : 'Pendiente');
+        return `<li class="brief-item ${cls}">
+          <div class="t">${esc(n.title || 'Notificación')}</div>
+          <div class="m">${esc(n.targetName || 'Equipo')} · ${esc(st)}</div>
+          <div class="m">${esc(when)}</div>
+        </li>`;
+      }).join('')
+    : `<li class="brief-empty">No hay recordatorios críticos por ahora.</li>`;
 
   const maxGroup = Math.max(1, ...groups.map(g=>Number(g.total || 0)));
-  const barsHtml = (!outputFlags.activities && !outputFlags.projects)
-    ? `<div class="brief-empty">No hay bloques de carga habilitados en SALIDA.</div>`
-    : (groups.length
-      ? `<div class="brief-bars">${
-          groups.map(g=>{
-            const pct = Math.max(4, Math.round((Number(g.total || 0) / maxGroup) * 100));
-            return `<div class="brief-bar">
-              <div class="brief-bar-head">
-                <span>${esc(g.name || 'Sin grupo')}</span>
-                <span>${Number(g.total || 0)} · Pend ${Number(g.pending || 0)}</span>
-              </div>
-              <div class="brief-bar-track"><span style="width:${pct}%"></span></div>
-            </div>`;
-          }).join('')
-        }</div>`
-      : `<div class="brief-empty">No hay carga agrupada para mostrar.</div>`);
+  const barsHtml = groups.length
+    ? `<div class="brief-bars">${
+      groups.map(g=>{
+        const pct = Math.max(4, Math.round((Number(g.total || 0) / maxGroup) * 100));
+        return `<div class="brief-bar">
+          <div class="brief-bar-head">
+            <span>${esc(g.name || 'Sin grupo')}</span>
+            <span>${Number(g.total || 0)} · Pend ${Number(g.pending || 0)}</span>
+          </div>
+          <div class="brief-bar-track"><span style="width:${pct}%"></span></div>
+        </div>`;
+      }).join('')
+    }</div>`
+    : `<div class="brief-empty">No hay carga agrupada para mostrar.</div>`;
 
-  const nextStep = !selectedOutputs.length
-    ? 'Activa al menos un bloque en SALIDA para definir prioridades.'
-    : totalPending > 0
-      ? (Number(stats.dueNotifications || 0) > 0
-          ? 'Primero atiende recordatorios por fecha. Luego libera actividades demoradas.'
-          : 'Prioriza actividades pendientes por responsable y confirma bloque de trabajo hoy.')
-      : 'Sin pendientes críticos. Mantén revisión breve diaria y control semanal.';
+  const nextStep = totalPending > 0
+    ? (Number(stats.dueNotifications || 0) > 0
+        ? 'Primero atiende recordatorios por fecha. Luego libera actividades demoradas.'
+        : 'Prioriza actividades pendientes por responsable y confirma bloque de trabajo hoy.')
+    : 'Sin pendientes críticos. Mantén revisión breve diaria y control semanal.';
 
   root.innerHTML = `
     <section class="brief-hero">
@@ -5106,7 +5078,6 @@ function renderSummaryReadable(result, filters){
         <div class="brief-tags">
           <span class="brief-tag">${esc(details.modeLabel || 'Resumen')}</span>
           <span class="brief-tag">${esc(filterText)}</span>
-          <span class="brief-tag">Salida: ${esc(outputText)}</span>
         </div>
       </div>
       <div class="brief-score">
@@ -5191,24 +5162,6 @@ function getSummaryFiltersFromControls(){
     };
   }
 
-  function syncSummaryOptionAvailability(){
-    const includeActivities = Boolean($('summaryIncludeActivities')?.checked);
-    const includeProjects = Boolean($('summaryIncludeProjects')?.checked);
-    const includeNotifications = Boolean($('summaryIncludeNotifications')?.checked);
-
-    const doneActivities = $('summaryIncludeDoneActivities');
-    if(doneActivities){
-      doneActivities.disabled = !(includeActivities || includeProjects);
-    }
-
-    const doneNotifications = $('summaryIncludeDoneNotifications');
-    const onlyDueNotifications = $('summaryOnlyDueNotifications');
-    [doneNotifications, onlyDueNotifications].forEach(ctrl=>{
-      if(ctrl) ctrl.disabled = !includeNotifications;
-    });
-  }
-
-
   function updateSummaryPreview(){
     const filters = getSummaryFiltersFromControls();
     const result = buildAdvancedSummaryReport(filters);
@@ -5251,19 +5204,9 @@ function getSummaryFiltersFromControls(){
       ...users.map(u=>`<option value="${esc(u.id)}" ${ui.summaryUser===u.id?'selected':''}>${esc(u.name)}</option>`)
     ].join('');
 
-    const isHighPreset = (
-      ui.summaryScope === 'team' &&
-      !ui.summaryUser &&
-      ui.summaryRange === 'day' &&
-      ui.summaryPriority === 'Alta' &&
-      !ui.summaryClient &&
-      !ui.summaryStatus &&
-      !ui.summaryQuery &&
-      ui.summaryIncludeActivities &&
-      !ui.summaryIncludeProjects &&
-      !ui.summaryIncludeNotifications
-    );
-    const activePreset = isHighPreset ? 'high' : (ui.summaryRange === 'day' ? 'today' : (ui.summaryRange === 'week' ? 'week' : ''));
+    const activePreset = (
+      ui.summaryRange === 'day' && ui.summaryPriority === 'Alta' && ui.summaryIncludeActivities && !ui.summaryIncludeProjects && !ui.summaryIncludeNotifications
+    ) ? 'alta' : (ui.summaryRange === 'day' ? 'today' : (ui.summaryRange === 'week' ? 'week' : ''));
 
     body.innerHTML = `
   <div class="summary-workspace">
@@ -5271,17 +5214,17 @@ function getSummaryFiltersFromControls(){
       <div class="summary-command-top">
         <div>
           <div class="summary-command-title"><i class="fa-solid fa-gauge-high" aria-hidden="true"></i> Centro de reporte</div>
-          <div class="summary-command-sub">Ajusta filtros si hace falta. El reporte se actualiza en automático.</div>
-        </div>
-        <div class="summary-command-actions">
-          <button class="btn" id="btnSummaryResetFilters">Limpiar filtros</button>
+          <div class="summary-command-sub">Ajusta filtros si hace falta. El foco es leer rápido y tener claridad.</div>
         </div>
       </div>
 
-      <div class="summary-preset-strip">
-        <button class="summary-preset ${activePreset==='week'?'active':''}" data-summary-preset="week">Semana</button>
-        <button class="summary-preset ${activePreset==='today'?'active':''}" data-summary-preset="today">Hoy</button>
-        <button class="summary-preset ${activePreset==='high'?'active':''}" data-summary-preset="high">ALTA</button>
+      <div class="summary-preset-row">
+        <div class="summary-preset-strip">
+          <button class="summary-preset ${activePreset==='week'?'active':''}" data-summary-preset="week">Semana</button>
+          <button class="summary-preset ${activePreset==='today'?'active':''}" data-summary-preset="today">Hoy</button>
+          <button class="summary-preset ${activePreset==='alta'?'active':''}" data-summary-preset="alta">Alta</button>
+        </div>
+        <button class="btn summary-preset-btn-clean" id="btnSummaryResetFilters">Limpiar filtros</button>
       </div>
     </section>
 
@@ -5379,7 +5322,7 @@ function getSummaryFiltersFromControls(){
             <div class="summary-checkgroups">
               <div class="summary-checkgroup">
                 <div class="title">Salida</div>
-                <div class="summary-checkline">
+                <div class="summary-checkline summary-checkline--single-row-mobile">
                   <label><input id="summaryIncludeActivities" type="checkbox" ${ui.summaryIncludeActivities?'checked':''} /> Actividades</label>
                   <label><input id="summaryIncludeProjects" type="checkbox" ${ui.summaryIncludeProjects?'checked':''} /> Proyectos</label>
                   <label><input id="summaryIncludeNotifications" type="checkbox" ${ui.summaryIncludeNotifications?'checked':''} /> Notificaciones</label>
@@ -5428,10 +5371,7 @@ function getSummaryFiltersFromControls(){
     let summaryDebounceTimer = null;
     const debounced = ()=>{
       if(summaryDebounceTimer) clearTimeout(summaryDebounceTimer);
-      summaryDebounceTimer = setTimeout(()=>{
-        syncSummaryOptionAvailability();
-        updateSummaryPreview();
-      }, 90);
+      summaryDebounceTimer = setTimeout(()=>updateSummaryPreview(), 90);
     };
 
     controls.forEach(ctrl=>{
@@ -5469,12 +5409,9 @@ function getSummaryFiltersFromControls(){
           ui.summaryScope = 'team';
           ui.summaryUser = '';
           ui.summaryRange = 'day';
+          ui.summaryPriority = '';
           ui.summaryGroupBy = 'owner';
           ui.summarySortBy = 'date';
-          ui.summaryClient = '';
-          ui.summaryPriority = '';
-          ui.summaryStatus = '';
-          ui.summaryQuery = '';
           ui.summaryIncludeActivities = true;
           ui.summaryIncludeProjects = true;
           ui.summaryIncludeNotifications = true;
@@ -5485,28 +5422,22 @@ function getSummaryFiltersFromControls(){
           ui.summaryScope = 'team';
           ui.summaryUser = '';
           ui.summaryRange = 'week';
+          ui.summaryPriority = '';
           ui.summaryGroupBy = 'owner';
           ui.summarySortBy = 'date';
-          ui.summaryClient = '';
-          ui.summaryPriority = '';
-          ui.summaryStatus = '';
-          ui.summaryQuery = '';
           ui.summaryIncludeActivities = true;
           ui.summaryIncludeProjects = true;
           ui.summaryIncludeNotifications = true;
           ui.summaryOnlyDueNotifications = false;
           ui.summaryIncludeDoneActivities = false;
           ui.summaryIncludeDoneNotifications = false;
-        }else if(preset === 'high'){
+        }else if(preset === 'alta'){
           ui.summaryScope = 'team';
           ui.summaryUser = '';
           ui.summaryRange = 'day';
+          ui.summaryPriority = 'Alta';
           ui.summaryGroupBy = 'owner';
           ui.summarySortBy = 'date';
-          ui.summaryClient = '';
-          ui.summaryPriority = 'Alta';
-          ui.summaryStatus = '';
-          ui.summaryQuery = '';
           ui.summaryIncludeActivities = true;
           ui.summaryIncludeProjects = false;
           ui.summaryIncludeNotifications = false;
@@ -5566,7 +5497,6 @@ function getSummaryFiltersFromControls(){
       };
     }
 
-    syncSummaryOptionAvailability();
     updateSummaryPreview();
   }
 
