@@ -801,9 +801,13 @@
 .summary-preset-strip{
   display:flex;
   gap:7px;
-  flex-wrap:wrap;
+  flex-wrap:nowrap;
   align-items:center;
+  overflow:auto hidden;
+  padding-bottom:2px;
+  scrollbar-width:thin;
 }
+.summary-preset-strip::-webkit-scrollbar{height:4px}
 .summary-reset-inline{
   margin-left:auto;
   height:29px;
@@ -1080,14 +1084,33 @@
   gap:6px;
 }
 .brief-scroll{
+  position:relative;
   max-height:248px;
   overflow-y:auto;
   overflow-x:hidden;
-  padding-right:2px;
-  -webkit-mask-image:linear-gradient(to bottom, transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%);
-  mask-image:linear-gradient(to bottom, transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%);
+  padding:12px 2px 12px 0;
+  scrollbar-gutter:stable;
 }
-.brief-scroll-activities .brief-list{
+.brief-scroll::before,
+.brief-scroll::after{
+  content:'';
+  position:absolute;
+  left:0;
+  right:0;
+  height:12px;
+  pointer-events:none;
+  z-index:2;
+}
+.brief-scroll::before{
+  top:0;
+  background:linear-gradient(to bottom, var(--surface), transparent);
+}
+.brief-scroll::after{
+  bottom:0;
+  background:linear-gradient(to top, var(--surface), transparent);
+}
+.brief-scroll-activities .brief-list,
+.brief-scroll-reminders .brief-list{
   padding-top:2px;
   padding-bottom:2px;
 }
@@ -1210,6 +1233,15 @@
   .summary-preset-strip::-webkit-scrollbar{height:4px}
   .summary-preset{flex:0 0 auto}
   .summary-reset-inline{flex:0 0 auto;margin-left:auto}
+  .summary-checkline{
+    flex-wrap:nowrap;
+    overflow:auto hidden;
+    padding-bottom:2px;
+    scrollbar-width:thin;
+    -webkit-overflow-scrolling:touch;
+  }
+  .summary-checkline::-webkit-scrollbar{height:4px}
+  .summary-checkline label{flex:0 0 auto;white-space:nowrap}
   #summaryOverlay #summaryQuery.ctrl{font-size:16px !important}
   .summary-layout{grid-template-columns:1fr}
   .summary-panel{
@@ -4485,7 +4517,9 @@ function openAccessGate(){
   }
 
   function resolveSummaryDateRange(mode = ui.summaryRange){
-    const baseDate = normalizeISO(ui.date) || todayISO();
+    const today = todayISO();
+    const selectedDate = normalizeISO(ui.date);
+    const baseDate = (selectedDate && selectedDate > today) ? selectedDate : today;
     if(mode === 'week'){
       const s = startOfWeekISO(baseDate);
       return { startDate:s, endDate:addDaysISO(s,4) };
@@ -5180,7 +5214,7 @@ function renderSummaryReadable(result, filters){
 
       <article class="brief-card">
         <h5><i class="fa-regular fa-bell" aria-hidden="true"></i> Recordatorios</h5>
-        <ul class="brief-list">${notifHtml}</ul>
+        <div class="brief-scroll brief-scroll-reminders"><ul class="brief-list">${notifHtml}</ul></div>
       </article>
 
       <article class="brief-card">
