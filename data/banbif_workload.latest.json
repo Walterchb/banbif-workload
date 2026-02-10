@@ -1,13 +1,13 @@
 {
   "meta": {
     "app": "banbif_workload",
-    "exportedAt": "2026-02-10T04:30:19.927Z",
+    "exportedAt": "2026-02-10T08:10:43.558Z",
     "version": 2,
     "schema": "full_backup",
     "counts": {
       "team": 3,
-      "projects": 7,
-      "activities": 19,
+      "projects": 10,
+      "activities": 22,
       "holidays": 2,
       "notifications": 2
     }
@@ -520,20 +520,99 @@
             "primaryFocus": false
           }
         ]
+      },
+      {
+        "id": "p_7z2upjh",
+        "name": "Documentar Macros en Notion",
+        "client": "Interno",
+        "reqDate": "2026-02-10",
+        "startDate": "2026-02-10",
+        "endDate": "2026-02-10",
+        "priority": "Baja",
+        "recurrenceFrequency": "Ninguna",
+        "leaderId": "u_zqqvadc",
+        "importance": 2,
+        "objective": "",
+        "deliverable": "",
+        "notes": "",
+        "isPrimaryFocus": false,
+        "activities": [
+          {
+            "id": "a_i3bqwmm",
+            "name": "Registrar Macros en Notion",
+            "startDate": "2026-02-10",
+            "endDate": "2026-02-10",
+            "startHour": "15:30",
+            "endHour": "16:40",
+            "ownerId": "u_zqqvadc",
+            "detail": "Se crearon nuevas macros que deben estar en Notion",
+            "done": false,
+            "primaryFocus": false
+          }
+        ]
+      },
+      {
+        "id": "p_2ic3qiv",
+        "name": "Formatear Portafolio Estratégico",
+        "client": "Interno",
+        "reqDate": "2026-02-11",
+        "startDate": "2026-02-11",
+        "endDate": "2026-02-12",
+        "priority": "Baja",
+        "recurrenceFrequency": "Ninguna",
+        "leaderId": "u_zqqvadc",
+        "importance": 1,
+        "objective": "",
+        "deliverable": "",
+        "notes": "",
+        "isPrimaryFocus": false,
+        "activities": [
+          {
+            "id": "a_u1krnbo",
+            "name": "Formatear Archivo Estratégico",
+            "startDate": "2026-02-11",
+            "endDate": "2026-02-12",
+            "startHour": "15:30",
+            "endHour": "16:40",
+            "ownerId": "u_zqqvadc",
+            "detail": "Tener en cuenta el modelo de RF Trading",
+            "done": false,
+            "primaryFocus": false
+          }
+        ]
+      },
+      {
+        "id": "p_d2rzlm8",
+        "name": "Grabar Nueva Operativa",
+        "client": "Interno",
+        "reqDate": "2026-02-13",
+        "startDate": "2026-02-13",
+        "endDate": "2026-02-13",
+        "priority": "Baja",
+        "recurrenceFrequency": "Ninguna",
+        "leaderId": "u_zqqvadc",
+        "importance": 2,
+        "objective": "",
+        "deliverable": "",
+        "notes": "",
+        "isPrimaryFocus": false,
+        "activities": [
+          {
+            "id": "a_6w367z2",
+            "name": "Grabar Nuevos Reportes",
+            "startDate": "2026-02-13",
+            "endDate": "2026-02-13",
+            "startHour": "15:30",
+            "endHour": "16:40",
+            "ownerId": "u_zqqvadc",
+            "detail": "Detallar paso a paso la nueva operativa para el reporte de resultados.",
+            "done": false,
+            "primaryFocus": false
+          }
+        ]
       }
     ],
     "notifications": [
-      {
-        "id": "n_z3mpu54",
-        "title": "Prueba Notificación",
-        "message": "Esta es una prueba",
-        "userId": "u1",
-        "remindDate": "2026-02-09",
-        "remindTime": "13:45",
-        "done": false,
-        "createdAt": "2026-02-09T18:37:44.030Z",
-        "updatedAt": "2026-02-09T18:37:44.030Z"
-      },
       {
         "id": "n_nztqexc",
         "title": "Requerimiento Covenants",
@@ -544,6 +623,17 @@
         "done": false,
         "createdAt": "2026-02-09T18:36:39.225Z",
         "updatedAt": "2026-02-09T18:36:39.225Z"
+      },
+      {
+        "id": "n_surcws3",
+        "title": "Seguimiento Comercial Diario",
+        "message": "Coordinar acerca del paso a paso para la migración del formato del reporte mensual al diario.",
+        "userId": "u_zqqvadc",
+        "remindDate": "2026-02-16",
+        "remindTime": "11:00",
+        "done": false,
+        "createdAt": "2026-02-10T07:59:27.607Z",
+        "updatedAt": "2026-02-10T07:59:27.607Z"
       }
     ]
   },
@@ -567,7 +657,7 @@
   "theme": "light",
   "ui": {
     "view": "day",
-    "date": "2026-02-09",
+    "date": "",
     "roadmapZoom": "week",
     "manageTab": "data",
     "manageProjectSort": "priority_desc",
