@@ -1090,24 +1090,23 @@
   overflow-x:hidden;
   padding:12px 2px 12px 0;
   scrollbar-gutter:stable;
+  --brief-fade-size:12px;
+  -webkit-mask-image:linear-gradient(to bottom,
+    transparent 0,
+    #000 var(--brief-fade-size),
+    #000 calc(100% - var(--brief-fade-size)),
+    transparent 100%
+  );
+  mask-image:linear-gradient(to bottom,
+    transparent 0,
+    #000 var(--brief-fade-size),
+    #000 calc(100% - var(--brief-fade-size)),
+    transparent 100%
+  );
 }
 .brief-scroll::before,
 .brief-scroll::after{
-  content:'';
-  position:absolute;
-  left:0;
-  right:0;
-  height:12px;
-  pointer-events:none;
-  z-index:2;
-}
-.brief-scroll::before{
-  top:0;
-  background:linear-gradient(to bottom, var(--surface), transparent);
-}
-.brief-scroll::after{
-  bottom:0;
-  background:linear-gradient(to top, var(--surface), transparent);
+  content:none;
 }
 .brief-scroll-activities .brief-list,
 .brief-scroll-reminders .brief-list{
@@ -4858,6 +4857,49 @@ function openAccessGate(){
     if(filters.includeProjects) selectedOutputLabels.push('Proyectos');
     if(filters.includeNotifications) selectedOutputLabels.push('Notificaciones');
 
+    const rhythmSourceActivities = allActivities.slice();
+    const rhythmTeam = (filters.scope === 'individual' && filters.userId)
+      ? (state.team || []).filter(t=>String(t.id || '') === String(filters.userId || ''))
+      : (state.team || []).slice();
+
+    const plannedMinutesInRange = rhythmSourceActivities.reduce((acc, row)=>{
+      const rawStart = normalizeISO(row.startDate);
+      const rawEnd = normalizeISO(row.endDate) || rawStart;
+      if(!rawStart || !rawEnd) return acc;
+
+      const clampedStart = maxISO(rawStart, startDate);
+      const clampedEnd = minISO(rawEnd, endDate);
+      if(clampedEnd < clampedStart) return acc;
+
+      const perDay = Math.max(0, durationMinutes(row.startHour || '', row.endHour || ''));
+      if(perDay <= 0) return acc;
+
+      const businessDays = eachBusinessDateBetween(clampedStart, clampedEnd).length;
+      if(businessDays <= 0) return acc;
+
+      return acc + (perDay * businessDays);
+    }, 0);
+
+    let availableCapacityMinutes = 0;
+    if(rhythmTeam.length){
+      let d = startDate;
+      let guard = 0;
+      while(d <= endDate && guard < 5000){
+        if(!isNonWorkingDayISO(d)){
+          availableCapacityMinutes += rhythmTeam.reduce((sum, person)=>sum + getDailyCapacityMin(person, d), 0);
+        }
+        d = addDaysISO(d, 1);
+        guard += 1;
+      }
+    }
+
+    const rhythmPct = availableCapacityMinutes
+      ? Math.round((plannedMinutesInRange / availableCapacityMinutes) * 100)
+      : (plannedMinutesInRange > 0 ? 100 : 0);
+
+    const rhythmSeverity = severity(rhythmPct);
+    const rhythmFreeMinutes = Math.max(0, availableCapacityMinutes - plannedMinutesInRange);
+
     const nowText = `${fmtDate(todayISO())} ${new Date().toLocaleTimeString(APP_LOCALE, {hour:'2-digit', minute:'2-digit'})}`;
 
     const lines = [];
@@ -5026,7 +5068,11 @@ function openAccessGate(){
         notifications: visibleNotifications.length,
         pendingNotifications,
         dueNotifications,
-        range: summaryRangeLabel(startDate, endDate)
+        range: summaryRangeLabel(startDate, endDate),
+        rhythmPct,
+        rhythmPlannedMin: plannedMinutesInRange,
+        rhythmCapacityMin: availableCapacityMinutes,
+        rhythmFreeMin: rhythmFreeMinutes
       },
       details: {
         scopeLabel,
@@ -5041,6 +5087,14 @@ function openAccessGate(){
           notifications: Boolean(filters.includeNotifications)
         },
         selectedOutputLabels: selectedOutputLabels.slice(),
+        loadRhythm: {
+          pct: rhythmPct,
+          plannedMin: plannedMinutesInRange,
+          capacityMin: availableCapacityMinutes,
+          freeMin: rhythmFreeMinutes,
+          tone: rhythmSeverity.className,
+          label: rhythmSeverity.label
+        },
         visibleActivities: visibleActivities.slice(),
         topActivities: criticalActivities.slice(0, 8),
         topProjects: visibleProjects
@@ -5132,6 +5186,15 @@ function renderSummaryReadable(result, filters){
   const topNotifs = Array.isArray(details.topNotifications) ? details.topNotifications.slice(0, 6) : [];
   const groups = Array.isArray(details.groupBreakdown) ? details.groupBreakdown.slice(0, 6) : [];
 
+  const rhythm = details.loadRhythm || {
+    pct: Number(stats.rhythmPct || 0),
+    plannedMin: Number(stats.rhythmPlannedMin || 0),
+    capacityMin: Number(stats.rhythmCapacityMin || 0),
+    freeMin: Number(stats.rhythmFreeMin || 0),
+    tone: 'ok',
+    label: 'Normal'
+  };
+
   const urgentHtml = outputFlags.activities
     ? (allFilteredActivities.length
       ? allFilteredActivities.map(a=>{
@@ -5163,23 +5226,24 @@ function renderSummaryReadable(result, filters){
         }).join('')
       : `<li class="brief-empty">No hay recordatorios críticos por ahora.</li>`);
 
-  const barsHtml = (!outputFlags.activities && !outputFlags.projects)
-    ? `<div class="brief-empty">No hay bloques de flujo habilitados en SALIDA.</div>`
-    : (groups.length
-      ? `<div class="brief-bars">${
-          groups.map(g=>{
-            const rawPct = Math.max(0, Math.min(100, Number(g.flowPct || 0)));
-            const barPct = rawPct > 0 ? Math.max(6, rawPct) : 0;
-            return `<div class="brief-bar">
-              <div class="brief-bar-head">
-                <span>${esc(g.name || 'Sin grupo')}</span>
-                <span>${rawPct}% de Flujo</span>
-              </div>
-              <div class="brief-bar-track"><span style="width:${barPct}%"></span></div>
-            </div>`;
-          }).join('')
-        }</div>`
-      : `<div class="brief-empty">No hay flujo agrupado para mostrar.</div>`);
+  const rhythmPct = Math.max(0, Number(rhythm.pct || 0));
+  const rhythmBarPct = Math.min(100, rhythmPct);
+  const rhythmTitle = filters?.scope === 'individual' ? 'Ritmo de trabajo individual' : 'Ritmo de trabajo del equipo';
+
+  const barsHtml = `
+    <div class="brief-bars">
+      <div class="brief-bar">
+        <div class="brief-bar-head">
+          <span>${esc(rhythmTitle)}</span>
+          <span>${Math.round(rhythmPct)}%</span>
+        </div>
+        <div class="brief-bar-track"><span style="width:${rhythmBarPct}%"></span></div>
+      </div>
+    </div>
+    <div class="brief-next">
+      <div class="t">${esc(fmtH(Number(rhythm.plannedMin || 0)))} de ${esc(fmtH(Number(rhythm.capacityMin || 0)))} planificado</div>
+      <div class="m">Capacidad libre: ${esc(fmtH(Number(rhythm.freeMin || 0)))} · ${esc(rhythm.label || 'Normal')}</div>
+    </div>`;
 
   const nextStep = !selectedOutputs.length
     ? 'Activa al menos un bloque en SALIDA para definir prioridades.'
@@ -5218,7 +5282,7 @@ function renderSummaryReadable(result, filters){
       </article>
 
       <article class="brief-card">
-        <h5><i class="fa-solid fa-chart-simple" aria-hidden="true"></i> Flujo</h5>
+        <h5><i class="fa-solid fa-chart-simple" aria-hidden="true"></i> Ritmo de trabajo</h5>
         ${barsHtml}
       </article>
 
