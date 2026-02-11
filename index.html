@@ -59,6 +59,18 @@
         var(--bg);
     }
     .app{max-width:1540px;margin:14px auto;padding:0 14px 18px;}
+    .app.auth-reveal{
+      opacity:0;
+      transform:translateY(8px) scale(.998);
+      filter:blur(1.2px);
+      will-change:opacity,transform,filter;
+    }
+    .app.auth-reveal.is-visible{
+      opacity:1;
+      transform:translateY(0) scale(1);
+      filter:blur(0);
+      transition:opacity .32s ease, transform .32s ease, filter .32s ease;
+    }
     .panel{
       background:var(--surface);
       border:1px solid var(--line);
@@ -1335,22 +1347,24 @@
         /* ===== Access/Login vNext (adaptado desde login.html, scopeado al overlay) ===== */
     #accessOverlay{
       z-index:170;
-      background:rgba(2,8,23,.72);
-      backdrop-filter:blur(5px);
+      background:#05080e;
+      backdrop-filter:none;
+      align-items:stretch;
+      justify-content:stretch;
+      padding:0;
     }
     #accessOverlay .modal.login-pro{
-      width:min(1120px,96vw);
-      height:min(90vh,800px);
-      min-height:540px;
-      max-height:90vh;
+      width:100vw;
+      height:100vh;
+      min-height:100vh;
+      max-height:none;
       overflow:hidden;
-      border-radius:10px;
-      border:1px solid color-mix(in srgb,var(--primary) 30%, var(--line));
-      box-shadow:
-        0 28px 70px rgba(2,8,23,.44),
-        0 0 0 1px rgba(255,255,255,.03);
-      background:#05080e;
+      border-radius:0;
+      border:none;
+      box-shadow:none;
+      background:transparent;
       padding:0;
+      margin:0;
     }
 
     #accessOverlay .access-scene{
@@ -1638,7 +1652,6 @@
     .acc-ind.neutral{color:var(--muted)}
 
     @media (max-width:1100px){
-      #accessOverlay .modal.login-pro{height:min(90vh,760px);}
       #accessOverlay .chart-shell{width:min(980px,90%);}
     }
     @media (max-width:900px){
@@ -1649,11 +1662,6 @@
       #accessOverlay .chart-shell{height:min(35%,250px);}
     }
     @media (max-width:640px){
-      #accessOverlay .modal.login-pro{
-        width:min(98vw,560px);
-        height:min(92vh,720px);
-        min-height:520px;
-      }
       #accessOverlay .top-ambient{height:43%;}
       #accessOverlay .chart-wrap{top:40.8%;}
       #accessOverlay .login-shell{width:min(94%,340px);}
@@ -2388,9 +2396,12 @@
       box-shadow: 0 8px 24px rgba(0,0,0,.26);
     }
 
-    html[data-theme="dark"] .modal,
-    html[data-theme="dark"] #accessOverlay .modal.login-pro{
+    html[data-theme="dark"] .modal{
       box-shadow: 0 20px 52px rgba(0,0,0,.42);
+    }
+
+    html[data-theme="dark"] #accessOverlay .modal.login-pro{
+      box-shadow:none;
     }
 
     html[data-theme="dark"] .blocked-slot{
@@ -4646,6 +4657,23 @@ function openAccessGate(){
     const lockMsg = $('accessLockMsg');
     const errMsg = $('accessErr');
 
+    const LOGIN_SUCCESS_DELAY_MS = 1500;
+    let isAuthorizing = false;
+    let successDelayTimer = null;
+    const defaultBtnHtml = '<span class="btn-inner"><span class="btn-label">Acceder</span></span>';
+    if(btn) btn.innerHTML = defaultBtnHtml;
+
+    const setBtnLoading = (loading=false) => {
+      if(!btn) return;
+      if(loading){
+        btn.classList.add('is-loading');
+        btn.innerHTML = '<span class="btn-inner"><i class="fa-solid fa-circle-notch fa-spin btn-spin" aria-hidden="true"></i></span>';
+      }else{
+        btn.classList.remove('is-loading');
+        btn.innerHTML = defaultBtnHtml;
+      }
+    };
+
     const startAccessAmbient = (canvas) => {
       const ctx = canvas && canvas.getContext ? canvas.getContext('2d') : null;
       if(!ctx) return ()=>{};
@@ -4915,6 +4943,7 @@ function openAccessGate(){
     };
 
     const submit = () => {
+      if(isAuthorizing) return;
       if(updateLockState()) return;
 
       const role = resolveRole(realCode);
@@ -4925,22 +4954,49 @@ function openAccessGate(){
         sessionStorage.removeItem(lockLevelKey);
 
         ui.role = role;
-        gate.remove();
-        document.body.style.overflow = '';
+        isAuthorizing = true;
         clearInterval(lockTimer);
         clearRevealTimer();
-        try{ stopAmbient && stopAmbient(); }catch(_e){}
-        updateRoleUI();
-        render();
-        toast(ui.role === 'admin' ? 'Modo administrador activado' : 'Modo lectura activado');
+        input.disabled = true;
+        btn.disabled = true;
+        lockMsg.style.display = 'none';
+        if(errMsg) errMsg.style.display = 'none';
+        setBtnLoading(true);
 
-        syncFromRemoteJson({
-          source: 'auto_login',
-          silentErrorToast: true,
-          silentImportToast: true
-        }).catch((err)=>{
-          console.warn('No se pudo sincronizar automáticamente desde JSON remoto', err);
-        });
+        successDelayTimer = setTimeout(()=>{
+          const appRoot = document.querySelector('.app');
+          if(appRoot){
+            appRoot.classList.add('auth-reveal');
+            appRoot.classList.remove('is-visible');
+            void appRoot.offsetWidth;
+          }
+
+          gate.remove();
+          document.body.style.overflow = '';
+          try{ stopAmbient && stopAmbient(); }catch(_e){}
+          updateRoleUI();
+          render();
+
+          if(appRoot){
+            requestAnimationFrame(()=>{
+              appRoot.classList.add('is-visible');
+            });
+            setTimeout(()=>{
+              appRoot.classList.remove('auth-reveal');
+              appRoot.classList.remove('is-visible');
+            }, 420);
+          }
+
+          toast(ui.role === 'admin' ? 'Modo administrador activado' : 'Modo lectura activado');
+
+          syncFromRemoteJson({
+            source: 'auto_login',
+            silentErrorToast: true,
+            silentImportToast: true
+          }).catch((err)=>{
+            console.warn('No se pudo sincronizar automáticamente desde JSON remoto', err);
+          });
+        }, LOGIN_SUCCESS_DELAY_MS);
 
         return;
       }
@@ -5053,6 +5109,9 @@ function openAccessGate(){
     gate.__cleanup = () => {
       try{ clearInterval(lockTimer); }catch(_e){}
       try{ clearRevealTimer(); }catch(_e){}
+      try{ if(successDelayTimer){ clearTimeout(successDelayTimer); successDelayTimer = null; } }catch(_e){}
+      try{ setBtnLoading(false); }catch(_e){}
+      try{ isAuthorizing = false; }catch(_e){}
       try{ stopAmbient && stopAmbient(); }catch(_e){}
     };
   }
