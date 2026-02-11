@@ -1332,39 +1332,342 @@
     .slot.busy{background:repeating-linear-gradient(135deg,color-mix(in srgb, #94a3b8 18%, transparent),color-mix(in srgb, #94a3b8 18%, transparent) 8px,transparent 8px,transparent 16px);border-color:color-mix(in srgb, #64748b 52%, var(--line))}
     .slot.off{background:transparent;opacity:.35}
     .day-free{font-size:10px;color:var(--muted);margin-top:4px;text-align:right}
-    #accessOverlay .modal.login-pro{
-      overflow:hidden;
-      border-radius:18px;
-      width:min(470px,94vw);
-      border:1px solid color-mix(in srgb,var(--primary) 28%, var(--line));
-      box-shadow:0 28px 70px rgba(2,8,23,.35);
+        /* ===== Access/Login vNext (adaptado desde login.html, scopeado al overlay) ===== */
+    #accessOverlay{
+      z-index:170;
+      background:rgba(2,8,23,.72);
+      backdrop-filter:blur(5px);
     }
-    .login-head{
+    #accessOverlay .modal.login-pro{
+      width:min(1120px,96vw);
+      height:min(90vh,800px);
+      min-height:540px;
+      max-height:90vh;
+      overflow:hidden;
+      border-radius:10px;
+      border:1px solid color-mix(in srgb,var(--primary) 30%, var(--line));
+      box-shadow:
+        0 28px 70px rgba(2,8,23,.44),
+        0 0 0 1px rgba(255,255,255,.03);
+      background:#05080e;
+      padding:0;
+    }
+
+    #accessOverlay .access-scene{
+      position:relative;
+      width:100%;
+      height:100%;
+      overflow:hidden;
+      isolation:isolate;
+      background:
+        radial-gradient(1200px 640px at 120% -24%, rgba(79,140,255,.16), transparent 68%),
+        radial-gradient(980px 560px at -20% -30%, rgba(20,184,166,.12), transparent 64%),
+        radial-gradient(1200px 700px at 50% 125%, rgba(0,0,0,.60), transparent 54%),
+        #05080e;
+      color:#e5edf8;
+    }
+    #accessOverlay .access-scene::before{
+      content:"";
+      position:absolute; inset:0;
+      z-index:0; pointer-events:none;
+      opacity:.14;
+      background-image:
+        radial-gradient(circle at 1px 1px, rgba(191,219,254,.40) 1px, transparent 1.22px),
+        radial-gradient(circle at 1px 1px, rgba(56,189,248,.24) 1px, transparent 1.2px),
+        radial-gradient(circle at 1px 1px, rgba(255,255,255,.12) 1px, transparent 1.15px);
+      background-size:22px 22px, 44px 44px, 66px 66px;
+      background-position:0 0, 11px 11px, 7px 7px;
+      mask-image:radial-gradient(130% 100% at 50% 38%, #000 58%, rgba(0,0,0,.78) 84%, transparent 100%);
+      -webkit-mask-image:radial-gradient(130% 100% at 50% 38%, #000 58%, rgba(0,0,0,.78) 84%, transparent 100%);
+    }
+    #accessOverlay .scene-vignette{
+      position:absolute; inset:0;
+      z-index:15; pointer-events:none;
+      background:
+        linear-gradient(to bottom, rgba(5,8,14,.72), rgba(5,8,14,0) 18%),
+        linear-gradient(to top, rgba(5,8,14,.84), rgba(5,8,14,0) 22%),
+        linear-gradient(to right, rgba(5,8,14,.82), rgba(5,8,14,0) 18%),
+        linear-gradient(to left, rgba(5,8,14,.82), rgba(5,8,14,0) 18%);
+    }
+
+    #accessOverlay .top-ambient{
+      position:absolute; left:0; right:0; top:0;
+      height:49%; min-height:270px;
+      z-index:3; pointer-events:none; overflow:hidden;
+      background:
+        radial-gradient(68% 54% at 50% 8%, rgba(79,140,255,.19), transparent 72%),
+        radial-gradient(58% 40% at 50% 26%, rgba(20,184,166,.12), transparent 76%);
+      mask-image:linear-gradient(to bottom, #000 63%, rgba(0,0,0,.72) 82%, transparent 100%);
+      -webkit-mask-image:linear-gradient(to bottom, #000 63%, rgba(0,0,0,.72) 82%, transparent 100%);
+    }
+    #accessOverlay #accessAmbientCanvas{
+      position:absolute; inset:0;
+      width:100%; height:100%; display:block;
+    }
+    #accessOverlay .ambient-glass{
+      position:absolute; inset:0; pointer-events:none;
+      background:
+        linear-gradient(105deg, transparent 12%, rgba(130,170,230,.06) 26%, transparent 42%),
+        linear-gradient(80deg, transparent 40%, rgba(48,180,170,.06) 56%, transparent 72%);
+      mix-blend-mode:screen;
+    }
+    #accessOverlay .ambient-line{
+      position:absolute; left:8%; right:8%; height:1px;
+      background:linear-gradient(90deg, transparent, rgba(170,190,210,.30), transparent);
+      opacity:.75; filter:blur(.1px);
+    }
+    #accessOverlay .ambient-line.l1{ top:16%; }
+    #accessOverlay .ambient-line.l2{ top:28%; opacity:.48; }
+    #accessOverlay .ambient-line.l3{ top:40%; opacity:.34; }
+
+    #accessOverlay .fade-ambient-login{
+      position:absolute; left:0; right:0;
+      top:30%; height:28%;
+      z-index:4; pointer-events:none;
+      background:linear-gradient(to bottom, rgba(6,8,13,0) 0%, rgba(6,8,13,.46) 54%, rgba(6,8,13,.76) 100%);
+      filter:blur(1px);
+    }
+
+    #accessOverlay .login-layer{
+      position:absolute; inset:0;
+      z-index:8;
+      display:grid;
+      place-items:center;
+      pointer-events:none;
+      padding:18px;
+    }
+    #accessOverlay .login-shell{
+      width:min(92%, 500px);
+      pointer-events:auto;
+      transform:translateY(-.5vh);
+    }
+
+    #accessOverlay .login-card{
+      overflow:hidden;
+      border-radius:5px;
+      width:100%;
+      border:1px solid color-mix(in srgb,var(--primary) 28%, #22314f);
+      box-shadow:
+        0 28px 70px rgba(2,8,23,.44),
+        0 0 0 1px rgba(255,255,255,.03);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)),
+        #111a2e;
+      backdrop-filter:blur(4px);
+    }
+
+    #accessOverlay .login-head{
       background:
         radial-gradient(500px 180px at 110% -25%, color-mix(in srgb,var(--primary) 34%, transparent), transparent 70%),
-        linear-gradient(135deg, color-mix(in srgb,var(--primary) 18%, var(--surface-2)), var(--surface));
-      padding:16px 16px 12px;
-      border-bottom:1px solid var(--line);
+        linear-gradient(135deg, color-mix(in srgb,var(--primary) 18%, #16233d), #111a2e);
+      padding:14px 16px 12px;
+      border-bottom:1px solid #22314f;
+      display:flex;align-items:center;gap:10px;
     }
-    .login-title{display:flex;align-items:center;gap:10px}
-    .login-badge{
+
+    #accessOverlay .login-logo{
       width:38px;height:38px;border-radius:10px;display:grid;place-items:center;
-      background:linear-gradient(135deg,var(--primary),var(--primary-2));color:#fff;font-weight:900
+      background:linear-gradient(135deg,var(--primary),var(--primary-2));
+      color:#fff;font-weight:900;font-size:12px;letter-spacing:.3px;
+      box-shadow:0 8px 18px rgba(79,140,255,.24);flex:0 0 auto;
     }
-    .login-sub{font-size:12px;color:var(--muted);margin-top:4px}
-    .login-body{padding:14px 16px 16px}
-    .code-wrap{display:flex;gap:8px;align-items:center}
-    .code-wrap .ctrl{height:42px;font-size:18px}
-    .access-code{letter-spacing:8px;text-align:center;font-weight:700}
-    .role-hint{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
-    .role-chip{border:1px solid var(--line);border-radius:10px;padding:8px;background:var(--surface-2)}
-    .role-chip b{display:block;font-size:11px}
-    .role-chip span{font-size:11px;color:var(--muted)}
-    .lock-msg{font-size:12px;color:var(--danger);margin-top:8px;display:none}
-        .acc-ind{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;font-size:11px;border:1px solid var(--line);border-radius:999px;background:var(--surface-2);color:var(--muted)}
+
+    #accessOverlay .login-title{color:#e5edf8;font-size:15px;font-weight:780;margin:0;line-height:1.05;}
+    #accessOverlay .login-sub{color:#9fb0c9;font-size:12px;margin:4px 0 0;line-height:1.2;}
+
+    #accessOverlay .login-form{
+      padding:14px 16px 16px;
+      gap:10px;
+      display:grid;
+      background:#111a2e;
+    }
+    #accessOverlay .input-access-row{
+      display:flex;align-items:center;gap:8px;width:100%;min-width:0;
+    }
+    #accessOverlay .input-access-row .access-code{
+      flex:1 1 auto;min-width:0;width:100%;
+      height:42px;border:1px solid #22314f;border-radius:8px;
+      background:#16233d;color:#e5edf8;font-size:18px;
+      letter-spacing:6px;text-align:center;font-weight:700;padding:0 12px;
+      outline:none;
+    }
+    #accessOverlay .input-access-row .access-code::placeholder{
+      color:#8fa3bf;letter-spacing:4px;font-weight:600;
+    }
+    #accessOverlay .input-access-row .access-code:focus{
+      border-color:color-mix(in srgb,var(--primary) 60%, #22314f);
+      box-shadow:0 0 0 3px rgba(79,140,255,.22);
+    }
+
+    #accessOverlay .input-access-row .login-btn{
+      flex:0 0 92px;
+      width:92px;min-width:92px;max-width:92px;
+      white-space:nowrap;height:42px;
+      padding:0 10px;border-radius:8px;
+      font-size:12px;font-weight:800;
+      overflow:hidden;text-overflow:ellipsis;
+      border:1px solid rgba(255,255,255,.14);
+      background:linear-gradient(135deg,var(--primary),#376fff);
+      color:#fff;
+      box-shadow:0 10px 20px rgba(79,140,255,.20);
+      cursor:pointer;
+      transition:filter .2s ease, transform .12s ease;
+    }
+    #accessOverlay .input-access-row .login-btn:hover{filter:brightness(1.05);}
+    #accessOverlay .input-access-row .login-btn:active{transform:translateY(1px);}
+    #accessOverlay .input-access-row .login-btn:disabled{
+      opacity:.65;cursor:not-allowed;transform:none;filter:none;
+    }
+
+    #accessOverlay .login-hint{
+      color:#9fb0c9;
+      font-size:11px;
+      line-height:1.2;
+      text-align:left;
+      margin-top:2px;
+      user-select:none;
+    }
+    #accessOverlay .mini-help{font-size:11px;color:#9fb0c9;margin-top:8px;}
+    #accessOverlay .dim{opacity:.9;}
+    #accessOverlay .lock-msg{
+      font-size:12px;
+      color:#f87171;
+      margin-top:2px;
+      display:none;
+      line-height:1.3;
+    }
+
+    #accessOverlay .fade-login-chart{
+      position:absolute; left:0; right:0; top:49%; height:27%;
+      z-index:6; pointer-events:none; filter:blur(1px);
+      background:linear-gradient(to bottom, rgba(6,8,13,.70) 0%, rgba(6,8,13,.32) 40%, rgba(6,8,13,0) 100%);
+    }
+
+    #accessOverlay .chart-wrap{
+      position:absolute; left:0; right:0; bottom:0; top:43%;
+      z-index:2; overflow:hidden; pointer-events:none;
+    }
+    #accessOverlay .chart-shell{
+      position:absolute;
+      left:50%;
+      transform:translateX(-50%);
+      bottom:2.6%;
+      width:min(1040px,86%);
+      height:min(36%,290px);
+      min-height:165px;
+      background:transparent;
+      overflow:hidden;
+      border-radius:8px;
+    }
+    #accessOverlay .chart-shell::before{
+      content:"";
+      position:absolute; inset:0;
+      z-index:20; pointer-events:none;
+      background:
+        linear-gradient(to bottom, rgba(5,8,14,.74), rgba(5,8,14,0) 20%),
+        linear-gradient(to top, rgba(5,8,14,.88), rgba(5,8,14,0) 24%),
+        linear-gradient(to right, rgba(5,8,14,.86), rgba(5,8,14,0) 16%),
+        linear-gradient(to left, rgba(5,8,14,.86), rgba(5,8,14,0) 16%);
+    }
+
+    #accessOverlay .grid{position:absolute; inset:0; z-index:1;}
+    #accessOverlay .grid-line{
+      position:absolute; top:8%; bottom:11.5%;
+      width:1px;
+      background:linear-gradient(to bottom, rgba(70,89,103,.90), rgba(70,89,103,.55));
+      opacity:.95;
+    }
+    #accessOverlay .session{
+      position:absolute;
+      height:12.8%;
+      border-radius:2px;
+      background:linear-gradient(90deg, rgba(58,74,86,.58), rgba(83,103,117,.74));
+      border:1px solid rgba(170,190,206,.06);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.02);
+      color:#c8d2db;
+      font-weight:600;
+      font-size:clamp(12px,1.1vw,16px);
+      letter-spacing:.2px;
+      display:flex; align-items:center;
+      padding-left:1.2%;
+      white-space:nowrap;
+      overflow:hidden;
+      text-shadow:0 1px 0 rgba(0,0,0,.35);
+      z-index:4;
+    }
+    #accessOverlay .s-london{ left:0.5%; top:17%; width:22.6%; }
+    #accessOverlay .s-newyork{ left:4.6%; top:35%; width:39.0%; }
+    #accessOverlay .s-sydney{ left:43.4%; top:53%; width:37.2%; }
+    #accessOverlay .s-tokyo{ left:52.7%; top:71%; width:34.8%; }
+    #accessOverlay .s-london-next{ left:84.7%; top:17%; width:15.3%; padding-left:.9%; }
+
+    #accessOverlay .now-line{
+      position:absolute; z-index:6;
+      top:8%; bottom:11.5%;
+      width:2px; left:80.8%;
+      background:linear-gradient(to bottom, rgba(217,138,16,.95), rgba(217,138,16,.80));
+      box-shadow:0 0 0 1px rgba(217,138,16,.10), 0 0 14px rgba(217,138,16,.18);
+    }
+
+    #accessOverlay .x-label{
+      position:absolute; bottom:3%;
+      transform:translateX(-50%);
+      color:#9aa4ae;
+      font-size:clamp(11px,.95vw,14px);
+      font-weight:500;
+      letter-spacing:.1px;
+      line-height:1;
+      z-index:8;
+      text-shadow:0 1px 0 rgba(0,0,0,.3);
+      user-select:none;
+    }
+    #accessOverlay .now-label{
+      position:absolute; left:80.8%; bottom:1%;
+      transform:translateX(-50%);
+      color:#d98a10;
+      font-size:clamp(11px,1vw,16px);
+      font-weight:700;
+      letter-spacing:.1px;
+      z-index:9;
+      text-shadow:0 1px 0 rgba(0,0,0,.3);
+    }
+
+    .acc-ind{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;font-size:11px;border:1px solid var(--line);border-radius:999px;background:var(--surface-2);color:var(--muted)}
     .acc-ind.ok{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 38%, var(--line));background:color-mix(in srgb,var(--ok) 10%, transparent)}
     .acc-ind.warn{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 40%, var(--line));background:color-mix(in srgb,var(--warn) 10%, transparent)}
     .acc-ind.neutral{color:var(--muted)}
+
+    @media (max-width:1100px){
+      #accessOverlay .modal.login-pro{height:min(90vh,760px);}
+      #accessOverlay .chart-shell{width:min(980px,90%);}
+    }
+    @media (max-width:900px){
+      #accessOverlay .top-ambient{height:45%;min-height:240px;}
+      #accessOverlay .chart-wrap{top:41.5%;}
+      #accessOverlay .login-shell{width:min(92%,450px);transform:translateY(0);}
+      #accessOverlay .fade-login-chart{top:47.8%;}
+      #accessOverlay .chart-shell{height:min(35%,250px);}
+    }
+    @media (max-width:640px){
+      #accessOverlay .modal.login-pro{
+        width:min(98vw,560px);
+        height:min(92vh,720px);
+        min-height:520px;
+      }
+      #accessOverlay .top-ambient{height:43%;}
+      #accessOverlay .chart-wrap{top:40.8%;}
+      #accessOverlay .login-shell{width:min(94%,340px);}
+      #accessOverlay .input-access-row .access-code{font-size:16px;letter-spacing:5px;}
+      #accessOverlay .chart-shell{
+        width:min(96vw,560px);
+        height:min(33%,215px);
+        min-height:150px;
+        bottom:1.6%;
+      }
+      #accessOverlay .session{font-size:clamp(10px,2.1vw,12px);}
+      #accessOverlay .x-label{font-size:clamp(10px,1.9vw,11px);}
+      #accessOverlay .now-label{font-size:clamp(10px,2vw,12px);}
+    }
     @media (max-width:1100px){
       .controls{align-items:center}
       .controls > .row{width:auto}
@@ -4251,34 +4554,90 @@
 
 function openAccessGate(){
     const prev = $('accessOverlay');
-    if(prev) prev.remove();
+    if(prev){
+      try{ prev.__cleanup && prev.__cleanup(); }catch(_e){}
+      prev.remove();
+    }
 
     const gate = document.createElement('div');
     gate.id = 'accessOverlay';
     gate.className = 'overlay open';
+    
     gate.innerHTML = `
       <div class="modal login-pro">
-        <div class="login-head">
-          <div class="login-title">
-            <div class="login-badge">BIF</div>
-            <div>
-              <div style="font-size:17px;font-weight:800;letter-spacing:-.2px">PROYECTOS</div>
-              <div class="login-sub">Mercado de Capitales &amp; Control de Gestión.</div>
+        <main class="access-scene">
+          <section class="top-ambient" aria-hidden="true">
+            <canvas id="accessAmbientCanvas"></canvas>
+            <div class="ambient-glass"></div>
+            <div class="ambient-line l1"></div>
+            <div class="ambient-line l2"></div>
+            <div class="ambient-line l3"></div>
+          </section>
+
+          <div class="fade-ambient-login"></div>
+
+          <section class="login-layer">
+            <div class="login-shell">
+              <div class="login-card">
+                <div class="login-head">
+                  <div class="login-logo">BIF</div>
+                  <div>
+                    <p class="login-title">PROYECTOS</p>
+                    <p class="login-sub">Mercado de Capitales &amp; Control de Gestión</p>
+                  </div>
+                </div>
+                <form class="login-form" onsubmit="event.preventDefault()">
+                  <div class="input-access-row">
+                    <input id="accessCode" class="access-code" type="text" inputmode="numeric" maxlength="4" placeholder="****" autocomplete="off" aria-label="Código de acceso" />
+                    <button id="accessBtn" class="login-btn" type="submit">Acceder</button>
+                  </div>
+                  <div class="login-hint">Ingrese el código de acceso</div>
+                  <div id="accessErr" class="lock-msg">Código inválido</div>
+                  <div id="accessLockMsg" class="mini-help dim" style="display:none;color:#fbbf24"></div>
+                </form>
+              </div>
             </div>
-          </div>
-        </div>
-        <div class="login-body">
-          <div class="small muted" style="margin-bottom:8px">Ingresa el código de acceso</div>
-          <div class="code-wrap">
-            <input id="accessCode" class="ctrl access-code" type="text" inputmode="numeric" maxlength="4" placeholder="****" style="flex:1" autocomplete="off" aria-label="Código de acceso" />
-            <button id="accessBtn" class="btn primary">Entrar</button>
-          </div>
-          <div class="mini-help dim" style="margin-top:10px">Ingrese el código de acceso</div>
-          <div id="accessErr" class="lock-msg">Código inválido</div>
-          <div id="accessLockMsg" class="mini-help" style="margin-top:8px;display:none;color:var(--warn)"></div>
-        </div>
+          </section>
+
+          <div class="fade-login-chart"></div>
+
+          <section class="chart-wrap" aria-hidden="true">
+            <div class="chart-shell">
+              <div class="grid">
+                <div class="grid-line" style="left:4.6%"></div>
+                <div class="grid-line" style="left:22.6%"></div>
+                <div class="grid-line" style="left:43.4%"></div>
+                <div class="grid-line" style="left:52.7%"></div>
+                <div class="grid-line" style="left:80.8%"></div>
+                <div class="grid-line" style="left:84.7%"></div>
+                <div class="grid-line" style="left:88.9%"></div>
+              </div>
+
+              <div class="session s-london">Amigables</div>
+              <div class="session s-newyork">Creadores</div>
+              <div class="session s-sydney">Puentes</div>
+              <div class="session s-tokyo">Tesorería</div>
+              <div class="session s-london-next"></div>
+
+              <div class="now-line"></div>
+
+              <div class="x-label" style="left:4.6%">8:00</div>
+              <div class="x-label" style="left:22.6%">12:00</div>
+              <div class="x-label" style="left:43.4%">17:00</div>
+              <div class="x-label" style="left:52.7%">19:00</div>
+              <div class="x-label" style="left:80.8%">2:00</div>
+              <div class="x-label" style="left:84.7%">3:00</div>
+              <div class="x-label" style="left:88.9%">4:00</div>
+
+              <div class="now-label">0:21</div>
+            </div>
+          </section>
+
+          <div class="scene-vignette"></div>
+        </main>
       </div>
     `;
+
     document.body.appendChild(gate);
     document.body.style.overflow = 'hidden';
 
@@ -4286,6 +4645,142 @@ function openAccessGate(){
     const btn = $('accessBtn');
     const lockMsg = $('accessLockMsg');
     const errMsg = $('accessErr');
+
+    const startAccessAmbient = (canvas) => {
+      const ctx = canvas && canvas.getContext ? canvas.getContext('2d') : null;
+      if(!ctx) return ()=>{};
+
+      let W = 0, H = 0, DPR = 1;
+      let raf = 0;
+      const t0 = performance.now();
+
+      const ribbons = [
+        { amp: 28, freq: 0.012, speed: 0.00028, y: 0.24, width: 1.6, c1:[79,140,255,0.45], c2:[79,140,255,0.04] },
+        { amp: 20, freq: 0.016, speed: 0.00042, y: 0.38, width: 1.3, c1:[20,184,166,0.36], c2:[20,184,166,0.03] },
+        { amp: 16, freq: 0.011, speed: -0.00023, y: 0.52, width: 1.1, c1:[140,175,230,0.28], c2:[140,175,230,0.02] }
+      ];
+
+      const movers = Array.from({length: 22}).map((_,i)=>({
+        lane: i % ribbons.length,
+        x: Math.random(),
+        v: 0.00006 + Math.random()*0.00022,
+        r: 1.6 + Math.random()*1.9
+      }));
+
+      const resize = () => {
+        const rect = canvas.getBoundingClientRect();
+        DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+        W = Math.max(320, Math.round(rect.width));
+        H = Math.max(160, Math.round(rect.height));
+        canvas.width = Math.round(W * DPR);
+        canvas.height = Math.round(H * DPR);
+        ctx.setTransform(DPR,0,0,DPR,0,0);
+      };
+
+      const pathY = (x, r, time) => {
+        const phase = time * r.speed * 1200;
+        const yBase = H * r.y;
+        return yBase + Math.sin(x*r.freq + phase)*r.amp + Math.sin(x*(r.freq*0.42) - phase*0.75)*(r.amp*0.34);
+      };
+
+      const drawRibbon = (r, time) => {
+        ctx.beginPath();
+        const step = 8;
+        for(let x=0; x<=W+step; x+=step){
+          const y = pathY(x, r, time);
+          if(x===0) ctx.moveTo(x,y);
+          else ctx.lineTo(x,y);
+        }
+
+        const g = ctx.createLinearGradient(0,0,W,0);
+        g.addColorStop(0, `rgba(${r.c2[0]},${r.c2[1]},${r.c2[2]},${r.c2[3]})`);
+        g.addColorStop(0.2, `rgba(${r.c1[0]},${r.c1[1]},${r.c1[2]},${r.c1[3]})`);
+        g.addColorStop(0.8, `rgba(${r.c1[0]},${r.c1[1]},${r.c1[2]},${r.c1[3]})`);
+        g.addColorStop(1, `rgba(${r.c2[0]},${r.c2[1]},${r.c2[2]},${r.c2[3]})`);
+        ctx.strokeStyle = g;
+        ctx.lineWidth = r.width;
+        ctx.shadowColor = `rgba(${r.c1[0]},${r.c1[1]},${r.c1[2]},0.35)`;
+        ctx.shadowBlur = 7;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+      };
+
+      const drawMovers = (time) => {
+        for(const m of movers){
+          m.x += m.v;
+          if(m.x > 1.02) m.x = -0.03;
+          const r = ribbons[m.lane];
+          const x = m.x * W;
+          const y = pathY(x, r, time);
+
+          ctx.beginPath();
+          ctx.arc(x, y, m.r + 2.2, 0, Math.PI*2);
+          ctx.fillStyle = `rgba(${r.c1[0]},${r.c1[1]},${r.c1[2]},0.16)`;
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.arc(x, y, m.r, 0, Math.PI*2);
+          ctx.fillStyle = `rgba(220,235,255,0.9)`;
+          ctx.fill();
+        }
+      };
+
+      const drawBeams = (time) => {
+        const count = 6;
+        for(let i=0;i<count;i++){
+          const p = (i+1)/(count+1);
+          const wob = Math.sin(time*1.3 + i*1.7) * 0.012;
+          const x = (p + wob) * W;
+          const w = 1 + (i%2)*0.5;
+
+          const g = ctx.createLinearGradient(0, H*0.06, 0, H*0.86);
+          g.addColorStop(0, "rgba(130,160,210,0.00)");
+          g.addColorStop(0.35, "rgba(130,160,210,0.09)");
+          g.addColorStop(0.75, "rgba(130,160,210,0.03)");
+          g.addColorStop(1, "rgba(130,160,210,0.00)");
+
+          ctx.fillStyle = g;
+          ctx.fillRect(x, H*0.06, w, H*0.80);
+        }
+      };
+
+      const frame = (ts) => {
+        const time = (ts - t0) * 0.001;
+
+        ctx.clearRect(0,0,W,H);
+
+        const halo = ctx.createRadialGradient(W*0.5, H*0.08, 8, W*0.5, H*0.08, W*0.46);
+        halo.addColorStop(0, "rgba(110,170,255,0.18)");
+        halo.addColorStop(0.42, "rgba(40,110,210,0.08)");
+        halo.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = halo;
+        ctx.fillRect(0,0,W,H);
+
+        drawBeams(time);
+        for(const r of ribbons) drawRibbon(r, time);
+        drawMovers(time);
+
+        const fog = ctx.createLinearGradient(0, H*0.60, 0, H);
+        fog.addColorStop(0, "rgba(5,8,14,0)");
+        fog.addColorStop(1, "rgba(5,8,14,0.42)");
+        ctx.fillStyle = fog;
+        ctx.fillRect(0, H*0.60, W, H*0.40);
+
+        raf = requestAnimationFrame(frame);
+      };
+
+      resize();
+      window.addEventListener('resize', resize, { passive:true });
+      raf = requestAnimationFrame(frame);
+
+      return () => {
+        try{ cancelAnimationFrame(raf); }catch(_){/* noop */}
+        window.removeEventListener('resize', resize);
+      };
+    };
+
+    const stopAmbient = startAccessAmbient(gate.querySelector('#accessAmbientCanvas'));
+
     const attemptKey = 'BANBIF_ACCESS_ATTEMPTS_V12';
     const lockKey = 'BANBIF_ACCESS_LOCK_UNTIL_V12';
     const lockLevelKey = 'BANBIF_ACCESS_LOCK_LEVEL_V12';
@@ -4434,6 +4929,7 @@ function openAccessGate(){
         document.body.style.overflow = '';
         clearInterval(lockTimer);
         clearRevealTimer();
+        try{ stopAmbient && stopAmbient(); }catch(_e){}
         updateRoleUI();
         render();
         toast(ui.role === 'admin' ? 'Modo administrador activado' : 'Modo lectura activado');
@@ -4553,6 +5049,12 @@ function openAccessGate(){
       input.focus();
       placeCaretAtEnd();
     }, 40);
+
+    gate.__cleanup = () => {
+      try{ clearInterval(lockTimer); }catch(_e){}
+      try{ clearRevealTimer(); }catch(_e){}
+      try{ stopAmbient && stopAmbient(); }catch(_e){}
+    };
   }
 
 
