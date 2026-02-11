@@ -2707,6 +2707,7 @@
           <button class="btn primary" id="btnAdd">+ Proyecto</button>
           <button class="btn icon" id="btnTheme" title="Tema">☾</button>
           <button class="btn icon" id="btnInfo" title="Notificaciones" aria-label="Notificaciones"><i class="fa-solid fa-bell" aria-hidden="true"></i></button>
+          <button class="btn icon" id="btnReload" title="Sincronizar / Recargar" aria-label="Recargar página"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i></button>
         </div>
       </div>
 
@@ -4507,6 +4508,7 @@
     $('btnManage').addEventListener('click', openManage);
     $('btnTheme').addEventListener('click', toggleTheme);
     $('btnInfo')?.addEventListener('click', ()=>{ renderInfoNotifications(); openOverlay('infoOverlay'); });
+    $('btnReload')?.addEventListener('click', ()=>{ window.location.reload(); });
 
     $('datePicker').addEventListener('change',e=>{ const v = normalizeISO(e.target.value); if(!v){ e.target.value = fmtDate(ui.date); toast('Fecha inválida. Usa dd/mm/aaaa'); return; } ui.date = v; render(); });
     $('prevBtn').addEventListener('click',()=>shiftDate(-1));
@@ -6603,9 +6605,10 @@ function buildDaySummaryText(dayISO=ui.date){
     const addBtn = $('btnAdd');
     const themeBtn = $('btnTheme');
     const infoBtn = $('btnInfo');
+    const reloadBtn = $('btnReload');
 
     // Orden estable y legible en la barra superior.
-    [badge, teamBtn, copyBtn, manageBtn, addBtn, themeBtn, infoBtn].forEach((el)=>{
+    [badge, teamBtn, copyBtn, manageBtn, addBtn, themeBtn, infoBtn, reloadBtn].forEach((el)=>{
       if(el) actions.appendChild(el);
     });
 
