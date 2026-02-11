@@ -103,6 +103,7 @@
     .title{margin:0;font-size:21px;letter-spacing:-.3px}
     .subtitle{margin-top:2px;font-size:12px;color:var(--muted)}
     .actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
+    .actions .actions-icon-group{display:flex;gap:8px;align-items:center;min-width:0;}
     .btn, .ctrl, select, input{
       font:inherit;
     }
@@ -1701,10 +1702,44 @@
     }
     @media (max-width:860px){
       .top{padding:12px}
-      .actions{width:100%;align-items:center}
-      .actions .mode-pill{flex:1 1 100%;justify-content:center;text-align:center}
-      .actions .btn{flex:1 1 calc(50% - 8px)}
-      .actions .btn.icon{flex:0 0 38px;margin-left:auto}
+      .actions{
+        width:100%;
+        display:grid;
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:6px;
+        align-items:stretch;
+      }
+      .actions .mode-pill{display:none !important}
+      .actions .btn{
+        height:34px;
+        padding:0 10px;
+        font-size:12px;
+        min-width:0;
+      }
+
+      /* Fila 1: Equipo + Resumen */
+      .actions #btnTeam{grid-column:1}
+      .actions #btnCopyDaySummary{grid-column:2}
+
+      /* Fila 2: Agenda (50%) + Grupo de íconos (50%) */
+      .actions #btnAgenda{grid-column:1}
+      .actions .actions-icon-group{
+        grid-column:2;
+        display:grid;
+        grid-template-columns:repeat(4,minmax(0,1fr));
+        gap:6px;
+        min-width:0;
+      }
+      .actions .actions-icon-group .btn.icon{
+        width:100%;
+        height:34px;
+        padding:0;
+        margin:0;
+      }
+
+      /* Si está visible en admin, queda en una tercera fila */
+      .actions #btnAdd{grid-column:1 / -1}
+
       .seg{width:100%;justify-content:space-between}
       .seg .btn{flex:1}
       .controls .seg{width:auto;justify-content:flex-start}
@@ -6571,23 +6606,24 @@ function buildDaySummaryText(dayISO=ui.date){
   function updateRoleUI(){
 
     const actions = document.querySelector('.actions');
-    let badge = $('modeBadge');
-    if(!badge){
-      badge = document.createElement('span');
-      badge.id = 'modeBadge';
-      badge.className = 'mode-pill';
-    }
+    if(!actions) return;
 
-    let teamBtn = $('btnTeamView');
+    // Se elimina visualmente el badge de modo (lectura/admin) en actions.
+    const badge = $('modeBadge');
+    if(badge?.parentNode) badge.parentNode.removeChild(badge);
+
+    let teamBtn = $('btnTeam');
     if(!teamBtn){
       teamBtn = document.createElement('button');
-      teamBtn.id = 'btnTeamView';
+      teamBtn.id = 'btnTeam';
       teamBtn.className = 'btn';
       teamBtn.type = 'button';
       teamBtn.textContent = 'Equipo';
       teamBtn.title = 'Ver estructura y actividades del equipo';
+      teamBtn.setAttribute('aria-label', 'Equipo');
       teamBtn.addEventListener('click', openTeamModal);
     }
+    teamBtn.onclick = openTeamModal;
 
     let copyBtn = $('btnCopyDaySummary');
     if(!copyBtn){
@@ -6601,28 +6637,50 @@ function buildDaySummaryText(dayISO=ui.date){
     }
     copyBtn.onclick = copySelectedDaySummary;
 
+    let agendaBtn = $('btnAgenda');
+    if(!agendaBtn){
+      agendaBtn = document.createElement('button');
+      agendaBtn.id = 'btnAgenda';
+      agendaBtn.className = 'btn';
+      agendaBtn.type = 'button';
+      agendaBtn.textContent = 'Agenda';
+      agendaBtn.title = 'Abrir agenda del día seleccionado';
+      agendaBtn.addEventListener('click', ()=> openMonthDayModal(normalizeISO(ui.date) || todayISO()));
+    }
+
     const manageBtn = $('btnManage');
     const addBtn = $('btnAdd');
     const themeBtn = $('btnTheme');
     const infoBtn = $('btnInfo');
     const reloadBtn = $('btnReload');
 
-    // Orden estable y legible en la barra superior.
-    [badge, teamBtn, copyBtn, manageBtn, addBtn, themeBtn, infoBtn, reloadBtn].forEach((el)=>{
-      if(el) actions.appendChild(el);
+    if(manageBtn){
+      manageBtn.classList.add('icon');
+      manageBtn.innerHTML = '<i class="fa-solid fa-gear" aria-hidden="true"></i>';
+      const cfgLabel = isAdmin() ? 'Administrar' : 'Ver configuración';
+      manageBtn.title = cfgLabel;
+      manageBtn.setAttribute('aria-label', cfgLabel);
+    }
+
+    if(addBtn){
+      addBtn.style.display = isAdmin() ? '' : 'none';
+    }
+
+    // Orden estable de actions:
+    // - Fila 1 (móvil): Equipo + Resumen
+    // - Fila 2 (móvil): Agenda + grupo de íconos (50/50)
+    let iconGroup = actions.querySelector('.actions-icon-group');
+    if(!iconGroup){
+      iconGroup = document.createElement('div');
+      iconGroup.className = 'actions-icon-group';
+    }
+    [manageBtn, themeBtn, infoBtn, reloadBtn].forEach((el)=>{
+      if(el) iconGroup.appendChild(el);
     });
 
-    if(isAdmin()){
-      badge.className = 'mode-pill admin';
-      badge.textContent = '🛠 Modo admin';
-      addBtn.style.display = '';
-      manageBtn.textContent = 'Administrar';
-    }else{
-      badge.className = 'mode-pill read';
-      badge.textContent = '👁 Modo lectura';
-      addBtn.style.display = 'none';
-      manageBtn.textContent = 'Ver configuración';
-    }
+    [teamBtn, copyBtn, agendaBtn, iconGroup, addBtn].forEach((el)=>{
+      if(el) actions.appendChild(el);
+    });
   }
 
   function isAdmin(){ return ui.role === 'admin'; }
