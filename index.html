@@ -4958,6 +4958,17 @@ function openAccessGate(){
       }
     };
 
+    const resetViewportToHeader = () => {
+      const scroller = document.scrollingElement || document.documentElement;
+      if(scroller) scroller.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      window.scrollTo(0, 0);
+      document.querySelector('.main')?.scrollTo(0, 0);
+    };
+
+    const isMobileViewport = () => window.matchMedia('(max-width: 900px)').matches;
+
     const startAccessAmbient = (canvas) => {
       const ctx = canvas && canvas.getContext ? canvas.getContext('2d') : null;
       if(!ctx) return ()=>{};
@@ -5255,11 +5266,29 @@ function openAccessGate(){
             void appRoot.offsetWidth;
           }
 
+          // Cierra teclado antes de mostrar la app (clave en móvil)
+          if(document.activeElement && typeof document.activeElement.blur === 'function'){
+            document.activeElement.blur();
+          }
+
           gate.remove();
           document.body.style.overflow = '';
+
+          // Primer reset inmediato
+          if(isMobileViewport()) resetViewportToHeader();
+
           try{ stopAmbient && stopAmbient(); }catch(_e){}
           updateRoleUI();
           render();
+
+          // Reforzar reset tras reflow/repaint
+          if(isMobileViewport()){
+            resetViewportToHeader();
+            requestAnimationFrame(()=>{
+              resetViewportToHeader();
+              setTimeout(resetViewportToHeader, 120);
+            });
+          }
 
           if(appRoot){
             requestAnimationFrame(()=>{
