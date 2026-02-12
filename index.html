@@ -2851,7 +2851,7 @@
 
       <div class="kpi-band" id="kpiBand"></div>
 
-      <div class="split">
+      <div class="split" id="dayTopSplit">
         <div class="box">
           <div class="head">
             <span>Equipo hoy</span>
@@ -8270,9 +8270,19 @@ function buildDaySummaryText(dayISO=ui.date){
     updateRoleUI();
     updateNotificationIndicator();
     renderHeaderControls();
-    renderKPIBand();
-    renderTodayCards();
-    renderPriorityRadar();
+
+    const showDayTop = ui.view === 'day';
+    const kpiBandEl = $('kpiBand');
+    const dayTopSplitEl = $('dayTopSplit');
+    if(kpiBandEl) kpiBandEl.classList.toggle('hidden', !showDayTop);
+    if(dayTopSplitEl) dayTopSplitEl.classList.toggle('hidden', !showDayTop);
+
+    if(showDayTop){
+      renderKPIBand();
+      renderTodayCards();
+      renderPriorityRadar();
+    }
+
     renderView();
     if($('infoOverlay')?.classList.contains('open')) renderInfoNotifications();
     applyStatTooltips(document);
