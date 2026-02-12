@@ -2797,6 +2797,164 @@
 }
 </style>
 
+<style id="roadmap-lite-v1">
+/* Roadmap (vista tipo notificaciones) */
+.road-n-board{display:grid;gap:10px;padding:10px;grid-template-columns:repeat(4,minmax(0,1fr));align-items:start}
+.road-n-sub{font-size:12px;color:var(--muted);margin:0 2px 2px;grid-column:1 / -1}
+
+.road-n-status{
+  border:1px solid var(--line);
+  min-width:0;
+  border-radius:5px;
+  background:linear-gradient(180deg, color-mix(in srgb,var(--surface-2) 92%, transparent), var(--surface));
+  padding:10px;
+  display:grid;
+  gap:8px;
+}
+.road-n-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.road-n-title{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:13px;
+  font-weight:800;
+  letter-spacing:.2px;
+  text-transform:uppercase;
+}
+.road-n-title i{font-size:12px;color:var(--primary)}
+.road-n-count{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:26px;
+  padding:2px 8px;
+  border-radius:5px;
+  border:1px solid var(--line);
+  background:var(--surface);
+  font-size:11px;
+  font-weight:700;
+  color:var(--text);
+}
+
+/* Escritorio: orientación vertical */
+.road-n-list{display:grid;gap:8px}
+
+/* Tarjetas guiadas por diseño de notificaciones */
+.road-n-card{
+  border:1px solid var(--line);
+  border-radius:5px;
+  background:var(--surface);
+  padding:10px;
+  display:grid;
+  gap:8px;
+  box-shadow:0 8px 20px rgba(2,8,23,.06);
+}
+.road-n-meta{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.road-n-date{
+  font-size:11px;
+  color:var(--muted);
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+.road-n-tag{
+  display:inline-flex;
+  align-items:center;
+  padding:3px 8px;
+  border-radius:5px;
+  border:1px solid color-mix(in srgb,var(--primary) 50%, var(--line));
+  background:color-mix(in srgb,var(--primary) 12%, transparent);
+  color:var(--primary);
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.2px;
+  text-transform:uppercase;
+}
+.road-n-name{font-size:13px;font-weight:700;line-height:1.35}
+.road-n-status-pill{
+  display:inline-flex;
+  align-items:center;
+  padding:3px 8px;
+  border-radius:5px;
+  border:1px solid var(--line);
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.2px;
+  text-transform:uppercase;
+}
+.road-n-status-pill.st-propuesto{
+  color:var(--primary);
+  border-color:color-mix(in srgb,var(--primary) 50%, var(--line));
+  background:color-mix(in srgb,var(--primary) 10%, transparent);
+}
+.road-n-status-pill.st-planificado{
+  color:#7c3aed;
+  border-color:color-mix(in srgb,#7c3aed 45%, var(--line));
+  background:color-mix(in srgb,#7c3aed 10%, transparent);
+}
+.road-n-status-pill.st-desarrollo{
+  color:var(--warn);
+  border-color:color-mix(in srgb,var(--warn) 55%, var(--line));
+  background:color-mix(in srgb,var(--warn) 12%, transparent);
+}
+.road-n-status-pill.st-completado{
+  color:var(--ok);
+  border-color:color-mix(in srgb,var(--ok) 50%, var(--line));
+  background:color-mix(in srgb,var(--ok) 12%, transparent);
+}
+
+.road-n-empty{
+  border:1px dashed var(--line);
+  border-radius:5px;
+  padding:12px;
+  text-align:center;
+  color:var(--muted);
+  background:color-mix(in srgb,var(--surface-2) 70%, transparent);
+  font-size:12px;
+}
+
+/* Móvil: desplazamiento horizontal */
+@media (max-width: 768px){
+  #segView [data-view="gantt"]{display:none !important;}
+  #roadmapZoomWrap{display:none !important;}
+
+  .road-n-board{padding:8px;grid-template-columns:1fr}
+  .road-n-status{padding:8px}
+  .road-n-head{margin-bottom:2px}
+
+  .road-n-list{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    overflow-y:hidden;
+    -webkit-overflow-scrolling:touch;
+    scroll-snap-type:x proximity;
+    padding-bottom:2px;
+  }
+  .road-n-list::-webkit-scrollbar{height:0}
+  .road-n-card{
+    min-width:245px;
+    max-width:245px;
+    flex:0 0 245px;
+    scroll-snap-align:start;
+  }
+  .road-n-empty{min-width:245px;flex:0 0 245px}
+}
+</style>
+
+
 </head>
 <body>
   <div class="app">
@@ -2824,8 +2982,8 @@
             <button class="btn tab active" data-view="day">Día</button>
             <button class="btn tab" data-view="week">Semana</button>
             <button class="btn tab" data-view="month">Mensual</button>
+            <button class="btn tab" data-view="gantt">Gantt</button>
             <button class="btn tab" data-view="roadmap">Roadmap</button>
-            <button class="btn tab" data-view="availability">Disponibilidad</button>
           </div>
           <button class="btn icon" id="prevBtn">◀</button>
           <input class="ctrl" type="text" id="datePicker" inputmode="numeric" placeholder="dd/mm/aaaa" title="Formato: dd/mm/aaaa" aria-label="Fecha (dd/mm/aaaa)" />
@@ -3020,6 +3178,7 @@
           <button class="btn tab" data-tab="team">Equipo y Bloqueos</button>
           <button class="btn tab" data-tab="holidays">Feriados</button>
           <button class="btn tab" data-tab="notifications">Notificaciones</button>
+          <button class="btn tab" data-tab="roadmap">Roadmap</button>
           <button class="btn tab" data-tab="data">Datos</button>
         </div>
 
@@ -3027,6 +3186,7 @@
         <div id="tab_team" class="hidden"></div>
         <div id="tab_holidays" class="hidden"></div>
         <div id="tab_notifications" class="hidden"></div>
+        <div id="tab_roadmap" class="hidden"></div>
         <div id="tab_data" class="hidden"></div>
       </div>
       <div class="m-foot">
@@ -3165,6 +3325,7 @@
   const RECURRENCE_FREQUENCIES = ['Ninguna','Diaria','Mensual','Trimestral','Anual'];
   const BLOCK_TYPES = ['Almuerzo','Vacaciones','Permiso','Capacitación','Trayecto','Otro'];
   const NOTIF_ALL_USERS = '__all__';
+  const ROADMAP_STATUSES = ['Propuesto','Planificado','En desarrollo','Completado'];
 
   const DEFAULT_STATE = {
     settings: {
@@ -3243,6 +3404,28 @@
         ]
       }
     ],
+
+    roadmapItems: [
+      { id:'rm1', date:'2026-02-13', title:'Dashboard Seguimiento Comercial', status:'Propuesto', tag:'ALM' },
+      { id:'rm2', date:'2026-02-13', title:'Dashboard Seguimiento Comercial', status:'Propuesto', tag:'ALM' },
+      { id:'rm3', date:'2026-02-13', title:'Dashboard Seguimiento Comercial', status:'Propuesto', tag:'ALM' },
+      { id:'rm4', date:'2026-02-13', title:'Dashboard Seguimiento Comercial', status:'Propuesto', tag:'ALM' },
+
+      { id:'rm5', date:'2026-02-13', title:'Dashboard Seguimiento Comercial', status:'Planificado', tag:'ALM' },
+      { id:'rm6', date:'2026-02-13', title:'Dashboard Seguimiento Comercial', status:'Planificado', tag:'ALM' },
+      { id:'rm7', date:'2026-02-13', title:'Dashboard Seguimiento Comercial', status:'Planificado', tag:'ALM' },
+      { id:'rm8', date:'2026-02-13', title:'Dashboard Seguimiento Comercial', status:'Planificado', tag:'ALM' },
+
+      { id:'rm9', date:'2026-02-13', title:'Dashboard Seguimiento Comercial', status:'En desarrollo', tag:'ALM' },
+      { id:'rm10', date:'2026-02-13', title:'Dashboard Seguimiento Comercial', status:'En desarrollo', tag:'ALM' },
+      { id:'rm11', date:'2026-02-13', title:'Dashboard Seguimiento Comercial', status:'En desarrollo', tag:'ALM' },
+      { id:'rm12', date:'2026-02-13', title:'Dashboard Seguimiento Comercial', status:'En desarrollo', tag:'ALM' },
+
+      { id:'rm13', date:'2026-02-13', title:'Dashboard Seguimiento Comercial', status:'Completado', tag:'ALM' },
+      { id:'rm14', date:'2026-02-13', title:'Dashboard Seguimiento Comercial', status:'Completado', tag:'ALM' },
+      { id:'rm15', date:'2026-02-13', title:'Dashboard Seguimiento Comercial', status:'Completado', tag:'ALM' },
+      { id:'rm16', date:'2026-02-13', title:'Dashboard Seguimiento Comercial', status:'Completado', tag:'ALM' }
+    ],
     notifications: []
   };
 
@@ -3293,6 +3476,7 @@
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   const rid = (p='id') => `${p}_${Math.random().toString(36).slice(2,9)}`;
+  const isMobileViewport = () => window.matchMedia('(max-width: 768px)').matches;
 
   const _loadedState = loadState();
   let holidaysState = sanitizeHolidayStore(loadHolidays(_loadedState));
@@ -7456,6 +7640,10 @@ function buildDaySummaryText(dayISO=ui.date){
 
     const teamIds = new Set(base.team.map(t=>t.id));
 
+    if(Array.isArray(legacy.roadmapItems)){
+      base.roadmapItems = sanitizeRoadmapItems(legacy.roadmapItems);
+    }
+
     if(Array.isArray(legacy.projects)){
       base.projects = legacy.projects.map((p,idx)=>{
         const s = normalizeISO(p?.startDate) || toISO(new Date());
@@ -7618,6 +7806,36 @@ function buildDaySummaryText(dayISO=ui.date){
     return { leader, members };
   }
 
+
+  function normalizeRoadmapStatus(raw){
+    const v = String(raw || '').trim().toLowerCase();
+    if(['propuesto','propuesta','backlog','idea'].includes(v)) return 'Propuesto';
+    if(['planificado','planeado','planned','plan'].includes(v)) return 'Planificado';
+    if(['en desarrollo','desarrollo','in progress','en progreso','ejecucion','ejecución'].includes(v)) return 'En desarrollo';
+    if(['completado','completada','finalizado','finalizada','done','cerrado','cerrada'].includes(v)) return 'Completado';
+    return 'Propuesto';
+  }
+
+  function sanitizeRoadmapItems(raw){
+    const fallback = Array.isArray(DEFAULT_STATE.roadmapItems) ? structuredClone(DEFAULT_STATE.roadmapItems) : [];
+    const src = Array.isArray(raw) ? raw : fallback;
+
+    return src.map((item, idx)=>{
+      const date = normalizeISO(item?.date) || todayISO();
+      const title = String(item?.title || item?.name || `Iniciativa ${idx+1}`).slice(0,120).trim();
+      const status = normalizeRoadmapStatus(item?.status);
+      const tag = String(item?.tag || item?.area || 'ALM').slice(0,10).trim().toUpperCase() || 'ALM';
+      if(!title) return null;
+      return {
+        id: String(item?.id || rid('rm')),
+        date,
+        title,
+        status,
+        tag
+      };
+    }).filter(Boolean);
+  }
+
   function sanitizeState(raw){
     const s = raw && typeof raw === 'object' ? raw : structuredClone(DEFAULT_STATE);
     const out = structuredClone(DEFAULT_STATE);
@@ -7722,6 +7940,7 @@ function buildDaySummaryText(dayISO=ui.date){
 
     }
 
+    out.roadmapItems = sanitizeRoadmapItems(s.roadmapItems);
     out.notifications = sanitizeNotifications(s.notifications, out.team);
 
     return out;
@@ -8242,6 +8461,7 @@ function buildDaySummaryText(dayISO=ui.date){
     if(!ui.role) return;
     state = sanitizeState(state);
     ui.roadmapZoom = (ui.roadmapZoom === 'week' || ui.roadmapZoom === 'year' || ui.roadmapZoom === 'month') ? ui.roadmapZoom : 'month';
+    if(isMobileViewport() && ui.view === 'gantt') ui.view = 'roadmap';
     saveState();
 
     $('datePicker').value = fmtDate(ui.date);
@@ -8346,7 +8566,7 @@ function buildDaySummaryText(dayISO=ui.date){
     document.querySelectorAll('#segRoadmapZoom [data-rz]').forEach(b => b.classList.toggle('active', b.dataset.rz === (ui.roadmapZoom || 'month')));
 
     const roadmapWrap = $('roadmapZoomWrap');
-    if(roadmapWrap) roadmapWrap.classList.toggle('hidden', ui.view !== 'roadmap');
+    if(roadmapWrap) roadmapWrap.classList.toggle('hidden', ui.view !== 'gantt');
 
     $('fOwner').innerHTML = ['<option value="">Responsable</option>']
       .concat(state.team.map(t=>`<option value="${esc(t.id)}" ${ui.filters.owner===t.id?'selected':''}>${esc(t.name)}</option>`))
@@ -8618,18 +8838,19 @@ function buildDaySummaryText(dayISO=ui.date){
     if(ui.view === 'day') return renderDayView();
     if(ui.view === 'week') return renderWeekView();
     if(ui.view === 'month') return renderMonthCalendarView();
-    if(ui.view === 'roadmap'){
+    if(ui.view === 'gantt'){
       try{ return renderRoadmapView(); }
       catch(err){
-        console.error('[roadmap-render-fallback]', err);
+        console.error('[gantt-render-fallback]', err);
         const c = $('mainView');
         if(c){
-          c.innerHTML = `<div class="roadmap"><div class="road-empty">No se pudo renderizar el Roadmap con esta configuración. Intenta cambiar el zoom o revisar datos de fechas.</div></div>`;
+          c.innerHTML = `<div class="roadmap"><div class="road-empty">No se pudo renderizar el Gantt con esta configuración. Intenta cambiar el zoom o revisar datos de fechas.</div></div>`;
         }
         return;
       }
     }
-    return renderAvailabilityView();
+    if(ui.view === 'roadmap') return renderRoadmapBoardView();
+    return renderRoadmapBoardView();
   }
 
   function renderDayView(fitPass = 0, windowOverride = null){
@@ -9147,75 +9368,85 @@ function buildDaySummaryText(dayISO=ui.date){
   }
 
 
-  function renderAvailabilityView(){
+  function renderRoadmapBoardView(){
     const c = $('mainView');
-    const monday = startOfWeekISO(ui.date);
-    const days = [0,1,2,3,4].map(i => addDaysISO(monday,i));
-    const team = getFilteredTeam();
+    const items = (state.roadmapItems || [])
+      .slice()
+      .sort((a,b)=>{
+        const da = String(a?.date || '');
+        const db = String(b?.date || '');
+        if(da !== db) return da.localeCompare(db);
+        const sa = ROADMAP_STATUSES.indexOf(normalizeRoadmapStatus(a?.status));
+        const sb = ROADMAP_STATUSES.indexOf(normalizeRoadmapStatus(b?.status));
+        if(sa !== sb) return sa - sb;
+        return String(a?.title || '').localeCompare(String(b?.title || ''), APP_LOCALE, { sensitivity:'base' });
+      });
 
-    if(!team.length){
-      c.innerHTML = `<div class="availability"><div class="muted small">Sin responsables para mostrar.</div></div>`;
+    if(!items.length){
+      c.innerHTML = `<div class="road-n-empty">No hay iniciativas en la hoja de ruta. Regístralas en Administrar → Roadmap.</div>`;
       return;
     }
 
-    const globalStart = Math.min(...team.map(t=>t.startHour))*60;
-    const globalEnd = Math.max(...team.map(t=>t.endHour))*60;
-    const slotSize = 30;
-    const slotCount = Math.max(1, Math.ceil((globalEnd-globalStart)/slotSize));
+    const grouped = {
+      'Propuesto': [],
+      'Planificado': [],
+      'En desarrollo': [],
+      'Completado': []
+    };
 
-    const dayHeaders = ['Lunes','Martes','Miércoles','Jueves','Viernes'];
+    items.forEach(it=>{
+      const st = normalizeRoadmapStatus(it.status);
+      (grouped[st] || grouped['Propuesto']).push(it);
+    });
 
-    const rows = team.map(person=>{
-      const cells = days.map((d,idx)=>{
-        const busy = getBusyIntervalsForPersonDay(person, d);
-        const free = subtractIntervals(person.startHour*60, person.endHour*60, busy);
-        const freeMin = minutesFromIntervals(free);
+    const statusClass = (status)=>{
+      if(status === 'Propuesto') return 'st-propuesto';
+      if(status === 'Planificado') return 'st-planificado';
+      if(status === 'En desarrollo') return 'st-desarrollo';
+      if(status === 'Completado') return 'st-completado';
+      return '';
+    };
 
-        const slots = [];
-        for(let t=globalStart; t<globalEnd; t+=slotSize){
-          const s=t,e=t+slotSize;
-          const inSchedule = s >= person.startHour*60 && e <= person.endHour*60;
-          let className = 'off';
-          if(inSchedule){
-            const isFree = free.some(([fs,fe])=>Math.max(fs,s) < Math.min(fe,e));
-            className = isFree ? 'av' : 'busy';
-          }
-          slots.push(`<span class="slot ${className}" title="${minToHHMM(s)}-${minToHHMM(e)}"></span>`);
-        }
+    const statusIcon = (status)=>{
+      if(status === 'Propuesto') return 'fa-lightbulb';
+      if(status === 'Planificado') return 'fa-list-check';
+      if(status === 'En desarrollo') return 'fa-gear';
+      if(status === 'Completado') return 'fa-circle-check';
+      return 'fa-diagram-project';
+    };
 
-        return `
-          <div>
-            <div class="slots" style="--slot-count:${slotCount}">${slots.join('')}</div>
-            <div class="day-free">${fmtH(freeMin)} libres · ${dayHeaders[idx]}</div>
+    const cardsForStatus = (status)=>{
+      const list = grouped[status] || [];
+      if(!list.length) return '<div class="road-n-empty">Sin iniciativas</div>';
+
+      return list.map(it=>`
+        <article class="road-n-card" title="${esc(it.title)} · ${esc(fmtDate(it.date))}">
+          <div class="road-n-meta">
+            <span class="road-n-date"><i class="fa-regular fa-calendar" aria-hidden="true"></i> ${esc(fmtDate(it.date))}</span>
+            <span class="road-n-tag">${esc((it.tag || 'ALM').slice(0,12).toUpperCase())}</span>
           </div>
-        `;
-      }).join('');
-
-      return `
-        <div class="avail-row">
+          <div class="road-n-name">${esc(it.title || 'Iniciativa')}</div>
           <div>
-            <div class="avail-user">${esc(person.name)}</div>
-            <div class="avail-meta">${String(person.startHour).padStart(2,'0')}:00–${String(person.endHour).padStart(2,'0')}:00 · cap ${person.capacityHoursPerDay}h</div>
+            <span class="road-n-status-pill ${statusClass(status)}">${esc(status)}</span>
           </div>
-          ${cells}
+        </article>
+      `).join('');
+    };
+
+    const sections = ROADMAP_STATUSES.map(status=>`
+      <section class="road-n-status">
+        <div class="road-n-head">
+          <div class="road-n-title"><i class="fa-solid ${statusIcon(status)}" aria-hidden="true"></i> ${esc(status)}</div>
+          <span class="road-n-count">${grouped[status]?.length || 0}</span>
         </div>
-      `;
-    }).join('');
+        <div class="road-n-list">${cardsForStatus(status)}</div>
+      </section>
+    `).join('');
 
     c.innerHTML = `
-      <div class="availability">
-        <div class="avail-legend">
-          <span><span class="dot av"></span> Disponible</span>
-          <span><span class="dot busy"></span> Ocupado / bloqueado</span>
-          <span>Semana: ${fmtDate(days[0])} → ${fmtDate(days[4])}</span>
-        </div>
-        <div class="avail-table">
-          <div class="avail-head">
-            <div>Responsable</div>
-            ${days.map((d,i)=>`<div>${dayHeaders[i]}<br><span class="small muted">${fmtDate(d)}</span></div>`).join('')}
-          </div>
-          ${rows}
-        </div>
+      <div class="road-n-board">
+        <div class="road-n-sub">Roadmap · ordenado por fecha ascendente dentro de cada estado${isMobileViewport() ? ' · desplazamiento horizontal' : ' · orientación vertical en escritorio'}</div>
+        ${sections}
       </div>
     `;
   }
@@ -9621,7 +9852,7 @@ function buildDaySummaryText(dayISO=ui.date){
     c.innerHTML = `
       <div class="roadmap">
         <div class="road-summary">
-          <div class="road-kpi"><div class="k">Vista</div><div class="v small">Roadmap ${zoomLabel}</div></div>
+          <div class="road-kpi"><div class="k">Vista</div><div class="v small">Gantt ${zoomLabel}</div></div>
           <div class="road-kpi"><div class="k">Ventana</div><div class="v small">${esc(fmtDate(range.start))} → ${esc(fmtDate(range.end))}</div></div>
           <div class="road-kpi"><div class="k">Proyectos</div><div class="v">${rows.length}</div></div>
           <div class="road-kpi"><div class="k">${peakTitle}</div><div class="v small">${ticks[monthLoad.indexOf(maxLoad)] ? `${ticks[monthLoad.indexOf(maxLoad)].label} (${maxLoad})` : '-'}</div></div>
@@ -10667,7 +10898,7 @@ function buildDaySummaryText(dayISO=ui.date){
   }
 
   function renderManage(){
-    const allTabs = ['projects','team','holidays','notifications','data'];
+    const allTabs = ['projects','team','holidays','notifications','roadmap','data'];
     const allowedTabs = isAdmin() ? allTabs : ['projects','notifications','data'];
     if(!allowedTabs.includes(ui.manageTab)) ui.manageTab = 'projects';
 
@@ -10692,6 +10923,7 @@ function buildDaySummaryText(dayISO=ui.date){
     if(ui.manageTab==='team') renderManageTeam();
     if(ui.manageTab==='holidays') renderManageHolidays();
     if(ui.manageTab==='notifications') renderManageNotifications();
+    if(ui.manageTab==='roadmap') renderManageRoadmap();
     if(ui.manageTab==='data') renderManageData();
   }
 
@@ -10842,6 +11074,101 @@ function buildDaySummaryText(dayISO=ui.date){
     });
 
     bindManageProjectRowActions();
+  }
+
+
+  function renderManageRoadmap(){
+    const disabled = !isAdmin();
+    const rows = (state.roadmapItems || [])
+      .slice()
+      .sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')))
+      .map(it=>`
+        <tr data-rm-row data-rm-id="${esc(it.id)}">
+          <td><input class="ctrl" type="date" data-rm-date value="${esc(it.date)}" ${disabled?'disabled':''} /></td>
+          <td><input class="ctrl" type="text" data-rm-title value="${esc(it.title)}" placeholder="Nombre de iniciativa" ${disabled?'disabled':''} /></td>
+          <td>
+            <select class="ctrl" data-rm-status ${disabled?'disabled':''}>
+              ${ROADMAP_STATUSES.map(st=>`<option value="${esc(st)}" ${normalizeRoadmapStatus(it.status)===st?'selected':''}>${esc(st)}</option>`).join('')}
+            </select>
+          </td>
+          <td><input class="ctrl" type="text" data-rm-tag value="${esc(it.tag || 'ALM')}" maxlength="10" ${disabled?'disabled':''} /></td>
+          <td>${isAdmin() ? '<button class="btn danger" data-rm-del>Eliminar</button>' : '<span class="small muted">—</span>'}</td>
+        </tr>
+      `).join('');
+
+    $('tab_roadmap').innerHTML = `
+      <div class="row" style="justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+        <div class="small muted">Registra iniciativas para la hoja de ruta. La vista Roadmap se ordena automáticamente por fecha.</div>
+        ${isAdmin() ? `
+        <div class="row" style="gap:8px">
+          <button class="btn" id="btnRoadmapAdd">+ Iniciativa</button>
+          <button class="btn primary" id="btnRoadmapSave">Guardar</button>
+        </div>` : '<span class="small muted">Modo lectura</span>'}
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Fecha</th><th>Iniciativa</th><th>Estado</th><th>Etiqueta</th><th>Acción</th></tr></thead>
+          <tbody id="roadmapRows">${rows || '<tr><td colspan="5" class="muted">Sin iniciativas</td></tr>'}</tbody>
+        </table>
+      </div>
+    `;
+
+    if(disabled) return;
+
+    const ensurePlaceholder = ()=>{
+      const body = $('roadmapRows');
+      if(!body) return;
+      if(body.querySelector('tr[data-rm-row]')) return;
+      body.innerHTML = '<tr><td colspan="5" class="muted">Sin iniciativas</td></tr>';
+    };
+
+    $('btnRoadmapAdd')?.addEventListener('click', ()=>{
+      const body = $('roadmapRows');
+      if(!body) return;
+      const empty = body.querySelector('td[colspan="5"]');
+      if(empty) body.innerHTML = '';
+      const tr = document.createElement('tr');
+      tr.setAttribute('data-rm-row','');
+      tr.innerHTML = `
+        <td><input class="ctrl" type="date" data-rm-date value="${todayISO()}" /></td>
+        <td><input class="ctrl" type="text" data-rm-title placeholder="Nueva iniciativa" /></td>
+        <td>
+          <select class="ctrl" data-rm-status>
+            ${ROADMAP_STATUSES.map(st=>`<option value="${esc(st)}">${esc(st)}</option>`).join('')}
+          </select>
+        </td>
+        <td><input class="ctrl" type="text" data-rm-tag value="ALM" maxlength="10" /></td>
+        <td><button class="btn danger" data-rm-del>Eliminar</button></td>
+      `;
+      body.appendChild(tr);
+      tr.querySelector('[data-rm-del]')?.addEventListener('click', ()=>{
+        tr.remove();
+        ensurePlaceholder();
+      });
+    });
+
+    $('tab_roadmap').querySelectorAll('[data-rm-del]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        btn.closest('tr')?.remove();
+        ensurePlaceholder();
+      });
+    });
+
+    $('btnRoadmapSave')?.addEventListener('click', ()=>{
+      const rowsEls = [...$('tab_roadmap').querySelectorAll('tr[data-rm-row]')];
+      const next = rowsEls.map((tr,idx)=>({
+        id: tr.getAttribute('data-rm-id') || rid('rm'),
+        date: tr.querySelector('[data-rm-date]')?.value || todayISO(),
+        title: tr.querySelector('[data-rm-title]')?.value || `Iniciativa ${idx+1}`,
+        status: tr.querySelector('[data-rm-status]')?.value || 'Propuesto',
+        tag: tr.querySelector('[data-rm-tag]')?.value || 'ALM'
+      }));
+      state.roadmapItems = sanitizeRoadmapItems(next);
+      saveState();
+      render();
+      renderManageRoadmap();
+      toast('Roadmap actualizado');
+    });
   }
 
   function renderManageTeam(){
@@ -11368,15 +11695,15 @@ function buildDaySummaryText(dayISO=ui.date){
     holidaysState = nextHolidays;
 
     if(bundle?.ui && typeof bundle.ui === 'object'){
-      if(bundle.ui.view === 'day' || bundle.ui.view === 'week' || bundle.ui.view === 'month' || bundle.ui.view === 'roadmap'){
-        ui.view = bundle.ui.view;
+      if(bundle.ui.view === 'day' || bundle.ui.view === 'week' || bundle.ui.view === 'month' || bundle.ui.view === 'roadmap' || bundle.ui.view === 'gantt' || bundle.ui.view === 'availability'){
+        ui.view = bundle.ui.view === 'availability' ? 'roadmap' : bundle.ui.view;
       }
       // Mantener siempre la fecha real del día al importar JSON.
       ui.date = todayISO();
       if(bundle.ui.roadmapZoom === 'week' || bundle.ui.roadmapZoom === 'month' || bundle.ui.roadmapZoom === 'year'){
         ui.roadmapZoom = bundle.ui.roadmapZoom;
       }
-      if(bundle.ui.manageTab === 'projects' || bundle.ui.manageTab === 'team' || bundle.ui.manageTab === 'holidays' || bundle.ui.manageTab === 'notifications' || bundle.ui.manageTab === 'data'){
+      if(bundle.ui.manageTab === 'projects' || bundle.ui.manageTab === 'team' || bundle.ui.manageTab === 'holidays' || bundle.ui.manageTab === 'notifications' || bundle.ui.manageTab === 'roadmap' || bundle.ui.manageTab === 'data'){
         ui.manageTab = bundle.ui.manageTab;
       }
       if(typeof bundle.ui.manageProjectSort === 'string') ui.manageProjectSort = bundle.ui.manageProjectSort;
@@ -12594,12 +12921,12 @@ function buildDaySummaryText(dayISO=ui.date){
 
   function shiftDate(step){
     const current = ui.date;
-    if(ui.view === 'roadmap'){
+    if(ui.view === 'gantt'){
       const zoom = ui.roadmapZoom || 'month';
       if(zoom === 'year') ui.date = addMonthsISO(current, step*12);
       else if(zoom === 'week') ui.date = addDaysISO(current, step*7);
       else ui.date = addMonthsISO(current, step);
-    }else if(ui.view === 'week' || ui.view === 'availability'){
+    }else if(ui.view === 'week' || ui.view === 'roadmap'){
       ui.date = addDaysISO(current, step*7);
     }else if(ui.view === 'month'){
       ui.date = addMonthsISO(current, step);
@@ -12613,12 +12940,13 @@ function buildDaySummaryText(dayISO=ui.date){
     if(v==='day') return 'Día';
     if(v==='week') return 'Semana';
     if(v==='month') return 'Mensual';
+    if(v==='gantt') return 'Gantt';
     if(v==='roadmap') return 'Roadmap';
-    return 'Disponibilidad';
+    return 'Roadmap';
   }
   function rangeLabel(){
     if(ui.view === 'day') return fmtDate(ui.date);
-    if(ui.view === 'week' || ui.view === 'availability'){
+    if(ui.view === 'week'){
       const s = startOfWeekISO(ui.date), e = addDaysISO(s,4);
       return `${fmtDate(s)} → ${fmtDate(e)}`;
     }
@@ -12626,6 +12954,11 @@ function buildDaySummaryText(dayISO=ui.date){
       const s = startOfMonthISO(ui.date);
       const e = addDaysISO(addMonthsISO(s,1), -1);
       return `${fmtDate(s)} → ${fmtDate(e)}`;
+    }
+    if(ui.view === 'roadmap'){
+      const items = (state.roadmapItems || []).slice().sort((a,b)=>String(a?.date||'').localeCompare(String(b?.date||'')));
+      if(!items.length) return 'Sin iniciativas';
+      return `${fmtDate(items[0].date)} → ${fmtDate(items[items.length-1].date)}`;
     }
     const zoom = ui.roadmapZoom || 'month';
     if(zoom === 'week'){
