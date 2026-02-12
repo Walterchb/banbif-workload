@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#051c2c" />
-  <title>Hub | Capitales &amp; Control de Gestión</title>
+  <title>Proyectos | Capitales &amp; Control de Gestión</title>
   <link rel="icon" href="./favicon.ico" sizes="any">
   <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
@@ -2916,6 +2916,275 @@
   background:color-mix(in srgb,var(--ok) 12%, transparent);
 }
 
+.road-n-extra{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.road-n-mini{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:2px 8px;
+  border-radius:5px;
+  border:1px solid var(--line);
+  background:var(--surface-2);
+  font-size:10px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.2px;
+}
+.road-n-mini.pri-alta{
+  color:var(--danger);
+  border-color:color-mix(in srgb,var(--danger) 45%, var(--line));
+  background:color-mix(in srgb,var(--danger) 9%, transparent);
+}
+.road-n-mini.pri-media{
+  color:var(--warn);
+  border-color:color-mix(in srgb,var(--warn) 45%, var(--line));
+  background:color-mix(in srgb,var(--warn) 10%, transparent);
+}
+.road-n-mini.pri-baja{
+  color:var(--ok);
+  border-color:color-mix(in srgb,var(--ok) 45%, var(--line));
+  background:color-mix(in srgb,var(--ok) 10%, transparent);
+}
+.road-n-note{
+  font-size:11px;
+  line-height:1.35;
+  color:var(--muted);
+  border-left:2px solid color-mix(in srgb,var(--line) 70%, transparent);
+  padding-left:8px;
+}
+.road-n-progress-wrap{
+  display:grid;
+  gap:6px;
+}
+.road-n-progress-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.25px;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+.road-n-progress-chip{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:52px;
+  padding:2px 8px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  font-size:11px;
+  font-weight:800;
+  color:var(--text);
+  background:var(--surface);
+}
+.road-n-progress-chip.low{
+  color:var(--muted);
+}
+.road-n-progress-chip.mid{
+  color:var(--warn);
+  border-color:color-mix(in srgb,var(--warn) 45%, var(--line));
+  background:color-mix(in srgb,var(--warn) 12%, transparent);
+}
+.road-n-progress-chip.high{
+  color:var(--primary);
+  border-color:color-mix(in srgb,var(--primary) 45%, var(--line));
+  background:color-mix(in srgb,var(--primary) 12%, transparent);
+}
+.road-n-progress-chip.done{
+  color:var(--ok);
+  border-color:color-mix(in srgb,var(--ok) 45%, var(--line));
+  background:color-mix(in srgb,var(--ok) 12%, transparent);
+}
+.road-n-progress-track{
+  position:relative;
+  height:8px;
+  border-radius:999px;
+  background:color-mix(in srgb,var(--surface-2) 80%, transparent);
+  border:1px solid color-mix(in srgb,var(--line) 70%, transparent);
+  overflow:hidden;
+}
+.road-n-progress-track > span{
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  border-radius:999px;
+  background:linear-gradient(90deg, color-mix(in srgb,var(--primary) 70%, #5f86ff), color-mix(in srgb,var(--ok) 68%, #5bd291));
+}
+.road-n-progress-meta{
+  font-size:10px;
+  color:var(--muted);
+}
+
+.road-n-progress-meta-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.road-n-progress-link{
+  appearance:none;
+  border:none;
+  padding:0;
+  margin:0;
+  background:transparent;
+  color:var(--primary);
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.2px;
+  text-decoration:underline;
+  cursor:pointer;
+}
+.road-n-progress-link:hover{
+  color:color-mix(in srgb,var(--primary) 84%, #1f4bd8);
+}
+.road-n-progress-chip.late{
+  color:var(--danger);
+  border-color:color-mix(in srgb,var(--danger) 45%, var(--line));
+  background:color-mix(in srgb,var(--danger) 10%, transparent);
+}
+.road-n-temporal{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:2px 8px;
+  border-radius:999px;
+  border:1px solid color-mix(in srgb,var(--danger) 45%, var(--line));
+  background:color-mix(in srgb,var(--danger) 10%, transparent);
+  color:var(--danger);
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.2px;
+  text-transform:uppercase;
+}
+
+.rm-progress-badge.late{
+  border-color:color-mix(in srgb,var(--danger) 45%, var(--line));
+  background:color-mix(in srgb,var(--danger) 10%, transparent);
+  color:var(--danger);
+}
+
+#roadmapStepsOverlay .modal{width:min(760px,94vw)}
+.road-steps-modal{display:grid;gap:12px}
+.road-steps-summary{
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:10px;
+  background:var(--surface-2);
+  display:grid;
+  gap:8px;
+}
+.road-steps-kpis{display:flex;gap:8px;flex-wrap:wrap}
+.road-steps-kpi{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:5px 10px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  font-size:11px;
+  font-weight:700;
+  background:var(--surface);
+}
+.road-steps-kpi.alert{
+  border-color:color-mix(in srgb,var(--danger) 45%, var(--line));
+  background:color-mix(in srgb,var(--danger) 10%, transparent);
+  color:var(--danger);
+}
+.road-steps-list{display:grid;gap:8px}
+.road-step-item{
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:var(--surface);
+  padding:9px 10px;
+  display:grid;
+  gap:5px;
+}
+.road-step-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.road-step-title{font-size:12px;line-height:1.35;font-weight:600}
+.road-step-check{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:20px;height:20px;border-radius:999px;border:1px solid var(--line);
+  font-size:11px;
+}
+.road-step-item.done .road-step-check{
+  border-color:color-mix(in srgb,var(--ok) 45%, var(--line));
+  color:var(--ok);
+  background:color-mix(in srgb,var(--ok) 12%, transparent);
+}
+.road-step-date{font-size:11px;color:var(--muted)}
+.road-step-item.late{
+  border-color:color-mix(in srgb,var(--danger) 45%, var(--line));
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--danger) 10%, transparent) inset;
+}
+.road-step-late{
+  display:inline-flex;align-items:center;gap:6px;
+  color:var(--danger);font-size:11px;font-weight:700;
+}
+
+#tab_roadmap .rm-table-wrap{
+  max-height:min(56vh,620px);
+  overflow:auto;
+  scrollbar-gutter:stable both-edges;
+}
+#tab_roadmap .rm-table-wrap table{min-width:1480px}
+#tab_roadmap .rm-table-wrap thead th{position:sticky;top:0;z-index:2}
+#tab_roadmap .rm-table-wrap::-webkit-scrollbar{height:11px;width:11px}
+#tab_roadmap .rm-table-wrap::-webkit-scrollbar-thumb{
+  background:color-mix(in srgb,var(--line) 75%, transparent);
+  border-radius:999px;
+}
+
+@media (max-width: 768px){
+  #tab_roadmap .rm-table-wrap{max-height:none}
+  #tab_roadmap .rm-table-wrap table{min-width:1180px}
+}
+
+.rm-col-stack{display:grid;gap:6px}
+.rm-notes-field{
+  min-height:56px;
+  padding:8px 10px;
+  resize:vertical;
+}
+.rm-steps-field{
+  min-height:92px;
+  padding:8px 10px;
+  resize:vertical;
+  line-height:1.35;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+.rm-helper{
+  font-size:10px;
+  line-height:1.3;
+}
+.rm-progress-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:68px;
+  padding:5px 10px;
+  border-radius:999px;
+  border:1px solid color-mix(in srgb,var(--primary) 45%, var(--line));
+  background:color-mix(in srgb,var(--primary) 11%, transparent);
+  color:var(--primary);
+  font-size:13px;
+  font-weight:800;
+}
+.rm-progress-meta{
+  margin-top:6px;
+  font-size:11px;
+}
+
 .road-n-empty{
   border:1px dashed var(--line);
   border-radius:5px;
@@ -3208,6 +3477,21 @@
       <div class="m-foot">
         <span class="small muted">Vista de solo lectura</span>
         <button class="btn" data-close="detailOverlay">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Roadmap Steps Modal -->
+  <div class="overlay" id="roadmapStepsOverlay">
+    <div class="modal">
+      <div class="m-head">
+        <b id="roadmapStepsTitle">Ruta de avance</b>
+        <button class="btn" data-close="roadmapStepsOverlay">✕</button>
+      </div>
+      <div class="m-body" id="roadmapStepsBody"></div>
+      <div class="m-foot">
+        <span class="small muted" id="roadmapStepsFooter">Detalle de pasos por iniciativa</span>
+        <button class="btn" data-close="roadmapStepsOverlay">Cerrar</button>
       </div>
     </div>
   </div>
@@ -4842,6 +5126,7 @@
         closeOverlay('teamOverlay');
         closeOverlay('infoOverlay');
         closeOverlay('summaryOverlay');
+        closeOverlay('roadmapStepsOverlay');
       }
     });
   }
@@ -4878,7 +5163,7 @@ function openAccessGate(){
                 <div class="login-head">
                   <div class="login-logo">BIF</div>
                   <div>
-                    <p class="login-title">HUB ESTRATÉGICO</p>
+                    <p class="login-title">PROYECTOS</p>
                     <p class="login-sub">Mercado de Capitales &amp; Control de Gestión</p>
                   </div>
                 </div>
@@ -7671,7 +7956,7 @@ function buildDaySummaryText(dayISO=ui.date){
     const teamIds = new Set(base.team.map(t=>t.id));
 
     if(Array.isArray(legacy.roadmapItems)){
-      base.roadmapItems = sanitizeRoadmapItems(legacy.roadmapItems);
+      base.roadmapItems = sanitizeRoadmapItems(legacy.roadmapItems, base.team);
     }
 
     if(Array.isArray(legacy.projects)){
@@ -7846,24 +8131,218 @@ function buildDaySummaryText(dayISO=ui.date){
     return 'Propuesto';
   }
 
-  function sanitizeRoadmapItems(raw){
+  function normalizeRoadmapPriority(value){
+    const raw = String(value || '').trim();
+    return PRIORITIES.includes(raw) ? raw : 'Media';
+  }
+
+  function extractRoadmapDueFromLine(rawLine){
+    const line = String(rawLine || '').trim();
+    if(!line) return { title:'', dueDate:'' };
+
+    const m = line.match(/(?:^|\s)(\d{4}-\d{2}-\d{2}|\d{1,2}[\/-]\d{1,2}[\/-]\d{4})\s*$/);
+    if(!m) return { title: line, dueDate: '' };
+
+    const dueDate = normalizeISO(m[1]);
+    if(!dueDate) return { title: line, dueDate: '' };
+
+    const title = line.slice(0, m.index).trim();
+    return { title, dueDate };
+  }
+
+  function sanitizeRoadmapSteps(steps){
+    if(!Array.isArray(steps)) return [];
+    return steps
+      .map((step, idx)=>{
+        if(typeof step === 'string'){
+          const parsed = parseRoadmapStepsText(step);
+          if(parsed.length) return { ...parsed[0], id: String(parsed[0].id || `rms_${idx+1}`) };
+          return null;
+        }
+
+        const titleRaw = (step?.title ?? step?.name ?? step?.step ?? step?.label ?? '');
+        const baseTitle = String(titleRaw || '').trim().replace(/\s+/g,' ');
+        const dueRaw = String(step?.dueDate || step?.due || step?.eta || step?.deadline || '').trim();
+        const extracted = dueRaw ? { title: baseTitle, dueDate: normalizeISO(dueRaw) } : extractRoadmapDueFromLine(baseTitle);
+        const title = String(extracted.title || baseTitle || '').trim().slice(0, 180);
+        const dueDate = normalizeISO(extracted.dueDate || '') || '';
+
+        if(!title) return null;
+
+        const done = Boolean(
+          step?.done || step?.completed || step?.ok || step?.checked
+          || /^\[(x|X|✔|✅)\]/.test(baseTitle)
+        );
+
+        return {
+          id: String(step?.id || `rms_${idx+1}`),
+          title,
+          done,
+          dueDate
+        };
+      })
+      .filter(Boolean)
+      .slice(0, 60);
+  }
+
+  function parseRoadmapStepsText(raw){
+    const text = String(raw || '').replace(/\r/g,'');
+    if(!text.trim()) return [];
+
+    const lines = text
+      .split('\n')
+      .map(line=>line.trim())
+      .filter(Boolean)
+      .slice(0, 60);
+
+    return lines.map((line, idx)=>{
+      const done = /^([\-•*]\s*)?\[(x|X|✔|✅)\]/.test(line)
+        || /^([\-•*]\s*)?(✅|✔)/.test(line);
+
+      const cleaned = line
+        .replace(/^([\-•*]\s*)?\[(x|X|✔|✅|\s)\]\s*/, '')
+        .replace(/^([\-•*]\s*)?(✅|✔)\s*/, '')
+        .replace(/^\d+[.)]\s*/, '')
+        .trim();
+
+      const extracted = extractRoadmapDueFromLine(cleaned);
+
+      return {
+        id: `rms_${idx+1}`,
+        title: String(extracted.title || '').trim().slice(0, 180) || `Paso ${idx+1}`,
+        done,
+        dueDate: normalizeISO(extracted.dueDate || '') || ''
+      };
+    });
+  }
+
+  function roadmapStepsToText(steps){
+    const clean = sanitizeRoadmapSteps(steps);
+    return clean
+      .map(step=>`${step.done ? '[x]' : '[ ]'} ${step.title}${step.dueDate ? ` ${fmtDate(step.dueDate)}` : ''}`)
+      .join('\n');
+  }
+
+  function roadmapProgressMeta(item){
+    const steps = sanitizeRoadmapSteps(item?.steps);
+    const status = normalizeRoadmapStatus(item?.status);
+
+    if(steps.length){
+      const completed = steps.reduce((acc, step)=>acc + (step.done ? 1 : 0), 0);
+      const percent = clampInt(Math.round((completed / steps.length) * 100), 0, 100, 0);
+      const today = todayISO();
+      const overdueSteps = steps.filter(step=>!step.done && step.dueDate && step.dueDate < today);
+      const pendingWithDate = steps
+        .filter(step=>!step.done && step.dueDate)
+        .map(step=>step.dueDate)
+        .sort((a,b)=>a.localeCompare(b));
+
+      return {
+        percent,
+        completed,
+        total: steps.length,
+        source: 'steps',
+        delayed: overdueSteps.length > 0,
+        overdue: overdueSteps.length,
+        nextDueDate: pendingWithDate[0] || ''
+      };
+    }
+
+    const fallbackByStatus = {
+      'Propuesto': 0,
+      'Planificado': 25,
+      'En desarrollo': 60,
+      'Completado': 100
+    };
+
+    return {
+      percent: fallbackByStatus[status] ?? 0,
+      completed: 0,
+      total: 0,
+      source: 'status',
+      delayed: false,
+      overdue: 0,
+      nextDueDate: ''
+    };
+  }
+
+  function resolveRoadmapOwner(item, teamList){
+    const teamRef = Array.isArray(teamList)
+      ? teamList
+      : (Array.isArray(state?.team) ? state.team : []);
+
+    const rawId = String(item?.ownerId || item?.responsableId || item?.leaderId || '').trim();
+    if(rawId){
+      const linked = teamRef.find(t=>String(t?.id) === rawId);
+      if(linked) return { ownerId: linked.id, ownerName: linked.name, linked: true, rawName: '' };
+    }
+
+    const rawName = String(item?.owner || item?.responsable || item?.leader || '').trim();
+    if(rawName){
+      const linkedByName = teamRef.find(t=>String(t?.name || '').trim().toLowerCase() === rawName.toLowerCase());
+      if(linkedByName) return { ownerId: linkedByName.id, ownerName: linkedByName.name, linked: true, rawName: rawName };
+      return { ownerId: '', ownerName: rawName, linked: false, rawName: rawName };
+    }
+
+    return { ownerId: '', ownerName: '', linked: false, rawName: '' };
+  }
+
+  function sanitizeRoadmapItems(raw, teamList){
     const fallback = Array.isArray(DEFAULT_STATE.roadmapItems) ? structuredClone(DEFAULT_STATE.roadmapItems) : [];
     const src = Array.isArray(raw) ? raw : fallback;
 
-    return src.map((item, idx)=>{
+    const teamRef = Array.isArray(teamList)
+      ? teamList
+      : (Array.isArray(state?.team) ? state.team : []);
+
+    const list = src.map((item, idx)=>{
       const date = normalizeISO(item?.date) || todayISO();
-      const title = String(item?.title || item?.name || `Iniciativa ${idx+1}`).slice(0,120).trim();
+      const title = String(item?.title || item?.name || `Iniciativa ${idx+1}`).slice(0,140).trim();
       const status = normalizeRoadmapStatus(item?.status);
-      const tag = String(item?.tag || item?.area || 'ALM').slice(0,10).trim().toUpperCase() || 'ALM';
+      const requesterTeam = String(
+        item?.requesterTeam
+        || item?.requester
+        || item?.team
+        || item?.tag
+        || item?.area
+        || 'ALM'
+      ).trim().slice(0, 36) || 'ALM';
+
+      const ownerMeta = resolveRoadmapOwner(item, teamRef);
+      const assignedOwner = ownerMeta.ownerId
+        ? ownerMeta
+        : (teamRef[0] ? { ownerId: teamRef[0].id, ownerName: teamRef[0].name, linked: true, rawName: ownerMeta.rawName || '' } : ownerMeta);
+      const priority = normalizeRoadmapPriority(item?.priority);
+      const notes = String(item?.notes || item?.context || item?.detail || item?.description || '').trim().slice(0, 500);
+
+      const stepsFromArray = sanitizeRoadmapSteps(item?.steps);
+      const stepsFromMilestones = stepsFromArray.length ? [] : sanitizeRoadmapSteps(item?.milestones);
+      const stepsFromText = (stepsFromArray.length || stepsFromMilestones.length)
+        ? []
+        : parseRoadmapStepsText(item?.stepsText || item?.route || item?.ruta || item?.path || item?.milestonesText || '');
+
+      const steps = stepsFromArray.length
+        ? stepsFromArray
+        : (stepsFromMilestones.length ? stepsFromMilestones : stepsFromText);
+
       if(!title) return null;
       return {
         id: String(item?.id || rid('rm')),
         date,
         title,
         status,
-        tag
+        requesterTeam,
+        tag: requesterTeam,
+        ownerId: assignedOwner.ownerId,
+        owner: String(assignedOwner.ownerName || '').slice(0, 48),
+        priority,
+        notes,
+        steps
       };
     }).filter(Boolean);
+
+    if(!list.length && src !== fallback) return sanitizeRoadmapItems(fallback, teamRef);
+    return list;
   }
 
   function sanitizeState(raw){
@@ -7970,7 +8449,7 @@ function buildDaySummaryText(dayISO=ui.date){
 
     }
 
-    out.roadmapItems = sanitizeRoadmapItems(s.roadmapItems);
+    out.roadmapItems = sanitizeRoadmapItems(s.roadmapItems, out.team);
     out.notifications = sanitizeNotifications(s.notifications, out.team);
 
     return out;
@@ -9429,14 +9908,6 @@ function buildDaySummaryText(dayISO=ui.date){
       (grouped[st] || grouped['Propuesto']).push(it);
     });
 
-    const statusClass = (status)=>{
-      if(status === 'Propuesto') return 'st-propuesto';
-      if(status === 'Planificado') return 'st-planificado';
-      if(status === 'En desarrollo') return 'st-desarrollo';
-      if(status === 'Completado') return 'st-completado';
-      return '';
-    };
-
     const statusIcon = (status)=>{
       if(status === 'Propuesto') return 'fa-lightbulb';
       if(status === 'Planificado') return 'fa-list-check';
@@ -9445,22 +9916,68 @@ function buildDaySummaryText(dayISO=ui.date){
       return 'fa-diagram-project';
     };
 
+    const progressTone = (pct, delayed=false)=>{
+      if(delayed) return 'late';
+      if(pct >= 100) return 'done';
+      if(pct >= 70) return 'high';
+      if(pct >= 35) return 'mid';
+      return 'low';
+    };
+
+    const priorityClass = (pri)=>{
+      if(pri === 'Alta') return 'pri-alta';
+      if(pri === 'Baja') return 'pri-baja';
+      return 'pri-media';
+    };
+
     const cardsForStatus = (status)=>{
       const list = grouped[status] || [];
       if(!list.length) return '<div class="road-n-empty">Sin iniciativas</div>';
 
-      return list.map(it=>`
-        <article class="road-n-card" title="${esc(it.title)} · ${esc(fmtDate(it.date))}">
-          <div class="road-n-meta">
-            <span class="road-n-date"><i class="fa-regular fa-calendar" aria-hidden="true"></i> ${esc(fmtDate(it.date))}</span>
-            <span class="road-n-tag">${esc((it.tag || 'ALM').slice(0,12).toUpperCase())}</span>
-          </div>
-          <div class="road-n-name">${esc(it.title || 'Iniciativa')}</div>
-          <div>
-            <span class="road-n-status-pill ${statusClass(status)}">${esc(status)}</span>
-          </div>
-        </article>
-      `).join('');
+      return list.map(it=>{
+        const meta = roadmapProgressMeta(it);
+        const pct = meta.percent;
+        const tone = progressTone(pct, meta.delayed);
+        const requesterTeam = String(it.requesterTeam || it.tag || 'ALM').trim().toUpperCase();
+        const ownerMeta = resolveRoadmapOwner(it);
+        const owner = ownerMeta.ownerName;
+        const priority = normalizeRoadmapPriority(it.priority);
+        const notes = String(it.notes || '').trim();
+        const stepsLabel = meta.total ? `${meta.completed}/${meta.total} pasos` : 'Sin pasos definidos';
+        const progressHint = meta.total
+          ? `${stepsLabel}${meta.overdue ? ` · ${meta.overdue} vencido(s)` : ''}${meta.nextDueDate ? ` · Próximo: ${fmtDate(meta.nextDueDate)}` : ''}`
+          : 'Sin pasos definidos';
+
+        return `
+          <article class="road-n-card" title="${esc(it.title)} · ${esc(fmtDate(it.date))}">
+            <div class="road-n-meta">
+              <span class="road-n-date"><i class="fa-regular fa-calendar" aria-hidden="true"></i> ${esc(fmtDate(it.date))}</span>
+              <span class="road-n-tag">${esc(requesterTeam)}</span>
+            </div>
+
+            <div class="road-n-name">${esc(it.title || 'Iniciativa')}</div>
+
+            <div class="road-n-extra">
+              ${owner ? `<span class="road-n-mini"><i class="fa-regular fa-user" aria-hidden="true"></i> ${esc(owner)}</span>` : '<span class="road-n-mini muted">Sin responsable</span>'}
+              <span class="road-n-mini ${priorityClass(priority)}">${esc(priority)}</span>
+            </div>
+
+            ${notes ? `<div class="road-n-note">${esc(notes)}</div>` : ''}
+
+            <div class="road-n-progress-wrap" title="${esc(progressHint)}">
+              <div class="road-n-progress-head">
+                <span>Avance</span>
+                <span class="road-n-progress-chip ${tone}">${pct}%</span>
+              </div>
+              <div class="road-n-progress-track"><span style="width:${clampInt(pct,0,100,0)}%"></span></div>
+              <div class="road-n-progress-meta-row">
+                <button type="button" class="road-n-progress-link" data-rm-opensteps="${esc(it.id)}">${esc(stepsLabel)}</button>
+                ${meta.delayed ? '<span class="road-n-temporal"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Demorada</span>' : ''}
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
     };
 
     const sections = ROADMAP_STATUSES.map(status=>`
@@ -9475,10 +9992,77 @@ function buildDaySummaryText(dayISO=ui.date){
 
     c.innerHTML = `
       <div class="road-n-board">
-        <div class="road-n-sub">Roadmap · ordenado por fecha ascendente dentro de cada estado${isMobileViewport() ? ' · desplazamiento horizontal' : ' · orientación vertical en escritorio'}</div>
+        <div class="road-n-sub">Roadmap · ordenado por fecha ascendente dentro de cada estado · tarjetas con avance % por pasos y alerta temporal de demora</div>
         ${sections}
       </div>
     `;
+
+    c.querySelectorAll('[data-rm-opensteps]').forEach(btn=>{
+      btn.addEventListener('click', (ev)=>{
+        ev.stopPropagation();
+        openRoadmapStepsOverlay(btn.dataset.rmOpensteps);
+      });
+    });
+  }
+
+  function openRoadmapStepsOverlay(itemId){
+    const item = (state.roadmapItems || []).find(it=>String(it?.id) === String(itemId || ''));
+    if(!item){
+      toast('No se encontró la iniciativa.');
+      return;
+    }
+
+    const titleEl = $('roadmapStepsTitle');
+    const bodyEl = $('roadmapStepsBody');
+    const footEl = $('roadmapStepsFooter');
+    if(!titleEl || !bodyEl) return;
+
+    const steps = sanitizeRoadmapSteps(item.steps);
+    const meta = roadmapProgressMeta(item);
+    const today = todayISO();
+
+    titleEl.textContent = `Ruta de avance · ${item.title || 'Iniciativa'}`;
+
+    const listHtml = steps.length
+      ? steps.map((step, idx)=>{
+          const late = !step.done && step.dueDate && step.dueDate < today;
+          const dueTxt = step.dueDate ? fmtDate(step.dueDate) : 'Sin fecha estimada';
+          return `
+            <div class="road-step-item ${step.done ? 'done' : ''} ${late ? 'late' : ''}">
+              <div class="road-step-head">
+                <div style="display:flex;gap:8px;align-items:flex-start;min-width:0">
+                  <span class="road-step-check" aria-hidden="true">${step.done ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-regular fa-circle"></i>'}</span>
+                  <div class="road-step-title">${idx+1}. ${esc(step.title)}</div>
+                </div>
+                ${late ? '<span class="road-step-late"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Vencido</span>' : ''}
+              </div>
+              <div class="road-step-date"><i class="fa-regular fa-calendar" aria-hidden="true"></i> Fecha estimada: ${esc(dueTxt)}</div>
+            </div>
+          `;
+        }).join('')
+      : '<div class="road-n-empty">Esta iniciativa aún no tiene pasos registrados.</div>';
+
+    bodyEl.innerHTML = `
+      <div class="road-steps-modal">
+        <div class="road-steps-summary">
+          <div class="small muted"><b>Equipo solicitante:</b> ${esc(String(item.requesterTeam || item.tag || 'ALM'))} · <b>Fecha:</b> ${esc(fmtDate(item.date))}</div>
+          <div class="road-steps-kpis">
+            <span class="road-steps-kpi"><i class="fa-solid fa-gauge" aria-hidden="true"></i> Avance: ${meta.percent}%</span>
+            <span class="road-steps-kpi"><i class="fa-solid fa-list-check" aria-hidden="true"></i> Pasos: ${meta.completed}/${meta.total || 0}</span>
+            ${meta.delayed ? `<span class="road-steps-kpi alert"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Demorada (${meta.overdue} vencido${meta.overdue===1?'':'s'})</span>` : ''}
+          </div>
+        </div>
+        <div class="road-steps-list">${listHtml}</div>
+      </div>
+    `;
+
+    if(footEl){
+      footEl.textContent = meta.delayed
+        ? `La iniciativa está demorada por ${meta.overdue} paso(s) fuera de fecha.`
+        : (meta.total ? 'Revisa y actualiza los pasos marcándolos con [x] cuando culminen.' : 'Agrega pasos con fecha para controlar la ruta de avance.');
+    }
+
+    openOverlay('roadmapStepsOverlay');
   }
 
   function roadmapStatusOrder(status){
@@ -11107,38 +11691,123 @@ function buildDaySummaryText(dayISO=ui.date){
   }
 
 
+  function refreshRoadmapRowProgress(row){
+    if(!row) return;
+    const status = row.querySelector('[data-rm-status]')?.value || 'Propuesto';
+    const stepsText = row.querySelector('[data-rm-steps]')?.value || '';
+    const steps = parseRoadmapStepsText(stepsText);
+    const meta = roadmapProgressMeta({ status, steps });
+
+    const pctEl = row.querySelector('[data-rm-progress]');
+    const metaEl = row.querySelector('[data-rm-progress-meta]');
+    if(pctEl){
+      pctEl.textContent = `${meta.percent}%`;
+      pctEl.classList.toggle('late', Boolean(meta.delayed));
+    }
+    if(metaEl){
+      metaEl.textContent = meta.total
+        ? `${meta.completed}/${meta.total} pasos${meta.delayed ? ' · Demorada' : ''}`
+        : 'Sin pasos';
+    }
+  }
+
   function renderManageRoadmap(){
     const disabled = !isAdmin();
+    const teamList = Array.isArray(state.team) ? state.team.slice() : [];
+
+    const buildOwnerOptions = (selectedId='')=>{
+      if(!teamList.length) return '<option value="">Sin usuarios en Equipo</option>';
+      const normalized = String(selectedId || '').trim();
+      const safeId = normalized || String(teamList[0].id);
+      return teamList
+        .map(t=>`<option value="${esc(t.id)}" ${safeId===String(t.id)?'selected':''}>${esc(t.name)}</option>`)
+        .join('');
+    };
+
     const rows = (state.roadmapItems || [])
       .slice()
       .sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')))
-      .map(it=>`
-        <tr data-rm-row data-rm-id="${esc(it.id)}">
-          <td><input class="ctrl" type="date" data-rm-date value="${esc(it.date)}" ${disabled?'disabled':''} /></td>
-          <td><input class="ctrl" type="text" data-rm-title value="${esc(it.title)}" placeholder="Nombre de iniciativa" ${disabled?'disabled':''} /></td>
-          <td>
-            <select class="ctrl" data-rm-status ${disabled?'disabled':''}>
-              ${ROADMAP_STATUSES.map(st=>`<option value="${esc(st)}" ${normalizeRoadmapStatus(it.status)===st?'selected':''}>${esc(st)}</option>`).join('')}
-            </select>
-          </td>
-          <td><input class="ctrl" type="text" data-rm-tag value="${esc(it.tag || 'ALM')}" maxlength="10" ${disabled?'disabled':''} /></td>
-          <td>${isAdmin() ? '<button class="btn danger" data-rm-del>Eliminar</button>' : '<span class="small muted">—</span>'}</td>
-        </tr>
-      `).join('');
+      .map(it=>{
+        const pMeta = roadmapProgressMeta(it);
+        const ownerMeta = resolveRoadmapOwner(it, teamList);
+        const ownerSelectionId = ownerMeta.ownerId || (teamList[0]?.id || '');
+
+        return `
+          <tr data-rm-row data-rm-id="${esc(it.id)}">
+            <td><input class="ctrl" type="date" data-rm-date value="${esc(it.date)}" ${disabled?'disabled':''} /></td>
+
+            <td style="min-width:260px">
+              <div class="rm-col-stack">
+                <input class="ctrl" type="text" data-rm-title value="${esc(it.title)}" placeholder="Nombre de iniciativa" ${disabled?'disabled':''} />
+                <textarea class="ctrl rm-notes-field" data-rm-notes placeholder="Notas, dependencias, riesgos u observaciones" ${disabled?'disabled':''}>${esc(it.notes || '')}</textarea>
+              </div>
+            </td>
+
+            <td><input class="ctrl" type="text" data-rm-team value="${esc(it.requesterTeam || it.tag || 'ALM')}" maxlength="36" placeholder="Equipo solicitante" ${disabled?'disabled':''} /></td>
+
+            <td style="min-width:210px">
+              <div class="rm-col-stack">
+                <select class="ctrl" data-rm-owner-id ${disabled?'disabled':''}>
+                  ${buildOwnerOptions(ownerSelectionId)}
+                </select>
+              </div>
+            </td>
+
+            <td>
+              <select class="ctrl" data-rm-priority ${disabled?'disabled':''}>
+                ${PRIORITIES.map(pr=>`<option value="${esc(pr)}" ${normalizeRoadmapPriority(it.priority)===pr?'selected':''}>${esc(pr)}</option>`).join('')}
+              </select>
+            </td>
+
+            <td>
+              <select class="ctrl" data-rm-status ${disabled?'disabled':''}>
+                ${ROADMAP_STATUSES.map(st=>`<option value="${esc(st)}" ${normalizeRoadmapStatus(it.status)===st?'selected':''}>${esc(st)}</option>`).join('')}
+              </select>
+            </td>
+
+            <td style="min-width:340px">
+              <div class="rm-col-stack">
+                <textarea class="ctrl rm-steps-field" data-rm-steps placeholder="[ ] Paso 1 dd/mm/yyyy\n[x] Paso 2 dd/mm/yyyy" ${disabled?'disabled':''}>${esc(roadmapStepsToText(it.steps))}</textarea>
+                <div class="small muted rm-helper">Formato: <b>[ ]</b> pendiente · <b>[x]</b> completado · fecha al final (<b>dd/mm/yyyy</b>). Si vence sin marcarse, la iniciativa se cataloga como <b>Demorada</b>.</div>
+              </div>
+            </td>
+
+            <td style="min-width:140px">
+              <div class="rm-progress-badge ${pMeta.delayed ? 'late' : ''}" data-rm-progress>${pMeta.percent}%</div>
+              <div class="small muted rm-progress-meta" data-rm-progress-meta>${pMeta.total ? `${pMeta.completed}/${pMeta.total} pasos${pMeta.delayed ? ' · Demorada' : ''}` : 'Sin pasos'}</div>
+            </td>
+
+            <td>${isAdmin() ? '<button class="btn danger" data-rm-del>Eliminar</button>' : '<span class="small muted">—</span>'}</td>
+          </tr>
+        `;
+      }).join('');
 
     $('tab_roadmap').innerHTML = `
       <div class="row" style="justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
-        <div class="small muted">Registra iniciativas para la hoja de ruta. La vista Roadmap se ordena automáticamente por fecha.</div>
+        <div class="small muted">Registra iniciativas para la hoja de ruta. Responsable vinculado al equipo · pasos con fecha estimada · cálculo automático de avance y alerta temporal de demora.</div>
         ${isAdmin() ? `
         <div class="row" style="gap:8px">
           <button class="btn" id="btnRoadmapAdd">+ Iniciativa</button>
           <button class="btn primary" id="btnRoadmapSave">Guardar</button>
         </div>` : '<span class="small muted">Modo lectura</span>'}
       </div>
-      <div class="table-wrap">
+
+      <div class="table-wrap rm-table-wrap">
         <table>
-          <thead><tr><th>Fecha</th><th>Iniciativa</th><th>Estado</th><th>Etiqueta</th><th>Acción</th></tr></thead>
-          <tbody id="roadmapRows">${rows || '<tr><td colspan="5" class="muted">Sin iniciativas</td></tr>'}</tbody>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Iniciativa + contexto</th>
+              <th>Equipo solicitante</th>
+              <th>Responsable (equipo)</th>
+              <th>Prioridad</th>
+              <th>Estado</th>
+              <th>Ruta de avance (pasos)</th>
+              <th>Avance</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="roadmapRows">${rows || '<tr><td colspan="9" class="muted">Sin iniciativas</td></tr>'}</tbody>
         </table>
       </div>
     `;
@@ -11149,32 +11818,70 @@ function buildDaySummaryText(dayISO=ui.date){
       const body = $('roadmapRows');
       if(!body) return;
       if(body.querySelector('tr[data-rm-row]')) return;
-      body.innerHTML = '<tr><td colspan="5" class="muted">Sin iniciativas</td></tr>';
+      body.innerHTML = '<tr><td colspan="9" class="muted">Sin iniciativas</td></tr>';
     };
 
+    const body = $('roadmapRows');
+
     $('btnRoadmapAdd')?.addEventListener('click', ()=>{
-      const body = $('roadmapRows');
       if(!body) return;
-      const empty = body.querySelector('td[colspan="5"]');
+      const empty = body.querySelector('td[colspan="9"]');
       if(empty) body.innerHTML = '';
+
       const tr = document.createElement('tr');
       tr.setAttribute('data-rm-row','');
       tr.innerHTML = `
         <td><input class="ctrl" type="date" data-rm-date value="${todayISO()}" /></td>
-        <td><input class="ctrl" type="text" data-rm-title placeholder="Nueva iniciativa" /></td>
+
+        <td style="min-width:260px">
+          <div class="rm-col-stack">
+            <input class="ctrl" type="text" data-rm-title placeholder="Nueva iniciativa" />
+            <textarea class="ctrl rm-notes-field" data-rm-notes placeholder="Notas, dependencias, riesgos u observaciones"></textarea>
+          </div>
+        </td>
+
+        <td><input class="ctrl" type="text" data-rm-team value="ALM" maxlength="36" placeholder="Equipo solicitante" /></td>
+
+        <td style="min-width:210px">
+          <select class="ctrl" data-rm-owner-id>
+            ${buildOwnerOptions(teamList[0]?.id || '')}
+          </select>
+        </td>
+
+        <td>
+          <select class="ctrl" data-rm-priority>
+            ${PRIORITIES.map(pr=>`<option value="${esc(pr)}" ${pr==='Media'?'selected':''}>${esc(pr)}</option>`).join('')}
+          </select>
+        </td>
+
         <td>
           <select class="ctrl" data-rm-status>
             ${ROADMAP_STATUSES.map(st=>`<option value="${esc(st)}">${esc(st)}</option>`).join('')}
           </select>
         </td>
-        <td><input class="ctrl" type="text" data-rm-tag value="ALM" maxlength="10" /></td>
+
+        <td style="min-width:340px">
+          <div class="rm-col-stack">
+            <textarea class="ctrl rm-steps-field" data-rm-steps placeholder="[ ] Paso 1 dd/mm/yyyy\n[x] Paso 2 dd/mm/yyyy">[ ] Definir alcance ${fmtDate(addDaysISO(todayISO(), 7))}</textarea>
+            <div class="small muted rm-helper">Formato: <b>[ ]</b> pendiente · <b>[x]</b> completado · fecha al final (<b>dd/mm/yyyy</b>).</div>
+          </div>
+        </td>
+
+        <td style="min-width:140px">
+          <div class="rm-progress-badge" data-rm-progress>0%</div>
+          <div class="small muted rm-progress-meta" data-rm-progress-meta>0/1 pasos</div>
+        </td>
+
         <td><button class="btn danger" data-rm-del>Eliminar</button></td>
       `;
       body.appendChild(tr);
+
       tr.querySelector('[data-rm-del]')?.addEventListener('click', ()=>{
         tr.remove();
         ensurePlaceholder();
       });
+
+      refreshRoadmapRowProgress(tr);
     });
 
     $('tab_roadmap').querySelectorAll('[data-rm-del]').forEach(btn=>{
@@ -11184,16 +11891,46 @@ function buildDaySummaryText(dayISO=ui.date){
       });
     });
 
+    body?.querySelectorAll('tr[data-rm-row]').forEach(tr=>refreshRoadmapRowProgress(tr));
+
+    body?.addEventListener('input', (ev)=>{
+      const target = ev.target;
+      if(!(target instanceof HTMLElement)) return;
+      if(!target.matches('[data-rm-steps], [data-rm-status]')) return;
+      const tr = target.closest('tr[data-rm-row]');
+      refreshRoadmapRowProgress(tr);
+    });
+
+    body?.addEventListener('change', (ev)=>{
+      const target = ev.target;
+      if(!(target instanceof HTMLElement)) return;
+      if(!target.matches('[data-rm-steps], [data-rm-status]')) return;
+      const tr = target.closest('tr[data-rm-row]');
+      refreshRoadmapRowProgress(tr);
+    });
+
     $('btnRoadmapSave')?.addEventListener('click', ()=>{
       const rowsEls = [...$('tab_roadmap').querySelectorAll('tr[data-rm-row]')];
-      const next = rowsEls.map((tr,idx)=>({
-        id: tr.getAttribute('data-rm-id') || rid('rm'),
-        date: tr.querySelector('[data-rm-date]')?.value || todayISO(),
-        title: tr.querySelector('[data-rm-title]')?.value || `Iniciativa ${idx+1}`,
-        status: tr.querySelector('[data-rm-status]')?.value || 'Propuesto',
-        tag: tr.querySelector('[data-rm-tag]')?.value || 'ALM'
-      }));
-      state.roadmapItems = sanitizeRoadmapItems(next);
+      const next = rowsEls.map((tr,idx)=>{
+        const steps = parseRoadmapStepsText(tr.querySelector('[data-rm-steps]')?.value || '');
+        const ownerId = String(tr.querySelector('[data-rm-owner-id]')?.value || '').trim();
+        const ownerName = findTeam(ownerId)?.name || '';
+
+        return {
+          id: tr.getAttribute('data-rm-id') || rid('rm'),
+          date: tr.querySelector('[data-rm-date]')?.value || todayISO(),
+          title: tr.querySelector('[data-rm-title]')?.value || `Iniciativa ${idx+1}`,
+          status: tr.querySelector('[data-rm-status]')?.value || 'Propuesto',
+          requesterTeam: tr.querySelector('[data-rm-team]')?.value || 'ALM',
+          ownerId,
+          owner: ownerName,
+          priority: tr.querySelector('[data-rm-priority]')?.value || 'Media',
+          notes: tr.querySelector('[data-rm-notes]')?.value || '',
+          steps
+        };
+      });
+
+      state.roadmapItems = sanitizeRoadmapItems(next, state.team);
       saveState();
       render();
       renderManageRoadmap();
