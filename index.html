@@ -300,6 +300,8 @@
     .prio .t{font-size:12px;font-weight:800;display:flex;justify-content:space-between;align-items:center}
     .prio ul{margin:8px 0 0 16px;padding:0;font-size:11px;line-height:1.25}
     .prio li{margin:4px 0}
+    .prio li.prio-more-row{list-style:none;margin:6px 0 0 0}
+    .prio li.prio-more-row .more-inline-btn{margin-left:0}
     .prio .prio-extra.hidden{display:none}
     .tagA{color:var(--danger)}
     .tagM{color:var(--warn)}
@@ -8430,8 +8432,7 @@ function buildDaySummaryText(dayISO=ui.date){
     const day = ui.date;
     const acts = getVisibleActivityInstances(day);
     const team = getFilteredTeam();
-    const teamTodayLabelEl = $('teamTodayLabel');
-    if(teamTodayLabelEl) teamTodayLabelEl.textContent = dayLabel(day);
+    $('teamTodayLabel').textContent = dayLabel(day);
 
     const cards = team.map(t=>{
       const mine = acts.filter(a=>a.ownerId===t.id).sort((a,b)=>a.startHour.localeCompare(b.startHour));
@@ -8452,12 +8453,11 @@ function buildDaySummaryText(dayISO=ui.date){
       const hasMoreByLength = !hasMoreByItems && previewAgenda.length > 110;
       if(hasMoreByLength) previewAgenda = `${previewAgenda.slice(0, 107).trimEnd()}…`;
       const canExpand = hasMoreByItems || hasMoreByLength;
-      const hiddenAgendaCount = hasMoreByItems ? (agendaItems.length - maxVisibleItems) : (hasMoreByLength ? 1 : 0);
 
       const agendaHtml = !fullAgenda
         ? `<div class="agenda">Sin actividades asignadas</div>`
         : canExpand
-          ? `<div class="agenda agenda-collapsed" data-agenda-expandable="1" data-expanded="false"><span class="agenda-preview">${esc(previewAgenda)}</span><span class="agenda-full hidden">${esc(fullAgenda)}</span><button class="more-inline-btn agenda-toggle" type="button" data-more-count="${hiddenAgendaCount}" aria-expanded="false">ver más (${hiddenAgendaCount})</button></div>`
+          ? `<div class="agenda agenda-collapsed" data-agenda-expandable="1" data-expanded="false"><span class="agenda-preview">${esc(previewAgenda)}</span><span class="agenda-full hidden">${esc(fullAgenda)}</span><button class="more-inline-btn agenda-toggle" type="button" aria-expanded="false">ver más</button></div>`
           : `<div class="agenda">${esc(fullAgenda)}</div>`;
 
       return `
@@ -8475,7 +8475,6 @@ function buildDaySummaryText(dayISO=ui.date){
     }).join('');
 
     const cardsEl = $('todayCards');
-    if(!cardsEl) return;
     cardsEl.innerHTML = cards || `<div class="muted small">Sin responsables para mostrar.</div>`;
 
     cardsEl.querySelectorAll('.agenda-toggle').forEach(btn=>{
@@ -8496,8 +8495,7 @@ function buildDaySummaryText(dayISO=ui.date){
         if(preview) preview.classList.toggle('hidden', next);
         if(full) full.classList.toggle('hidden', !next);
 
-        const moreCount = Number(btn.getAttribute('data-more-count') || '0');
-        btn.textContent = next ? 'ver menos' : `ver más (${moreCount})`;
+        btn.textContent = next ? 'ver menos' : 'ver más';
         btn.setAttribute('aria-expanded', next ? 'true' : 'false');
       });
     });
@@ -8522,22 +8520,22 @@ function buildDaySummaryText(dayISO=ui.date){
       const dayKey = String(day || '').replace(/[^\w-]/g,'_');
       const groupId = `prio_more_${dayKey}_${key.toLowerCase()}`;
 
-      const visibleItems = visible.map((a, idx)=>{
-        const isLastVisible = idx === visible.length - 1;
-        const inlineToggle = (hidden.length && isLastVisible)
-          ? ` <button class="more-inline-btn prio-toggle" type="button" data-prio-group="${esc(groupId)}" data-more-count="${hidden.length}" data-expanded="false" aria-expanded="false">ver más (${hidden.length})</button>`
-          : '';
-        return `<li>${buildItemLabel(a)}${inlineToggle}</li>`;
-      }).join('');
+      const visibleItems = visible
+        .map(a=>`<li>${buildItemLabel(a)}</li>`)
+        .join('');
 
       const hiddenItems = hidden
         .map(a=>`<li class="prio-extra hidden" data-prio-group="${esc(groupId)}">${buildItemLabel(a)}</li>`)
         .join('');
 
+      const toggleItem = hidden.length
+        ? `<li class="prio-more-row"><button class="more-inline-btn prio-toggle" type="button" data-prio-group="${esc(groupId)}" data-more-count="${hidden.length}" data-expanded="false" aria-expanded="false">ver más (${hidden.length})</button></li>`
+        : '';
+
       return `
         <div class="prio">
           <div class="t"><span class="${cls}">${key}</span><span class="pill">${arr.length}</span></div>
-          <ul>${visibleItems || '<li class="muted">Sin flujo</li>'}${hiddenItems}</ul>
+          <ul>${visibleItems || '<li class="muted">Sin flujo</li>'}${hiddenItems}${toggleItem}</ul>
         </div>
       `;
     };
