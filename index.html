@@ -2872,6 +2872,8 @@
         </div>
       </div>
 
+      <div class="kpi-band hidden" id="monthKpiBand"></div>
+
       <div class="main" id="mainView"></div>
 
       <div class="footer-strip">
@@ -3823,26 +3825,6 @@
       .monthcal-title{font-size:20px;font-weight:900;letter-spacing:-.35px;line-height:1.1;margin:0}
       .monthcal-subtitle{margin-top:3px;font-size:12px;color:var(--muted);font-weight:600}
 
-      .monthcal-kpis{display:grid;grid-template-columns:repeat(4,minmax(160px,1fr));gap:8px;margin:0 0 10px}
-      .month-kpi{
-        border:1px solid color-mix(in srgb,var(--line) 88%, transparent);
-        border-radius:5px;
-        background:linear-gradient(180deg,color-mix(in srgb,var(--surface-2) 66%, transparent), var(--surface));
-        padding:8px 10px;
-        min-height:62px;
-        min-width:0;
-      }
-      .month-kpi .k{
-        font-size:10px;color:var(--muted);font-weight:800;
-        text-transform:uppercase;letter-spacing:.26px;
-        white-space:nowrap;overflow:hidden;text-overflow:ellipsis
-      }
-      .month-kpi .v{margin-top:2px;font-size:20px;font-weight:900;letter-spacing:-.25px;line-height:1.05}
-      .month-kpi .s{
-        margin-top:2px;font-size:11px;color:var(--muted);font-weight:700;
-        white-space:nowrap;overflow:hidden;text-overflow:ellipsis
-      }
-
       .monthcal-weekdays{
         --mcols:7;
         display:grid;
@@ -4082,10 +4064,6 @@
         .monthcal-grid,
         .monthcal-weekdays{grid-template-columns:repeat(var(--mcols),minmax(102px,1fr))}
         .mcal-cell{min-height:124px}
-        .monthcal-kpis{grid-template-columns:repeat(2,minmax(140px,1fr))}
-      }
-      @media (max-width:700px){
-        .monthcal-kpis{grid-template-columns:1fr}
       }
       /* Modal Equipo */
       #teamOverlay .modal{
@@ -8271,14 +8249,23 @@ function buildDaySummaryText(dayISO=ui.date){
     updateNotificationIndicator();
     renderHeaderControls();
 
+    const showMainTopKpi = (ui.view === 'day' || ui.view === 'week' || ui.view === 'month');
     const showDayTop = ui.view === 'day';
     const kpiBandEl = $('kpiBand');
     const dayTopSplitEl = $('dayTopSplit');
-    if(kpiBandEl) kpiBandEl.classList.toggle('hidden', !showDayTop);
+    const monthKpiBandEl = $('monthKpiBand');
+
+    if(kpiBandEl) kpiBandEl.classList.toggle('hidden', !showMainTopKpi);
     if(dayTopSplitEl) dayTopSplitEl.classList.toggle('hidden', !showDayTop);
 
+    if(monthKpiBandEl){
+      monthKpiBandEl.classList.add('hidden');
+      monthKpiBandEl.innerHTML = '';
+    }
+
+    if(showMainTopKpi) renderKPIBand();
+
     if(showDayTop){
-      renderKPIBand();
       renderTodayCards();
       renderPriorityRadar();
     }
@@ -8346,7 +8333,7 @@ function buildDaySummaryText(dayISO=ui.date){
       }
     });
 
-    scope.querySelectorAll('.kpi .pill,.month-kpi .s,.eq-kpi .s,.impact-kpi .s').forEach(el=>{
+    scope.querySelectorAll('.kpi .pill,.kpi .sub,.eq-kpi .s,.impact-kpi .s').forEach(el=>{
       if(!el.getAttribute('title')){
         const txt = (el.textContent || '').replace(/\s+/g,' ').trim();
         if(txt) el.setAttribute('title', txt);
@@ -8382,30 +8369,72 @@ function buildDaySummaryText(dayISO=ui.date){
     $('fSearch').value = ui.filters.q || '';
   }
 
+  function getKpiRangeByView(view = ui.view, refDate = ui.date){
+    if(view === 'week'){
+      const start = startOfWeekISO(refDate);
+      return { start, end: addDaysISO(start, 4) }; // Semanal: L-V (coherente con la vista Semana)
+    }
+    if(view === 'month'){
+      const start = startOfMonthISO(refDate);
+      return { start, end: addDaysISO(addMonthsISO(start, 1), -1) };
+    }
+    return { start: refDate, end: refDate };
+  }
+
+  function flowRangeLabelByView(view = ui.view, refDate = ui.date){
+    if(view === 'day') return flowDayLabel(refDate);
+    if(view === 'week') return 'FLUJO SEMANAL';
+    if(view === 'month') return 'FLUJO MENSUAL';
+    return 'FLUJO';
+  }
+
   function renderKPIBand(){
-    const day = ui.date;
-    const acts = getVisibleActivityInstances(day);
+    const host = $('kpiBand');
+    if(!host) return;
+
+    if(!(ui.view === 'day' || ui.view === 'week' || ui.view === 'month')){
+      host.innerHTML = '';
+      return;
+    }
+
+    const { start, end } = getKpiRangeByView(ui.view, ui.date);
     const team = getFilteredTeam();
 
-    const totalMin = acts.reduce((a,b)=>a+b.minutes,0);
-    const capMin = team.reduce((acc,t)=>acc + getDailyCapacityMin(t, day),0);
-    const freeMin = Math.max(0, capMin-totalMin);
-    const util = capMin ? Math.round((totalMin/capMin)*100) : (totalMin>0?100:0);
+    let totalMin = 0;
+    let capMin = 0;
+    let blockedMin = 0;
 
-    const risksRaw = getRiskMetrics(day) || {};
     const risks = {
-      overdue: Number(risksRaw.overdue ?? risksRaw.demorado ?? 0) || 0,
-      dueSoon: Number(risksRaw.dueSoon ?? risksRaw.enRiesgo ?? 0) || 0,
-      conflicts: Number(risksRaw.conflicts ?? 0) || 0,
-      blocked: Number(risksRaw.blocked ?? risksRaw.bloqueado ?? 0) || 0
+      overdue: 0,
+      dueSoon: 0,
+      conflicts: 0,
+      blocked: 0
     };
+
+    for(let d = start; d <= end; d = addDaysISO(d, 1)){
+      const acts = getVisibleActivityInstances(d);
+      totalMin += acts.reduce((a,b)=>a + (Number(b.minutes) || 0), 0);
+      capMin += team.reduce((acc,t)=>acc + getDailyCapacityMin(t, d), 0);
+      blockedMin += team.reduce((acc,t)=>acc + sumBlockedMinutes(t, d), 0);
+
+      const rm = getRiskMetrics(d) || {};
+      risks.overdue += Number(rm.overdue ?? rm.demorado ?? 0) || 0;
+      risks.dueSoon += Number(rm.dueSoon ?? rm.enRiesgo ?? 0) || 0;
+      risks.conflicts += Number(rm.conflicts ?? 0) || 0;
+      risks.blocked += Number(rm.blocked ?? rm.bloqueado ?? 0) || 0;
+    }
+
+    const freeMin = Math.max(0, capMin - totalMin);
+    const util = capMin ? Math.round((totalMin / capMin) * 100) : (totalMin > 0 ? 100 : 0);
+
     const sev = severity(util);
     const alertTotal = risks.overdue + risks.dueSoon + risks.conflicts + risks.blocked;
+    const conflictTotal = risks.conflicts + risks.blocked;
 
-    $('kpiBand').innerHTML = `
+    host.innerHTML = `
       <div class="kpi">
         <div>
-          <div class="label">${esc(flowDayLabel(day))}</div>
+          <div class="label">${esc(flowRangeLabelByView(ui.view, ui.date))}</div>
           <div class="val">${util}%</div>
           <div class="sub">${fmtH(totalMin)} de ${fmtH(capMin)}</div>
         </div>
@@ -8417,7 +8446,7 @@ function buildDaySummaryText(dayISO=ui.date){
           <div class="val">${fmtH(freeMin)}</div>
           <div class="sub">${team.length} Persona(s)</div>
         </div>
-        <span class="pill">Nd.: ${fmtH(team.reduce((a,t)=>a+sumBlockedMinutes(t,day),0))}</span>
+        <span class="pill">Nd.: ${fmtH(blockedMin)}</span>
       </div>
       <div class="kpi">
         <div>
@@ -8430,10 +8459,10 @@ function buildDaySummaryText(dayISO=ui.date){
       <div class="kpi">
         <div>
           <div class="label">Conflictos agenda</div>
-          <div class="val">${risks.conflicts + risks.blocked}</div>
+          <div class="val">${conflictTotal}</div>
           <div class="sub">Cruces: ${risks.conflicts} · En restricción: ${risks.blocked}</div>
         </div>
-        <span class="pill ${(risks.conflicts+risks.blocked)>0?'warn':'ok'}">${(risks.conflicts+risks.blocked)>0?'Revisar':'OK'}</span>
+        <span class="pill ${conflictTotal>0?'warn':'ok'}">${conflictTotal>0?'Revisar':'OK'}</span>
       </div>
     `;
   }
@@ -8963,6 +8992,7 @@ function buildDaySummaryText(dayISO=ui.date){
     let overloadedDays = 0;
     let activeDays = 0;
     let consideredDays = 0;
+    const monthProjectIds = new Set();
 
     while(d <= gridEnd){
       const inMonth = d >= monthStart && d <= monthEnd;
@@ -9005,6 +9035,7 @@ function buildDaySummaryText(dayISO=ui.date){
       if(inMonth){
         consideredDays += 1;
         totalActivitiesMonth += acts.length;
+        acts.forEach(a=>{ if(a?.projectId) monthProjectIds.add(String(a.projectId)); });
         utilSamples.push(util);
         if(util >= 100) overloadedDays += 1;
         if(acts.length) activeDays += 1;
@@ -9048,6 +9079,32 @@ function buildDaySummaryText(dayISO=ui.date){
 
     const monthTitle = parseISO(monthStart).toLocaleDateString(APP_LOCALE, { month:'long', year:'numeric' });
     const avgUtil = utilSamples.length ? Math.round(utilSamples.reduce((a,b)=>a+b,0) / utilSamples.length) : 0;
+    const monthFlowSev = severity(avgUtil);
+    const overloadedTone = overloadedDays >= Math.max(2, Math.ceil(consideredDays * 0.2))
+      ? 'danger'
+      : (overloadedDays > 0 ? 'warn' : 'ok');
+    const overloadedLabel = overloadedTone === 'danger' ? 'Alta' : (overloadedTone === 'warn' ? 'Vigilar' : 'Normal');
+
+    const mixTotal = prioCount.alta + prioCount.media + prioCount.baja;
+    const dominantMixKey = mixTotal === 0
+      ? 'none'
+      : ((prioCount.alta >= prioCount.media && prioCount.alta >= prioCount.baja)
+          ? 'alta'
+          : ((prioCount.media >= prioCount.alta && prioCount.media >= prioCount.baja) ? 'media' : 'baja'));
+    const dominantMixTone = dominantMixKey === 'alta'
+      ? 'danger'
+      : (dominantMixKey === 'media' ? 'warn' : 'ok');
+    const dominantMixLabel = dominantMixKey === 'none'
+      ? 'Sin carga'
+      : dominantMixKey.charAt(0).toUpperCase() + dominantMixKey.slice(1);
+
+
+    const monthProjectCount = monthProjectIds.size;
+    const monthKpiHost = $('monthKpiBand');
+    if(monthKpiHost){
+      monthKpiHost.classList.add('hidden');
+      monthKpiHost.innerHTML = '';
+    }
 
     c.innerHTML = `
       <div class="monthcal-wrap">
@@ -9056,29 +9113,6 @@ function buildDaySummaryText(dayISO=ui.date){
             <div>
               <div class="monthcal-title">${esc(monthTitle.charAt(0).toUpperCase() + monthTitle.slice(1))}</div>
               <div class="monthcal-subtitle">Vista mensual de flujo, prioridades y foco operativo · ordenada por día</div>
-            </div>
-          </div>
-
-          <div class="monthcal-kpis">
-            <div class="month-kpi">
-              <div class="k">Actividades del mes</div>
-              <div class="v">${totalActivitiesMonth}</div>
-              <div class="s">${activeDays} de ${consideredDays} días con actividad</div>
-            </div>
-            <div class="month-kpi">
-              <div class="k">Flujo promedio diario</div>
-              <div class="v">${avgUtil}%</div>
-              <div class="s">Promedio en días visibles</div>
-            </div>
-            <div class="month-kpi">
-              <div class="k">Días de alto flujo</div>
-              <div class="v">${overloadedDays}</div>
-              <div class="s">Objetivo: reducir colisiones</div>
-            </div>
-            <div class="month-kpi">
-              <div class="k">Mix de prioridad</div>
-              <div class="v">${prioCount.alta}/${prioCount.media}/${prioCount.baja}</div>
-              <div class="s">Alta / Media / Baja</div>
             </div>
           </div>
 
