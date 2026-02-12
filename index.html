@@ -267,10 +267,28 @@
       margin-top:8px;
       font-size:11px;
       line-height:1.25;
+      overflow-wrap:anywhere;
+    }
+    .agenda.agenda-collapsed{
       max-height:44px;
       overflow:hidden;
       text-overflow:ellipsis;
     }
+    .more-inline-btn{
+      appearance:none;
+      border:none;
+      background:transparent;
+      color:var(--muted);
+      font-size:10px;
+      font-weight:700;
+      cursor:pointer;
+      margin-left:4px;
+      padding:0;
+      line-height:1.1;
+      text-decoration:none;
+      white-space:nowrap;
+    }
+    .more-inline-btn:hover{color:var(--text); text-decoration:underline;}
 
     .prio-grid{
       display:grid;grid-template-columns:repeat(3,minmax(120px,1fr));gap:8px;
@@ -282,6 +300,7 @@
     .prio .t{font-size:12px;font-weight:800;display:flex;justify-content:space-between;align-items:center}
     .prio ul{margin:8px 0 0 16px;padding:0;font-size:11px;line-height:1.25}
     .prio li{margin:4px 0}
+    .prio .prio-extra.hidden{display:none}
     .tagA{color:var(--danger)}
     .tagM{color:var(--warn)}
     .tagB{color:var(--ok)}
@@ -8411,7 +8430,8 @@ function buildDaySummaryText(dayISO=ui.date){
     const day = ui.date;
     const acts = getVisibleActivityInstances(day);
     const team = getFilteredTeam();
-    $('teamTodayLabel').textContent = dayLabel(day);
+    const teamTodayLabelEl = $('teamTodayLabel');
+    if(teamTodayLabelEl) teamTodayLabelEl.textContent = dayLabel(day);
 
     const cards = team.map(t=>{
       const mine = acts.filter(a=>a.ownerId===t.id).sort((a,b)=>a.startHour.localeCompare(b.startHour));
@@ -8424,7 +8444,22 @@ function buildDaySummaryText(dayISO=ui.date){
       const blockTags = getBlocksForDay(t, day).slice(0,2)
         .map(b=>`<span class="blocked-tag">${esc(b.type)}</span>`).join(' ');
 
-      const agenda = mine.slice(0,3).map(a=>`${a.startHour}-${a.endHour} ${a.taskName}`).join(' · ');
+      const agendaItems = mine.map(a=>`${a.startHour}-${a.endHour} ${a.taskName}`);
+      const fullAgenda = agendaItems.join(' · ');
+      const maxVisibleItems = 3;
+      const hasMoreByItems = agendaItems.length > maxVisibleItems;
+      let previewAgenda = agendaItems.slice(0, maxVisibleItems).join(' · ');
+      const hasMoreByLength = !hasMoreByItems && previewAgenda.length > 110;
+      if(hasMoreByLength) previewAgenda = `${previewAgenda.slice(0, 107).trimEnd()}…`;
+      const canExpand = hasMoreByItems || hasMoreByLength;
+      const hiddenAgendaCount = hasMoreByItems ? (agendaItems.length - maxVisibleItems) : (hasMoreByLength ? 1 : 0);
+
+      const agendaHtml = !fullAgenda
+        ? `<div class="agenda">Sin actividades asignadas</div>`
+        : canExpand
+          ? `<div class="agenda agenda-collapsed" data-agenda-expandable="1" data-expanded="false"><span class="agenda-preview">${esc(previewAgenda)}</span><span class="agenda-full hidden">${esc(fullAgenda)}</span><button class="more-inline-btn agenda-toggle" type="button" data-more-count="${hiddenAgendaCount}" aria-expanded="false">ver más (${hiddenAgendaCount})</button></div>`
+          : `<div class="agenda">${esc(fullAgenda)}</div>`;
+
       return `
         <div class="person">
           <div class="n">
@@ -8433,13 +8468,39 @@ function buildDaySummaryText(dayISO=ui.date){
           </div>
           <div class="meter"><span style="width:${Math.min(100,util)}%"></span></div>
           <div class="meta">Flujo ${fmtH(min)} · Capacidad ${fmtH(cap)} · Libre ${fmtH(free)}</div>
-          <div class="agenda">${esc(agenda || 'Sin actividades asignadas')}</div>
+          ${agendaHtml}
           <div style="margin-top:6px">${blockTags || '<span class="small muted">Sin bloqueos</span>'}</div>
         </div>
       `;
     }).join('');
 
-    $('todayCards').innerHTML = cards || `<div class="muted small">Sin responsables para mostrar.</div>`;
+    const cardsEl = $('todayCards');
+    if(!cardsEl) return;
+    cardsEl.innerHTML = cards || `<div class="muted small">Sin responsables para mostrar.</div>`;
+
+    cardsEl.querySelectorAll('.agenda-toggle').forEach(btn=>{
+      btn.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        const agenda = btn.closest('[data-agenda-expandable]');
+        if(!agenda) return;
+
+        const expanded = agenda.getAttribute('data-expanded') === 'true';
+        const next = !expanded;
+
+        agenda.setAttribute('data-expanded', next ? 'true' : 'false');
+        agenda.classList.toggle('agenda-collapsed', !next);
+
+        const preview = agenda.querySelector('.agenda-preview');
+        const full = agenda.querySelector('.agenda-full');
+
+        if(preview) preview.classList.toggle('hidden', next);
+        if(full) full.classList.toggle('hidden', !next);
+
+        const moreCount = Number(btn.getAttribute('data-more-count') || '0');
+        btn.textContent = next ? 'ver menos' : `ver más (${moreCount})`;
+        btn.setAttribute('aria-expanded', next ? 'true' : 'false');
+      });
+    });
   }
 
   function renderPriorityRadar(){
@@ -8452,22 +8513,65 @@ function buildDaySummaryText(dayISO=ui.date){
       'Baja': acts.filter(a=>a.priority==='Baja').sort((a,b)=>a.startHour.localeCompare(b.startHour))
     };
 
+    const buildItemLabel = (a)=>`${esc(a.startHour)} ${esc(findTeam(a.ownerId)?.name || '-')} · ${esc(a.taskName)}`;
+
     const build = (key, cls) => {
       const arr = groups[key];
-      const items = arr.slice(0,4).map(a=>`<li>${esc(a.startHour)} ${esc(findTeam(a.ownerId)?.name || '-')} · ${esc(a.taskName)}</li>`).join('');
+      const visible = arr.slice(0,4);
+      const hidden = arr.slice(4);
+      const dayKey = String(day || '').replace(/[^\w-]/g,'_');
+      const groupId = `prio_more_${dayKey}_${key.toLowerCase()}`;
+
+      const visibleItems = visible.map((a, idx)=>{
+        const isLastVisible = idx === visible.length - 1;
+        const inlineToggle = (hidden.length && isLastVisible)
+          ? ` <button class="more-inline-btn prio-toggle" type="button" data-prio-group="${esc(groupId)}" data-more-count="${hidden.length}" data-expanded="false" aria-expanded="false">ver más (${hidden.length})</button>`
+          : '';
+        return `<li>${buildItemLabel(a)}${inlineToggle}</li>`;
+      }).join('');
+
+      const hiddenItems = hidden
+        .map(a=>`<li class="prio-extra hidden" data-prio-group="${esc(groupId)}">${buildItemLabel(a)}</li>`)
+        .join('');
+
       return `
         <div class="prio">
           <div class="t"><span class="${cls}">${key}</span><span class="pill">${arr.length}</span></div>
-          <ul>${items || '<li class="muted">Sin flujo</li>'}</ul>
+          <ul>${visibleItems || '<li class="muted">Sin flujo</li>'}${hiddenItems}</ul>
         </div>
       `;
     };
 
-    $('priorityRadar').innerHTML = [
+    const radarEl = $('priorityRadar');
+    if(!radarEl) return;
+    radarEl.innerHTML = [
       build('Alta','tagA'),
       build('Media','tagM'),
       build('Baja','tagB')
     ].join('');
+
+    radarEl.querySelectorAll('.prio-toggle').forEach(btn=>{
+      btn.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        const group = btn.getAttribute('data-prio-group');
+        if(!group) return;
+
+        const expanded = btn.getAttribute('data-expanded') === 'true';
+        const next = !expanded;
+
+        const safeGroup = (window.CSS && typeof CSS.escape === 'function')
+          ? CSS.escape(group)
+          : String(group).replace(/["\\]/g,'\\$&');
+        radarEl.querySelectorAll(`.prio-extra[data-prio-group="${safeGroup}"]`).forEach(li=>{
+          li.classList.toggle('hidden', !next);
+        });
+
+        btn.setAttribute('data-expanded', next ? 'true' : 'false');
+        btn.setAttribute('aria-expanded', next ? 'true' : 'false');
+        const moreCount = Number(btn.getAttribute('data-more-count') || '0');
+        btn.textContent = next ? 'ver menos' : `ver más (${moreCount})`;
+      });
+    });
   }
 
   function renderView(){
