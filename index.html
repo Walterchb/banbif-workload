@@ -8764,7 +8764,7 @@ function buildDaySummaryText(dayISO=ui.date){
 
 
   function getBusyIntervalsForPersonDay(person, dayISO){
-    const acts = getVisibleActivityInstances(dayISO).filter(a=>a.ownerId===person.id);
+    const acts = getVisibleActivityInstances(dayISO, { includeDone:false }).filter(a=>a.ownerId===person.id);
     const taskIntervals = acts.map(a=>[timeToMin(a.startHour), timeToMin(a.endHour)]);
     const blockIntervals = blockIntervalsForDay(person, dayISO).map(b=>[b.startMin, b.endMin]);
     const all = taskIntervals.concat(blockIntervals).map(([s,e])=>[
@@ -12024,8 +12024,9 @@ function buildDaySummaryText(dayISO=ui.date){
     return state.team.filter(t=>!ui.filters.owner || t.id===ui.filters.owner);
   }
 
-  function getVisibleActivityInstances(dayISO){
+  function getVisibleActivityInstances(dayISO, options = {}){
     if(isNonWorkingDayISO(dayISO)) return [];
+    const includeDone = options.includeDone !== false;
     const list = [];
     state.projects.forEach(p=>{
       if(!projectVisible(p, dayISO)) return;
@@ -12052,9 +12053,9 @@ function buildDaySummaryText(dayISO=ui.date){
         }
 
         if(dayISO < occStart || dayISO > occEnd) return;
-        if(activityStatus({...a, startDate:occStart, endDate:occEnd}, dayISO, p)==='Finalizado') return;
 
         const status = activityStatus({...a, startDate:occStart, endDate:occEnd}, dayISO, p);
+        if(!includeDone && status === 'Finalizado') return;
         const projectStatusLabel = projectStatus(p, dayISO, occurrence);
         list.push({
           projectId: p.id,
@@ -12200,7 +12201,7 @@ function buildDaySummaryText(dayISO=ui.date){
 
   function detectTaskConflicts(dayISO){
     let cnt = 0;
-    const acts = getVisibleActivityInstances(dayISO);
+    const acts = getVisibleActivityInstances(dayISO, { includeDone:false });
     const byOwner = new Map();
     acts.forEach(a=>{
       if(!byOwner.has(a.ownerId)) byOwner.set(a.ownerId, []);
@@ -12218,7 +12219,7 @@ function buildDaySummaryText(dayISO=ui.date){
 
   function detectBlockedConflicts(dayISO){
     let cnt = 0;
-    const acts = getVisibleActivityInstances(dayISO);
+    const acts = getVisibleActivityInstances(dayISO, { includeDone:false });
 
     for(const a of acts){
       const person = findTeam(a.ownerId);
