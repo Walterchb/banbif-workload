@@ -5328,10 +5328,28 @@ function openAccessGate(){
       if(!occurrences.length) return;
 
       const activities = Array.isArray(project.activities) ? project.activities : [];
-      const allDone = activities.length > 0 && activities.every(a=>Boolean(a.done));
 
       occurrences.forEach(occ=>{
-        const status = statusByObserved(occ.startDate, occ.endDate, allDone);
+        const activitySnapshots = activities.map(activity=>{
+          const mapped = mapRecurringDateRange(activity.startDate, activity.endDate, occ);
+          if(!mapped) return null;
+
+          const occStart = normalizeISO(mapped.startDate);
+          const occEnd = normalizeISO(mapped.endDate);
+          if(!occStart || !occEnd) return null;
+
+          const done = Boolean(activity.done);
+          const status = statusByObserved(occStart, occEnd, done);
+          return { done, status };
+        }).filter(Boolean);
+
+        const allDone = activitySnapshots.length > 0 && activitySnapshots.every(x=>x.done);
+        const hasDelayedOpen = activitySnapshots.some(x=>!x.done && x.status === 'Demorado');
+
+        let status = statusByObserved(occ.startDate, occ.endDate, false);
+        if(allDone) status = 'Finalizado';
+        else if(hasDelayedOpen) status = 'Demorado';
+
         const ownerIds = Array.from(new Set(activities.map(a=>String(a.ownerId || '')).filter(Boolean)));
         const ownerNames = ownerIds.map(id=>findTeam(id)?.name).filter(Boolean);
 
@@ -8764,7 +8782,7 @@ function buildDaySummaryText(dayISO=ui.date){
 
 
   function getBusyIntervalsForPersonDay(person, dayISO){
-    const acts = getVisibleActivityInstances(dayISO, { includeDone:false }).filter(a=>a.ownerId===person.id);
+    const acts = getVisibleActivityInstances(dayISO).filter(a=>a.ownerId===person.id);
     const taskIntervals = acts.map(a=>[timeToMin(a.startHour), timeToMin(a.endHour)]);
     const blockIntervals = blockIntervalsForDay(person, dayISO).map(b=>[b.startMin, b.endMin]);
     const all = taskIntervals.concat(blockIntervals).map(([s,e])=>[
@@ -12024,9 +12042,8 @@ function buildDaySummaryText(dayISO=ui.date){
     return state.team.filter(t=>!ui.filters.owner || t.id===ui.filters.owner);
   }
 
-  function getVisibleActivityInstances(dayISO, options = {}){
+  function getVisibleActivityInstances(dayISO){
     if(isNonWorkingDayISO(dayISO)) return [];
-    const includeDone = options.includeDone !== false;
     const list = [];
     state.projects.forEach(p=>{
       if(!projectVisible(p, dayISO)) return;
@@ -12055,8 +12072,8 @@ function buildDaySummaryText(dayISO=ui.date){
         if(dayISO < occStart || dayISO > occEnd) return;
 
         const status = activityStatus({...a, startDate:occStart, endDate:occEnd}, dayISO, p);
-        if(!includeDone && status === 'Finalizado') return;
         const projectStatusLabel = projectStatus(p, dayISO, occurrence);
+        const displayStatus = (status === 'Demorado' || status === 'Finalizado') ? status : projectStatusLabel;
         list.push({
           projectId: p.id,
           taskId: a.id,
@@ -12073,7 +12090,7 @@ function buildDaySummaryText(dayISO=ui.date){
           endHour: a.endHour,
           minutes: durationMinutes(a.startHour, a.endHour),
           status,
-          displayStatus: projectStatusLabel
+          displayStatus
         });
       });
     });
@@ -12110,21 +12127,46 @@ function buildDaySummaryText(dayISO=ui.date){
 
   function projectStatus(p, refDate=todayISO(), occurrence=null){
     const realDate = todayISO();
-    const acts = Array.isArray(p.activities) ? p.activities : [];
+    const acts = Array.isArray(p?.activities) ? p.activities : [];
     if(acts.length && acts.every(a=>Boolean(a.done))) return 'Finalizado';
 
     const rec = normalizeRecurrenceFrequency(p?.recurrenceFrequency);
-    if(rec === 'Ninguna'){
-      return autoStatusByDates(p.startDate, p.endDate, false, realDate);
+    let occStart = normalizeISO(p?.startDate) || p?.startDate;
+    let occEnd = normalizeISO(p?.endDate) || p?.endDate;
+    let currentOcc = null;
+
+    if(rec !== 'Ninguna'){
+      currentOcc = occurrence || getRelevantOccurrenceForDate(p, realDate);
+      if(currentOcc){
+        occStart = normalizeISO(currentOcc.startDate) || occStart;
+        occEnd = normalizeISO(currentOcc.endDate) || occEnd;
+      }
     }
 
-    // Siempre calcular el estatus contra la fecha real (hoy),
-    // no contra la fecha de búsqueda/navegación.
-    if(rec === 'Diaria') return autoStatusByDates(p.startDate, p.endDate, false, realDate);
+    // Regla clave: si existe al menos una actividad abierta y demorada,
+    // el proyecto se considera "Demorado" (excepto si esas actividades ya están finalizadas).
+    if(acts.length){
+      const hasDelayedOpenActivity = acts.some(a=>{
+        if(Boolean(a?.done)) return false;
 
-    const currentOcc = getRelevantOccurrenceForDate(p, realDate);
-    if(!currentOcc) return autoStatusByDates(p.startDate, p.endDate, false, realDate);
-    return autoStatusByDates(currentOcc.startDate, currentOcc.endDate, false, realDate);
+        let aStart = normalizeISO(a?.startDate) || a?.startDate;
+        let aEnd = normalizeISO(a?.endDate) || a?.endDate;
+
+        if(rec !== 'Ninguna' && currentOcc){
+          const mapped = mapRecurringDateRange(a.startDate, a.endDate, currentOcc);
+          if(!mapped) return false;
+          aStart = normalizeISO(mapped.startDate) || aStart;
+          aEnd = normalizeISO(mapped.endDate) || aEnd;
+        }
+
+        const st = activityStatus({ ...a, startDate:aStart, endDate:aEnd }, realDate, p);
+        return st === 'Demorado';
+      });
+
+      if(hasDelayedOpenActivity) return 'Demorado';
+    }
+
+    return autoStatusByDates(occStart, occEnd, false, realDate);
   }
 
   function autoStatusByDates(startDate, endDate, isDone=false, refDate=todayISO()){
@@ -12201,7 +12243,7 @@ function buildDaySummaryText(dayISO=ui.date){
 
   function detectTaskConflicts(dayISO){
     let cnt = 0;
-    const acts = getVisibleActivityInstances(dayISO, { includeDone:false });
+    const acts = getVisibleActivityInstances(dayISO);
     const byOwner = new Map();
     acts.forEach(a=>{
       if(!byOwner.has(a.ownerId)) byOwner.set(a.ownerId, []);
@@ -12219,7 +12261,7 @@ function buildDaySummaryText(dayISO=ui.date){
 
   function detectBlockedConflicts(dayISO){
     let cnt = 0;
-    const acts = getVisibleActivityInstances(dayISO, { includeDone:false });
+    const acts = getVisibleActivityInstances(dayISO);
 
     for(const a of acts){
       const person = findTeam(a.ownerId);
