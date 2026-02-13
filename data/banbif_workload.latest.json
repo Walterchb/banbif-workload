@@ -1,13 +1,13 @@
 {
   "meta": {
     "app": "banbif_workload",
-    "exportedAt": "2026-02-10T08:10:43.558Z",
+    "exportedAt": "2026-02-13T21:53:59.227Z",
     "version": 2,
     "schema": "full_backup",
     "counts": {
       "team": 3,
       "projects": 10,
-      "activities": 22,
+      "activities": 23,
       "holidays": 2,
       "notifications": 2
     }
@@ -51,16 +51,6 @@
             "allDay": false,
             "startHour": "09:00",
             "endHour": "10:00",
-            "note": ""
-          },
-          {
-            "id": "b_so6rxy1",
-            "type": "Otro",
-            "startDate": "2026-02-13",
-            "endDate": "2026-02-13",
-            "allDay": false,
-            "startHour": "16:00",
-            "endHour": "22:00",
             "note": ""
           }
         ]
@@ -301,7 +291,7 @@
         "objective": "",
         "deliverable": "",
         "notes": "",
-        "isPrimaryFocus": true,
+        "isPrimaryFocus": false,
         "activities": [
           {
             "id": "a_3tok2jk",
@@ -312,7 +302,7 @@
             "endHour": "13:00",
             "ownerId": "u1",
             "detail": "Revisar los resultados de Trading y enviar para la conformidad",
-            "done": false,
+            "done": true,
             "primaryFocus": false
           },
           {
@@ -324,7 +314,7 @@
             "endHour": "14:00",
             "ownerId": "u1",
             "detail": "Calcular los resultados de la BXI y reportar.",
-            "done": false,
+            "done": true,
             "primaryFocus": false
           },
           {
@@ -336,7 +326,7 @@
             "endHour": "17:30",
             "ownerId": "u1",
             "detail": "Setear el archivo para el nuevo año",
-            "done": false,
+            "done": true,
             "primaryFocus": false
           },
           {
@@ -348,7 +338,7 @@
             "endHour": "19:00",
             "ownerId": "u1",
             "detail": "Asignar las operaciones de Hola Cambios según el sector.",
-            "done": false,
+            "done": true,
             "primaryFocus": false
           },
           {
@@ -360,8 +350,8 @@
             "endHour": "22:00",
             "ownerId": "u1",
             "detail": "Revisar los resultados de Distribución y enviar para la conformidad",
-            "done": false,
-            "primaryFocus": true
+            "done": true,
+            "primaryFocus": false
           },
           {
             "id": "a_m380bat",
@@ -372,7 +362,7 @@
             "endHour": "14:00",
             "ownerId": "u1",
             "detail": "Preparar todo lo necesario para armar la PPT Tesorería",
-            "done": false,
+            "done": true,
             "primaryFocus": false
           },
           {
@@ -384,7 +374,7 @@
             "endHour": "18:00",
             "ownerId": "u1",
             "detail": "Elaborar PPT Tesorería",
-            "done": false,
+            "done": true,
             "primaryFocus": false
           },
           {
@@ -481,7 +471,7 @@
         "objective": "",
         "deliverable": "",
         "notes": "",
-        "isPrimaryFocus": false,
+        "isPrimaryFocus": true,
         "activities": [
           {
             "id": "a_ombkn5u",
@@ -492,7 +482,7 @@
             "endHour": "19:00",
             "ownerId": "u1",
             "detail": "Revisar el reporte pasado para entender el nuevo envío",
-            "done": false,
+            "done": true,
             "primaryFocus": false
           },
           {
@@ -504,7 +494,7 @@
             "endHour": "14:00",
             "ownerId": "u1",
             "detail": "Por definir",
-            "done": false,
+            "done": true,
             "primaryFocus": false
           },
           {
@@ -516,8 +506,20 @@
             "endHour": "19:00",
             "ownerId": "u1",
             "detail": "Por definir",
-            "done": false,
+            "done": true,
             "primaryFocus": false
+          },
+          {
+            "id": "a_s7qdmxl",
+            "name": "flujo covenants",
+            "startDate": "2026-02-13",
+            "endDate": "2026-02-13",
+            "startHour": "16:00",
+            "endHour": "22:00",
+            "ownerId": "u1",
+            "detail": "por definir",
+            "done": false,
+            "primaryFocus": true
           }
         ]
       },
@@ -612,6 +614,124 @@
         ]
       }
     ],
+    "roadmapItems": [
+      {
+        "id": "rm13",
+        "date": "2026-02-13",
+        "title": "Dashboard Seguimiento Comercial",
+        "status": "Propuesto",
+        "requesterTeam": "distribución",
+        "tag": "distribución",
+        "ownerId": "u1",
+        "owner": "WALTER",
+        "priority": "Media",
+        "notes": "",
+        "steps": [
+          {
+            "id": "rms_1",
+            "title": "Paso 1",
+            "done": true,
+            "dueDate": "2026-01-01"
+          },
+          {
+            "id": "rms_2",
+            "title": "PAso 2",
+            "done": false,
+            "dueDate": "2026-02-02"
+          },
+          {
+            "id": "rms_3",
+            "title": "Paso 3",
+            "done": false,
+            "dueDate": "2026-02-12"
+          }
+        ]
+      },
+      {
+        "id": "rm14",
+        "date": "2026-02-13",
+        "title": "Dashboard Seguimiento Comercial",
+        "status": "Planificado",
+        "requesterTeam": "ALM",
+        "tag": "ALM",
+        "ownerId": "u2",
+        "owner": "DIEGO",
+        "priority": "Baja",
+        "notes": "",
+        "steps": [
+          {
+            "id": "rms_1",
+            "title": "Paso 1",
+            "done": false,
+            "dueDate": ""
+          },
+          {
+            "id": "rms_2",
+            "title": "PAso 2",
+            "done": false,
+            "dueDate": ""
+          },
+          {
+            "id": "rms_3",
+            "title": "Paso 3",
+            "done": false,
+            "dueDate": ""
+          }
+        ]
+      },
+      {
+        "id": "rm15",
+        "date": "2026-02-13",
+        "title": "Dashboard Seguimiento Comercial",
+        "status": "En desarrollo",
+        "requesterTeam": "trading",
+        "tag": "trading",
+        "ownerId": "u_zqqvadc",
+        "owner": "DIANA",
+        "priority": "Media",
+        "notes": "",
+        "steps": [
+          {
+            "id": "rms_1",
+            "title": "Paso 1",
+            "done": false,
+            "dueDate": ""
+          },
+          {
+            "id": "rms_2",
+            "title": "Paso 2",
+            "done": false,
+            "dueDate": ""
+          },
+          {
+            "id": "rms_3",
+            "title": "paso 3",
+            "done": false,
+            "dueDate": ""
+          }
+        ]
+      },
+      {
+        "id": "rm16",
+        "date": "2026-02-13",
+        "title": "Dashboard Seguimiento Comercial",
+        "status": "Completado",
+        "requesterTeam": "interno",
+        "tag": "interno",
+        "ownerId": "u1",
+        "owner": "WALTER",
+        "priority": "Alta",
+        "notes": "",
+        "steps": [
+          {
+            "id": "rms_1",
+            "title": "Paso 1",
+            "done": true,
+            "dueDate": ""
+          }
+        ]
+      }
+    ],
     "notifications": [
       {
         "id": "n_nztqexc",
@@ -661,7 +781,7 @@
     "roadmapZoom": "week",
     "manageTab": "data",
     "manageProjectSort": "priority_desc",
-    "manageProjectSearch": "",
+    "manageProjectSearch": "walte",
     "manageNotifUser": "",
     "manageNotifQ": "",
     "manageNotifShowDone": true,
