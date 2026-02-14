@@ -1860,6 +1860,7 @@
       .seg .btn{flex:1}
       .controls .seg{width:auto;justify-content:flex-start}
       .controls .seg .btn{flex:0 0 auto}
+      .controls > .row > #segView{order:99}
       .grid2,.grid3,.grid4{grid-template-columns:1fr !important}
       .detail-grid{grid-template-columns:1fr}
       .modal{width:min(1120px,98vw);max-height:94vh}
@@ -3495,7 +3496,7 @@
             <button class="btn tab" data-view="roadmap">Roadmap</button>
           </div>
           <button class="btn icon" id="prevBtn">◀</button>
-          <input class="ctrl" type="text" id="datePicker" inputmode="numeric" placeholder="dd/mm/aaaa" title="Formato: dd/mm/aaaa" aria-label="Fecha (dd/mm/aaaa)" />
+          <input class="ctrl" type="date" id="datePicker" title="Seleccionar fecha" aria-label="Seleccionar fecha" />
           <button class="btn icon" id="nextBtn">▶</button>
           <button class="btn" id="todayBtn">Hoy</button>
           <div class="row roadmap-tools hidden" id="roadmapZoomWrap">
@@ -5303,7 +5304,25 @@
     $('btnInfo')?.addEventListener('click', ()=>{ renderInfoNotifications(); openOverlay('infoOverlay'); });
     $('btnReload')?.addEventListener('click', ()=>{ window.location.reload(); });
 
-    $('datePicker').addEventListener('change',e=>{ const v = normalizeISO(e.target.value); if(!v){ e.target.value = fmtDate(ui.date); toast('Fecha inválida. Usa dd/mm/aaaa'); return; } ui.date = v; render(); });
+    const datePickerEl = $('datePicker');
+    datePickerEl.addEventListener('change', e=>{
+      const v = normalizeISO(e.target.value);
+      if(!v){
+        e.target.value = ui.date;
+        toast('Fecha inválida. Selecciona una fecha válida.');
+        return;
+      }
+      ui.date = v;
+      render();
+    });
+
+    const openNativeDatePicker = ()=>{
+      if(typeof datePickerEl.showPicker === 'function'){
+        try{ datePickerEl.showPicker(); }catch(_err){}
+      }
+    };
+    datePickerEl.addEventListener('click', openNativeDatePicker);
+    datePickerEl.addEventListener('focus', openNativeDatePicker);
     $('prevBtn').addEventListener('click',()=>shiftDate(-1));
     $('nextBtn').addEventListener('click',()=>shiftDate(1));
     $('todayBtn').addEventListener('click',()=>{ ui.date = toISO(new Date()); render(); });
@@ -9269,7 +9288,7 @@ function buildDaySummaryText(dayISO=ui.date){
     if(isMobileViewport() && ui.view === 'gantt') ui.view = 'roadmap';
     saveState();
 
-    $('datePicker').value = fmtDate(ui.date);
+    $('datePicker').value = ui.date;
     updateRoleUI();
     updateNotificationIndicator();
     renderHeaderControls();
