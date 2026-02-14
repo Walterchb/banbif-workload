@@ -1489,13 +1489,15 @@
 
     #accessOverlay .login-card{
       overflow:hidden;
+      position:relative;
       border-radius:5px;
       width:100%;
       border:1px solid color-mix(in srgb,var(--primary) 28%, #22314f);
       box-shadow:
-        0 28px 70px rgba(2,8,23,.44),
+        
+        0 18px 44px rgba(2,8,23,.40),
         0 0 0 1px rgba(255,255,255,.03);
-      background:
+            background:
         linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)),
         #111a2e;
       backdrop-filter:blur(4px);
@@ -1519,6 +1521,84 @@
 
     #accessOverlay .login-title{color:#e5edf8;font-size:15px;font-weight:780;margin:0;line-height:1.05;}
     #accessOverlay .login-sub{color:#9fb0c9;font-size:12px;margin:4px 0 0;line-height:1.2;}
+    #accessOverlay .login-module{
+      margin:0 0 4px 0;
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.55px;
+      text-transform:uppercase;
+      color:rgba(229,237,248,.66);
+    }
+    #accessOverlay .login-micro{
+      margin-top:6px;
+      font-size:11px;
+      line-height:1.2;
+      color:rgba(229,237,248,.52);
+      letter-spacing:.25px;
+      user-select:none;
+    }
+    #accessOverlay .login-footerline{
+      text-align:center;
+      margin-top:10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      font-size:10px;
+      letter-spacing:.45px;
+      text-transform:uppercase;
+      color:rgba(229,237,248,.40);
+    }
+    #accessOverlay .login-footerline b{
+      font-weight:900;
+      color:rgba(229,237,248,.60);
+    }
+
+
+    #accessOverlay .internal-left{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      min-width:0;
+      justify-content:center;
+      width:100%;
+    }
+    #accessOverlay .op-text{
+      font-size:10px;
+      letter-spacing:.45px;
+      text-transform:uppercase;
+      color:rgba(229,237,248,.38);
+      white-space:nowrap;
+    }
+    #accessOverlay .op-ind{
+      width:8px;height:8px;border-radius:50%;
+      background:rgba(34,197,94,.95);
+      box-shadow:0 0 0 1px rgba(34,197,94,.25), 0 6px 16px rgba(34,197,94,.12);
+      position:relative;
+      flex:0 0 auto;
+    }
+    #accessOverlay .op-ind::before,
+    #accessOverlay .op-ind::after{
+      content:"";
+      position:absolute;
+      inset:-8px;
+      border-radius:999px;
+      border:1px solid rgba(34,197,94,.35);
+      opacity:0;
+      transform:scale(.35);
+      animation:opPing 1.6s ease-out infinite;
+    }
+    #accessOverlay .op-ind::after{
+      inset:-14px;
+      border-color:rgba(34,197,94,.22);
+      animation-delay:.45s;
+    }
+    @keyframes opPing{
+      0%{opacity:.0; transform:scale(.35);}
+      12%{opacity:.55;}
+      65%{opacity:.08;}
+      100%{opacity:0; transform:scale(1.15);}
+    }
 
     #accessOverlay .login-form{
       padding:14px 16px 16px;
@@ -1554,7 +1634,7 @@
       border:1px solid rgba(255,255,255,.14);
       background:linear-gradient(135deg,var(--primary),#376fff);
       color:#fff;
-      box-shadow:0 10px 20px rgba(79,140,255,.20);
+      box-shadow: 0 8px 16px rgba(2,8,23,.28);
       cursor:pointer;
       transition:filter .2s ease, transform .12s ease;
     }
@@ -1705,6 +1785,15 @@
       #accessOverlay .fade-ambient-login{top:41%;height:23%;}
       #accessOverlay .chart-wrap{top:38.5%;}
       #accessOverlay .login-shell{width:min(94%,340px);}
+      #accessOverlay .login-layer{padding:24px 16px;}
+      #accessOverlay .login-card{border-radius:8px;}
+      #accessOverlay .login-head{padding:16px 16px 14px;gap:12px;}
+      #accessOverlay .login-logo{width:42px;height:42px;border-radius:7px;}
+      #accessOverlay .login-form{padding:16px 16px 18px;gap:12px;}
+      #accessOverlay .login-title{font-size:16px;line-height:1.1;}
+      #accessOverlay .login-sub{font-size:12px;line-height:1.25;margin-top:6px;}
+      #accessOverlay .login-micro{margin-top:8px;line-height:1.25;}
+      #accessOverlay .login-footerline{margin-top:12px;}
       #accessOverlay .input-access-row .access-code{font-size:16px;letter-spacing:5px;}
       #accessOverlay .chart-shell{
         width:min(96vw,560px);
@@ -5168,22 +5257,31 @@ function openAccessGate(){
 
           <section class="login-layer">
             <div class="login-shell">
-              <div class="login-card">
-                <div class="login-head">
+              <div class="login-card">                <div class="login-head">
                   <div class="login-logo" style="background-image: url(./apple-touch-icon.png);background-size: contain;"></div>
                   <div>
+                    <p class="login-module">TREASURY &amp; GLOBAL MARKETS</p>
                     <p class="login-title">HUB ESTRATÉGICO</p>
                     <p class="login-sub">Mercado de Capitales &amp; Control de Gestión</p>
                   </div>
                 </div>
+
                 <form class="login-form" onsubmit="event.preventDefault()">
                   <div class="input-access-row">
                     <input id="accessCode" class="access-code" type="text" inputmode="numeric" maxlength="4" placeholder="****" autocomplete="off" aria-label="Código de acceso" />
                     <button id="accessBtn" class="login-btn" type="submit">Acceder</button>
                   </div>
-                  <div class="login-hint">Ingrese el código de acceso</div>
+                  <div class="login-hint">Validación de acceso interno</div>
+                  <div class="login-micro">KPIs estratégicos · Roadmap · Herramientas de análisis</div>
                   <div id="accessErr" class="lock-msg">Código inválido</div>
                   <div id="accessLockMsg" class="mini-help dim" style="display:none;color:#fbbf24"></div>
+                <div class="login-footerline">
+                  <span class="internal-left">
+                    <span>INTERNAL ACCESS · v1.0</span>
+                    <span class="op-ind" aria-hidden="true"></span>
+                    
+                  </span>
+                </div>
                 </form>
               </div>
             </div>
@@ -5230,6 +5328,7 @@ function openAccessGate(){
 
     document.body.appendChild(gate);
     document.body.style.overflow = 'hidden';
+
 
     const input = $('accessCode');
     const btn = $('accessBtn');
