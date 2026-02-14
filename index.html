@@ -2894,6 +2894,146 @@
 }
 </style>
 
+<style id="access-overlay-view-selector-v1">
+/* Selector de vista en Login (solo Gestión Interna habilitado) */
+#accessOverlay .login-form{
+  gap:14px; /* más aire vertical sin tocar estructura */
+}
+
+#accessOverlay .access-home-title{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin:8px 0 14px;
+  color:#ffffff;
+}
+#accessOverlay .access-home-title::before,
+#accessOverlay .access-home-title::after{
+  content:"";
+  height:2px;
+  flex:1 1 auto;
+  background:linear-gradient(90deg, rgba(55,111,255,.0), rgba(55,111,255,.95));
+}
+#accessOverlay .access-home-title::after{
+  background:linear-gradient(90deg, rgba(55,111,255,.95), rgba(55,111,255,.0));
+}
+#accessOverlay .access-home-title b{
+  font-size:32px;
+  line-height:1;
+  font-weight:500;
+  letter-spacing:.1px;
+}
+
+#accessOverlay .access-view-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+  margin:2px 0 14px;
+}
+#accessOverlay .access-view-card{
+  position:relative;
+  min-height:112px;
+  border:1px solid #5b6f92;
+  border-radius:8px;
+  background:linear-gradient(180deg,#cad8ef 0%, #bdd0ec 100%);
+  color:#0f172a;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  text-align:center;
+  padding:42px 10px 14px;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  transition:border-color .16s ease, box-shadow .16s ease, transform .16s ease, opacity .16s ease, filter .16s ease;
+  overflow:visible;
+}
+/* Encabezado blanco superior como referencia */
+#accessOverlay .access-view-card::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:26px;
+  border-top-left-radius:7px;
+  border-top-right-radius:7px;
+  background:linear-gradient(180deg,#ffffff 0%, #f4f7fc 100%);
+  border-bottom:1px solid #d7e0ef;
+}
+#accessOverlay .access-view-card .line{
+  position:absolute;
+  top:12px;
+  left:9px;
+  right:9px;
+  height:2px;
+  border-radius:999px;
+  background:#2f3f57;
+  opacity:.98;
+}
+#accessOverlay .access-view-card:hover{
+  transform:translateY(-1px);
+}
+
+/* Selección MUY visible */
+#accessOverlay .access-view-card.is-selected{
+  border-color:#16a7ff;
+  box-shadow:
+    0 0 0 2px rgba(22,167,255,.34),
+    0 10px 20px rgba(2,8,23,.22);
+  transform:translateY(-1px);
+}
+#accessOverlay .access-view-card.is-selected::after{content:none;display:none;}
+
+#accessOverlay .access-view-card.is-locked,
+#accessOverlay .access-view-card[disabled]{
+  opacity:.56;
+  filter:grayscale(.12) saturate(.85);
+  cursor:not-allowed;
+}
+#accessOverlay .access-view-card .soon-tag{
+  position:absolute;
+  top:-11px;
+  left:50%;
+  transform:translateX(-50%);
+  padding:2px 9px;
+  border-radius:999px;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.45px;
+  text-transform:uppercase;
+  color:#8fa3bf;
+  border:1px solid #3b4b67;
+  background:#0d1730;
+  white-space:nowrap;
+}
+
+#accessOverlay .access-view-hint{
+  margin:0 0 14px;
+  font-size:12px;
+  color:#b3c2d8;
+}
+
+#accessOverlay .access-view-card:focus-visible{
+  outline:2px solid #56bfff;
+  outline-offset:2px;
+}
+
+@media (max-width:640px){
+  #accessOverlay .access-home-title b{font-size:33px}
+  #accessOverlay .access-view-grid{gap:10px;margin:2px 0 12px;}
+  #accessOverlay .access-view-card{
+    min-height:104px;
+    font-size:13px;
+    padding:38px 8px 12px;
+  }
+  #accessOverlay .access-view-card::before{height:24px;}
+  #accessOverlay .access-view-card .line{top:11px;left:8px;right:8px}
+  #accessOverlay .access-view-card .soon-tag{font-size:8.5px;padding:2px 7px}
+  #accessOverlay .access-view-hint{font-size:11px;margin-bottom:10px}
+}
+</style>
+
 <style id="roadmap-lite-v1">
 /* Roadmap (vista tipo notificaciones) */
 .road-n-board{display:grid;gap:10px;padding:10px;grid-template-columns:repeat(4,minmax(0,1fr));align-items:start}
@@ -5268,6 +5408,27 @@ function openAccessGate(){
                 </div>
 
                 <form class="login-form" onsubmit="event.preventDefault()">
+                  <div class="access-home-title"><b>Inicio</b></div>
+
+                  <div class="access-view-grid" role="radiogroup" aria-label="Seleccione la vista">
+                    <button type="button" class="access-view-card is-selected" data-view-selectable="1" data-view="gestion-interna" aria-pressed="true">
+                      <span class="line" aria-hidden="true"></span>
+                      <span>Gestión<br>Interna</span>
+                    </button>
+                    <button type="button" class="access-view-card is-locked" data-view="resultados" disabled aria-disabled="true" tabindex="-1">
+                      <span class="soon-tag">PROXIMAMENTE</span>
+                      <span class="line" aria-hidden="true"></span>
+                      <span>Resultados</span>
+                    </button>
+                    <button type="button" class="access-view-card is-locked" data-view="inteligencia-analitica" disabled aria-disabled="true" tabindex="-1">
+                      <span class="soon-tag">PROXIMAMENTE</span>
+                      <span class="line" aria-hidden="true"></span>
+                      <span>Inteligencia<br>&amp; Analítica</span>
+                    </button>
+                  </div>
+
+                  <div class="access-view-hint">Seleccione la vista</div>
+
                   <div class="input-access-row">
                     <input id="accessCode" class="access-code" type="text" inputmode="numeric" maxlength="4" placeholder="****" autocomplete="off" aria-label="Código de acceso" />
                     <button id="accessBtn" class="login-btn" type="submit">Acceder</button>
@@ -5335,6 +5496,27 @@ function openAccessGate(){
     const btn = $('accessBtn');
     const lockMsg = $('accessLockMsg');
     const errMsg = $('accessErr');
+
+    const viewCards = Array.from(gate.querySelectorAll('.access-view-card[data-view-selectable="1"]'));
+    let selectedAccessView = gate.querySelector('.access-view-card.is-selected')?.dataset.view || 'gestion-interna';
+
+    const syncAccessViewSelection = () => {
+      const active = gate.querySelector('.access-view-card[data-view-selectable="1"].is-selected');
+      selectedAccessView = active?.dataset.view || 'gestion-interna';
+      viewCards.forEach(card=>{
+        const isActive = card.classList.contains('is-selected');
+        card.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+      });
+    };
+
+    viewCards.forEach(card=>{
+      card.addEventListener('click', ()=>{
+        viewCards.forEach(c=>c.classList.remove('is-selected'));
+        card.classList.add('is-selected');
+        syncAccessViewSelection();
+      });
+    });
+    syncAccessViewSelection();
 
     const LOGIN_SUCCESS_DELAY_MS = 1500;
     let isAuthorizing = false;
@@ -5635,6 +5817,11 @@ function openAccessGate(){
     const submit = () => {
       if(isAuthorizing) return;
       if(updateLockState()) return;
+
+      if(selectedAccessView !== 'gestion-interna'){
+        toast('Vista no disponible por ahora');
+        return;
+      }
 
       const role = resolveRole(realCode);
 
