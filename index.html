@@ -152,6 +152,72 @@
     .controls > .row{display:flex;gap:8px;align-items:center;flex-wrap:nowrap;flex:0 0 auto;white-space:nowrap}
     .controls > .row.filters{margin-left:auto}
     .controls > .row.filters .ctrl{min-width:108px}
+    .controls > .row.filters .ctrl.is-active{
+      border-color:color-mix(in srgb, var(--primary) 48%, var(--line));
+      background:color-mix(in srgb, var(--primary) 8%, var(--surface));
+      box-shadow:0 0 0 2px color-mix(in srgb, var(--primary) 14%, transparent);
+    }
+    .controls > .row.filters.has-active{
+      padding:4px;
+      border-radius:11px;
+      background:color-mix(in srgb, var(--primary) 6%, transparent);
+      box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--primary) 30%, var(--line));
+    }
+    .filter-active-note{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      height:32px;
+      padding:0 10px;
+      border-radius:999px;
+      border:1px solid color-mix(in srgb, var(--warn) 38%, var(--line));
+      background:color-mix(in srgb, var(--warn) 10%, var(--surface));
+      color:color-mix(in srgb, var(--warn) 74%, var(--text));
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.2px;
+      white-space:nowrap;
+    }
+    .filter-active-note .dot{
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:var(--warn);
+      box-shadow:0 0 0 0 color-mix(in srgb, var(--warn) 65%, transparent);
+      animation:filter-active-pulse 1.55s ease-out infinite;
+      flex:0 0 auto;
+    }
+    .filter-active-note .txt{line-height:1;}
+    .filter-active-note .icon{
+      display:none;
+      width:16px;
+      height:16px;
+      align-items:center;
+      justify-content:center;
+      flex:0 0 auto;
+      font-size:12px;
+      line-height:1;
+    }
+    .filter-active-note .count{
+      display:none;
+      align-items:center;
+      justify-content:center;
+      min-width:16px;
+      height:16px;
+      padding:0 4px;
+      border-radius:999px;
+      font-size:10px;
+      font-weight:900;
+      line-height:1;
+      border:1px solid color-mix(in srgb, var(--warn) 46%, var(--line));
+      background:color-mix(in srgb, var(--warn) 18%, var(--surface));
+      color:color-mix(in srgb, var(--warn) 85%, var(--text));
+    }
+    @keyframes filter-active-pulse{
+      0%{box-shadow:0 0 0 0 color-mix(in srgb, var(--warn) 52%, transparent)}
+      70%{box-shadow:0 0 0 7px color-mix(in srgb, var(--warn) 0%, transparent)}
+      100%{box-shadow:0 0 0 0 color-mix(in srgb, var(--warn) 0%, transparent)}
+    }
     .seg{
       display:inline-flex;gap:4px;padding:4px;
       border:1px solid var(--line);border-radius:999px;background:var(--surface);
@@ -1810,6 +1876,7 @@
       .controls{align-items:center}
       .controls > .row{width:auto}
       .controls > .row.filters .ctrl{flex:0 0 auto;min-width:100px}
+      .controls > .row.filters .filter-active-note{padding:0 9px}
       .ctrl.search{min-width:130px;width:140px}
       .day-grid{min-width:760px}
       .week{min-width:920px}
@@ -1817,6 +1884,39 @@
       .road-row{grid-template-columns:210px 1fr}
     }
     @media (max-width:860px){
+      /* Indicador compacto de filtros en móvil */
+      .controls > .row.filters .filter-active-note{
+        order:-1;
+        margin-right:2px;
+        height:32px;
+        min-width:32px;
+        width:32px;
+        padding:0;
+        justify-content:center;
+        position:sticky;
+        left:0;
+        z-index:5;
+        border-radius:999px;
+        box-shadow:0 0 0 1px color-mix(in srgb, var(--warn) 24%, var(--line));
+      }
+      .controls > .row.filters .filter-active-note .dot,
+      .controls > .row.filters .filter-active-note .txt{
+        display:none !important;
+      }
+      .controls > .row.filters .filter-active-note .icon{
+        display:inline-flex !important;
+        font-size:13px;
+      }
+      .controls > .row.filters .filter-active-note .count{
+        display:inline-flex;
+        position:absolute;
+        top:-4px;
+        right:-4px;
+      }
+      .controls > .row.filters .filter-active-note[data-count="0"] .count{
+        display:none !important;
+      }
+
       .top{padding:12px}
       .actions{
         width:100%;
@@ -1872,6 +1972,7 @@
     @media (max-width:560px){
       .app{padding:0 8px 14px}
       .controls{margin:0 10px 10px}
+      .controls > .row.filters .filter-active-note{height:30px;font-size:10px;padding:0 8px}
       .kpi-band,.split{margin:0 10px 10px}
       .title{font-size:18px}
       .subtitle{font-size:11px}
@@ -3416,21 +3517,19 @@
 
 
 
-  <style id="mobile-controls-sticky-v3">
-  /* v3 - Móvil: mantener TODA la barra de controls siempre visible al desplazar */
-  @media (max-width: 860px){
-    .controls,
-    .panel > .controls,
-    .controls.sticky,
-    .controls.is-sticky,
-    .controls.fixed{
-      position: -webkit-sticky !important;
-        position: sticky !important;
-      top: 0 !important;
-      z-index: 40 !important;
-      background: var(--surface-2) !important;
-      box-shadow: 0 2px 10px rgba(2,8,23,.08);
-    }
+  <style id="controls-sticky-v4">
+  /* v4 - Móvil + Escritorio: mantener TODA la barra de controls siempre visible al desplazar */
+  .controls,
+  .panel > .controls,
+  .controls.sticky,
+  .controls.is-sticky,
+  .controls.fixed{
+    position: -webkit-sticky !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 40 !important;
+    background: var(--surface-2) !important;
+    box-shadow: 0 2px 10px rgba(2,8,23,.08);
   }
 </style>
 
@@ -3477,12 +3576,18 @@
             </div>
           </div>
         </div>
-        <div class="row filters">
+        <div class="row filters" id="mainFiltersRow">
           <select class="ctrl" id="fOwner"><option value="">Responsable</option></select>
           <select class="ctrl" id="fClient"><option value="">Equipo</option></select>
           <select class="ctrl" id="fStatus"><option value="">Estatus</option></select>
           <select class="ctrl" id="fPriority"><option value="">Prioridad</option></select>
           <input class="ctrl search" id="fSearch" placeholder="Buscar..." />
+          <div class="filter-active-note hidden" id="activeFiltersNote" role="status" aria-live="polite" title="">
+            <span class="icon" aria-hidden="true"><i class="fa-solid fa-filter"></i></span>
+            <span class="dot" aria-hidden="true"></span>
+            <span class="txt" id="activeFiltersNoteText">Filtros activos</span>
+            <span class="count hidden" id="activeFiltersNoteCount" aria-hidden="true">0</span>
+          </div>
         </div>
       </div>
 
@@ -9334,6 +9439,68 @@ function buildDaySummaryText(dayISO=ui.date){
     });
   }
 
+  function getMainActiveFilters(){
+    const f = ui.filters || {};
+    const active = [];
+    if(String(f.owner || '').trim()) active.push('Responsable');
+    if(String(f.client || '').trim()) active.push('Equipo');
+    if(String(f.status || '').trim()) active.push('Estatus');
+    if(String(f.priority || '').trim()) active.push('Prioridad');
+    if(String(f.q || '').trim()) active.push('Búsqueda');
+    return active;
+  }
+
+  function updateMainFiltersIndicator(){
+    const row = $('mainFiltersRow') || document.querySelector('.controls > .row.filters');
+    const note = $('activeFiltersNote');
+    const noteText = $('activeFiltersNoteText');
+    const noteCount = $('activeFiltersNoteCount');
+
+    const binding = [
+      ['fOwner','owner'],
+      ['fClient','client'],
+      ['fStatus','status'],
+      ['fPriority','priority'],
+      ['fSearch','q']
+    ];
+
+    const active = getMainActiveFilters();
+    const hasActive = active.length > 0;
+
+    binding.forEach(([id,key])=>{
+      const el = $(id);
+      if(!el) return;
+      const value = String((ui.filters || {})[key] || '').trim();
+      el.classList.toggle('is-active', value.length > 0);
+    });
+
+    if(row) row.classList.toggle('has-active', hasActive);
+
+    if(note && noteText){
+      note.classList.toggle('hidden', !hasActive);
+      if(hasActive){
+        const n = active.length;
+        noteText.textContent = `${n} filtro${n>1?'s':''} activo${n>1?'s':''}`;
+        note.title = `Filtros activos: ${active.join(' · ')}`;
+        note.dataset.count = String(n);
+        note.setAttribute('aria-label', `${n} filtro${n>1?'s':''} activo${n>1?'s':''}`);
+        if(noteCount){
+          noteCount.classList.remove('hidden');
+          noteCount.textContent = String(n);
+        }
+      }else{
+        noteText.textContent = 'Sin filtros';
+        note.title = '';
+        note.dataset.count = '0';
+        note.removeAttribute('aria-label');
+        if(noteCount){
+          noteCount.textContent = '0';
+          noteCount.classList.add('hidden');
+        }
+      }
+    }
+  }
+
   function renderHeaderControls(){
     document.querySelectorAll('#segView [data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === ui.view));
     document.querySelectorAll('#segRoadmapZoom [data-rz]').forEach(b => b.classList.toggle('active', b.dataset.rz === (ui.roadmapZoom || 'month')));
@@ -9360,6 +9527,7 @@ function buildDaySummaryText(dayISO=ui.date){
       .join('');
 
     $('fSearch').value = ui.filters.q || '';
+    updateMainFiltersIndicator();
   }
 
   function getKpiRangeByView(view = ui.view, refDate = ui.date){
