@@ -14492,130 +14492,393 @@ function buildDaySummaryText(dayISO=ui.date){
 
   </script>
 
-  <!-- TreasuryHub GPT Chat Widget -->
-  <style id="thchat-style">
-    #thchat-open{
-      position:fixed; right:18px; bottom:18px; z-index:2147483000;
-      border:none; border-radius:999px; padding:11px 15px; cursor:pointer;
-      font-weight:800; font-size:12px; letter-spacing:.02em; text-transform:uppercase;
-      background:linear-gradient(135deg,#376fff,#6e8dff); color:#fff;
-      box-shadow:0 8px 28px rgba(0,0,0,.28);
+  
+  <!-- TreasuryHub GPT Chat Widget - Premium UX -->
+  <style id="thx-style">
+    :root{
+      --thx-bg:#051c2c;
+      --thx-bg-2:#0a2438;
+      --thx-panel:rgba(10,24,40,.88);
+      --thx-border:rgba(117,151,196,.28);
+      --thx-text:#eaf2ff;
+      --thx-muted:#9cb3cf;
+      --thx-user1:#376fff;
+      --thx-user2:#5d84ff;
+      --thx-accent:#8b0bff;
+      --thx-success:#26d07c;
+      --thx-shadow:0 16px 42px rgba(2,8,18,.45);
+      --thx-radius:16px;
+      --thx-z:2147483000;
     }
-    #thchat-panel{
-      position:fixed; right:18px; bottom:68px; z-index:2147483000;
-      width:360px; max-width:calc(100vw - 24px); height:560px; max-height:74vh;
-      background:#0d1f31; color:#eaf2ff; border:1px solid rgba(117,151,196,.3);
-      border-radius:14px; box-shadow:0 16px 44px rgba(0,0,0,.45);
+
+    #thx-launch{
+      position:fixed; right:18px; bottom:18px; z-index:var(--thx-z);
+      border:none; border-radius:999px; padding:12px 15px; cursor:pointer;
+      display:flex; align-items:center; gap:10px;
+      color:#fff;
+      background:
+        radial-gradient(120% 150% at 10% 0%, rgba(139,11,255,.35), transparent 45%),
+        linear-gradient(135deg, #2f66ff 0%, #2c56c7 55%, #4a2eb8 100%);
+      box-shadow:0 10px 26px rgba(21,58,180,.45), inset 0 0 0 1px rgba(255,255,255,.2);
+      font:700 12px/1.1 Manrope, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      letter-spacing:.03em; text-transform:uppercase;
+      transition:transform .2s ease, box-shadow .2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #thx-launch:hover{ transform:translateY(-1px); box-shadow:0 14px 30px rgba(21,58,180,.52), inset 0 0 0 1px rgba(255,255,255,.25); }
+    #thx-launch:active{ transform:translateY(0); }
+    #thx-launch .thx-dot{
+      width:8px; height:8px; border-radius:50%; background:var(--thx-success);
+      box-shadow:0 0 0 0 rgba(38,208,124,.7);
+      animation:thxPulse 1.8s infinite;
+    }
+    #thx-launch .thx-badge{
+      min-width:18px; height:18px; border-radius:10px; padding:0 6px;
+      display:none; align-items:center; justify-content:center;
+      background:#ff4d67; color:#fff; font-size:10px; font-weight:800;
+      box-shadow:0 4px 10px rgba(255,77,103,.45);
+    }
+
+    #thx-panel{
+      position:fixed; right:18px; bottom:70px; z-index:var(--thx-z);
+      width:380px; max-width:calc(100vw - 24px); height:640px; max-height:78vh;
       display:none; flex-direction:column; overflow:hidden;
-      backdrop-filter: blur(5px);
+      border-radius:var(--thx-radius);
+      color:var(--thx-text);
+      background:
+        radial-gradient(1200px 450px at 100% -120px, rgba(55,111,255,.17), transparent 52%),
+        linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.01)),
+        var(--thx-panel);
+      border:1px solid var(--thx-border);
+      box-shadow:var(--thx-shadow);
+      backdrop-filter: blur(10px);
+      transform-origin: bottom right;
+      animation:thxIn .2s ease;
+      font-family:Manrope, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
     }
-    #thchat-head{
-      display:flex; align-items:center; justify-content:space-between; gap:8px;
-      padding:10px 12px; border-bottom:1px solid rgba(117,151,196,.25);
-      background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.01));
+
+    #thx-head{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:8px;
+      padding:12px 12px 10px;
+      border-bottom:1px solid rgba(156,179,207,.2);
     }
-    #thchat-title{font-weight:800; font-size:13px; letter-spacing:.02em;}
-    #thchat-sub{font-size:11px; opacity:.82;}
-    #thchat-actions{display:flex; gap:6px; align-items:center;}
-    .thchat-btn-mini{
-      border:1px solid rgba(117,151,196,.35); background:rgba(255,255,255,.04);
-      color:#eaf2ff; border-radius:8px; padding:5px 7px; font-size:11px; cursor:pointer;
+    .thx-brand{display:flex; align-items:center; gap:10px; min-width:0;}
+    .thx-logo{
+      width:28px; height:28px; border-radius:8px; flex:none;
+      display:grid; place-items:center;
+      background:
+        linear-gradient(145deg, rgba(55,111,255,.95), rgba(139,11,255,.95));
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.25), 0 6px 14px rgba(21,58,180,.4);
+      font-weight:900; font-size:12px; letter-spacing:.03em;
     }
-    #thchat-log{
+    .thx-title{font-weight:800; font-size:13px; letter-spacing:.02em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+    .thx-sub{display:flex; align-items:center; gap:6px; color:var(--thx-muted); font-size:11px; margin-top:1px;}
+    .thx-sub .thx-status{
+      width:7px; height:7px; border-radius:50%; background:#9aa7b8;
+      box-shadow:0 0 0 0 rgba(38,208,124,.65);
+      transition:background .25s ease;
+    }
+    .thx-sub.online .thx-status{ background:var(--thx-success); animation:thxPulse 1.8s infinite; }
+
+    .thx-actions{display:flex; align-items:center; gap:6px;}
+    .thx-ico{
+      border:1px solid rgba(156,179,207,.35);
+      background:rgba(255,255,255,.04); color:#dce8ff;
+      border-radius:10px; width:30px; height:30px; cursor:pointer;
+      font-size:13px; display:grid; place-items:center;
+      transition:all .16s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .thx-ico:hover{ background:rgba(255,255,255,.10); }
+    .thx-ico:active{ transform:scale(.97); }
+
+    #thx-log{
       flex:1; overflow:auto; padding:12px; display:flex; flex-direction:column; gap:10px;
-      background:radial-gradient(1200px 500px at 100% -200px, rgba(55,111,255,.15), transparent 50%);
+      scrollbar-width:thin;
     }
-    .thchat-msg{max-width:92%; padding:9px 10px; border-radius:10px; line-height:1.35; white-space:pre-wrap; word-break:break-word;}
-    .thchat-user{align-self:flex-end; background:rgba(55,111,255,.25); border:1px solid rgba(116,157,255,.45);}
-    .thchat-ai{align-self:flex-start; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14);}
-    .thchat-meta{font-size:10px; opacity:.7; margin-bottom:4px;}
-    #thchat-diagnostic{
-      padding:7px 10px; font-size:11px; border-top:1px dashed rgba(117,151,196,.28);
-      background:rgba(255,255,255,.03); color:#d7e7ff; display:none; white-space:pre-wrap;
+    #thx-log::-webkit-scrollbar{width:8px}
+    #thx-log::-webkit-scrollbar-thumb{background:rgba(156,179,207,.35); border-radius:999px}
+
+    .thx-day{
+      margin:2px auto 4px; font-size:10px; color:var(--thx-muted);
+      background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.09);
+      border-radius:999px; padding:3px 8px;
     }
-    #thchat-input-wrap{
-      display:flex; gap:8px; padding:10px; border-top:1px solid rgba(117,151,196,.25);
+
+    .thx-msg{
+      max-width:90%;
+      border-radius:14px;
+      padding:9px 11px;
+      line-height:1.38;
+      word-break:break-word;
+      white-space:pre-wrap;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
+      animation:thxMsgIn .16s ease;
+    }
+    .thx-ai{
+      align-self:flex-start;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .thx-user{
+      align-self:flex-end;
+      background:linear-gradient(135deg, rgba(55,111,255,.35), rgba(93,132,255,.28));
+      border:1px solid rgba(114,154,255,.5);
+    }
+    .thx-meta{
+      display:flex; align-items:center; gap:6px; margin-bottom:4px;
+      font-size:10px; color:#c3d6f2;
+    }
+    .thx-meta .sep{opacity:.45}
+
+    .thx-typing{
+      align-self:flex-start;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:12px; padding:8px 10px; width:58px;
+      display:flex; justify-content:center; gap:5px;
+    }
+    .thx-typing span{
+      width:6px; height:6px; border-radius:50%; background:#b9c8de;
+      animation:thxTyping 1s infinite ease-in-out;
+    }
+    .thx-typing span:nth-child(2){ animation-delay:.15s; }
+    .thx-typing span:nth-child(3){ animation-delay:.3s; }
+
+    #thx-chips{
+      display:flex; flex-wrap:wrap; gap:7px;
+      padding:0 12px 10px;
+      border-top:1px dashed rgba(156,179,207,.22);
+      margin-top:2px;
+    }
+    .thx-chip{
+      border:1px solid rgba(117,151,196,.35);
+      background:rgba(255,255,255,.04);
+      color:#dce8ff;
+      border-radius:999px;
+      padding:6px 9px;
+      font-size:11px;
+      cursor:pointer;
+      transition:all .16s ease;
+    }
+    .thx-chip:hover{ background:rgba(255,255,255,.09); border-color:rgba(117,151,196,.6); }
+    .thx-chip:active{ transform:scale(.98); }
+
+    #thx-input-wrap{
+      padding:10px;
+      border-top:1px solid rgba(156,179,207,.24);
       background:rgba(255,255,255,.02);
+      display:grid; grid-template-columns:1fr auto; gap:8px; align-items:end;
     }
-    #thchat-input{
-      flex:1; min-width:0; border:1px solid rgba(117,151,196,.38); outline:none;
-      background:rgba(255,255,255,.06); color:#f2f7ff; border-radius:9px; padding:10px 11px;
-      font-size:14px;
+    #thx-input{
+      resize:none; width:100%; min-height:42px; max-height:132px;
+      border:1px solid rgba(117,151,196,.42);
+      background:rgba(255,255,255,.06);
+      color:#f3f8ff; border-radius:12px;
+      outline:none; padding:10px 11px;
+      font:600 14px/1.35 Manrope, system-ui, sans-serif;
     }
-    #thchat-send{
-      border:none; border-radius:9px; cursor:pointer; padding:0 12px; font-weight:700;
-      background:#376fff; color:#fff; min-width:72px;
+    #thx-input::placeholder{color:#b7c7de}
+    #thx-send{
+      border:none; border-radius:12px;
+      padding:11px 14px; min-width:88px;
+      font:800 12px/1 Manrope, system-ui, sans-serif;
+      letter-spacing:.03em; text-transform:uppercase; cursor:pointer;
+      color:#fff;
+      background:
+        radial-gradient(120% 150% at 10% 0%, rgba(139,11,255,.32), transparent 45%),
+        linear-gradient(135deg, #376fff 0%, #2e63e7 60%, #4b4bff 100%);
+      box-shadow:0 8px 22px rgba(32,70,190,.35);
+      transition:transform .15s ease, opacity .15s ease;
     }
-    #thchat-send[disabled]{opacity:.6; cursor:not-allowed;}
-    @media (max-width: 768px){
-      #thchat-panel{right:8px; bottom:58px; width:calc(100vw - 16px); height:70vh; border-radius:12px;}
-      #thchat-open{right:8px; bottom:10px;}
+    #thx-send:hover{ transform:translateY(-1px); }
+    #thx-send:active{ transform:translateY(0); }
+    #thx-send[disabled]{opacity:.6; cursor:not-allowed; box-shadow:none}
+
+    #thx-tip{
+      padding:7px 12px 10px; color:var(--thx-muted); font-size:10px;
+      border-top:1px dashed rgba(156,179,207,.18);
+    }
+
+    .thx-toast{
+      position:absolute; left:50%; transform:translateX(-50%);
+      bottom:76px; max-width:92%;
+      background:rgba(8,18,30,.92);
+      border:1px solid rgba(156,179,207,.35);
+      color:#dfeaff;
+      font-size:11px; padding:8px 10px; border-radius:10px;
+      box-shadow:0 8px 20px rgba(0,0,0,.35);
+      opacity:0; pointer-events:none; transition:opacity .2s ease, transform .2s ease;
+    }
+    .thx-toast.show{ opacity:1; transform:translateX(-50%) translateY(-2px); }
+
+    @keyframes thxIn{
+      from{ opacity:0; transform:translateY(8px) scale(.985); }
+      to{ opacity:1; transform:translateY(0) scale(1); }
+    }
+    @keyframes thxMsgIn{
+      from{ opacity:.05; transform:translateY(4px); }
+      to{ opacity:1; transform:translateY(0); }
+    }
+    @keyframes thxPulse{
+      0%{ box-shadow:0 0 0 0 rgba(38,208,124,.58); }
+      70%{ box-shadow:0 0 0 8px rgba(38,208,124,0); }
+      100%{ box-shadow:0 0 0 0 rgba(38,208,124,0); }
+    }
+    @keyframes thxTyping{
+      0%,80%,100%{ transform:translateY(0); opacity:.45; }
+      40%{ transform:translateY(-3px); opacity:1; }
+    }
+
+    @media (max-width: 920px){
+      #thx-panel{
+        right:8px; bottom:60px;
+        width:calc(100vw - 16px);
+        height:min(78vh, 680px);
+        max-height:78vh;
+        border-radius:14px;
+      }
+      #thx-launch{ right:8px; bottom:10px; }
+      #thx-log{ padding:10px; }
+      #thx-input-wrap{ padding:8px; }
+    }
+
+    @media (max-width: 560px){
+      #thx-panel{
+        right:0; left:0; margin:0 auto;
+        bottom:0; width:100vw; max-width:100vw;
+        height:78vh; max-height:78vh;
+        border-radius:14px 14px 0 0;
+        border-left:none; border-right:none; border-bottom:none;
+      }
+      #thx-launch{ bottom:8px; right:8px; }
+      #thx-chips{ padding:0 10px 8px; }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *{ animation:none !important; transition:none !important; }
     }
   </style>
 
-  <button id="thchat-open" type="button" aria-label="Abrir chat IA">Chat IA</button>
+  <button id="thx-launch" type="button" aria-label="Abrir asistente IA">
+    <span class="thx-dot" aria-hidden="true"></span>
+    <span>Asistente IA</span>
+    <span class="thx-badge" id="thx-badge">0</span>
+  </button>
 
-  <section id="thchat-panel" role="dialog" aria-label="TreasuryHub Assistant" aria-modal="false">
-    <div id="thchat-head">
-      <div>
-        <div id="thchat-title">TreasuryHub Assistant</div>
-        <div id="thchat-sub">Conectado al Worker</div>
+  <section id="thx-panel" role="dialog" aria-label="TreasuryHub Assistant" aria-modal="false">
+    <header id="thx-head">
+      <div class="thx-brand">
+        <div class="thx-logo" aria-hidden="true">TH</div>
+        <div style="min-width:0;">
+          <div class="thx-title">TreasuryHub Assistant</div>
+          <div class="thx-sub" id="thx-sub"><span class="thx-status"></span><span id="thx-status-text">Conectando...</span></div>
+        </div>
       </div>
-      <div id="thchat-actions">
-        <button class="thchat-btn-mini" id="thchat-health" type="button" title="Probar estado del Worker">Health</button>
-        <button class="thchat-btn-mini" id="thchat-clear" type="button" title="Limpiar conversación">Limpiar</button>
-        <button class="thchat-btn-mini" id="thchat-close" type="button" title="Cerrar">✕</button>
+      <div class="thx-actions">
+        <button class="thx-ico" id="thx-clear" type="button" title="Limpiar chat">↺</button>
+        <button class="thx-ico" id="thx-close" type="button" title="Cerrar">✕</button>
       </div>
+    </header>
+
+    <div id="thx-log" aria-live="polite"></div>
+
+    <div id="thx-chips" aria-label="Sugerencias rápidas">
+      <button class="thx-chip" type="button" data-q="Resumen ejecutivo del día de Tesorería">Resumen del día</button>
+      <button class="thx-chip" type="button" data-q="Explícame el carry de forma simple">Explicar carry</button>
+      <button class="thx-chip" type="button" data-q="Dame 5 KPIs para monitorear FX y Derivados">KPIs FX/Derivados</button>
+      <button class="thx-chip" type="button" data-q="¿Qué riesgos debo vigilar esta semana?">Riesgos semanales</button>
     </div>
 
-    <div id="thchat-log" aria-live="polite"></div>
-    <div id="thchat-diagnostic"></div>
-    <div id="thchat-input-wrap">
-      <input id="thchat-input" type="text" autocomplete="off" placeholder="Escribe tu consulta..." />
-      <button id="thchat-send" type="button">Enviar</button>
+    <div id="thx-input-wrap">
+      <textarea id="thx-input" rows="1" autocomplete="off" placeholder="Escribe tu consulta…"></textarea>
+      <button id="thx-send" type="button">Enviar</button>
     </div>
+    <div id="thx-tip">Enter para enviar • Shift+Enter para salto de línea</div>
+
+    <div class="thx-toast" id="thx-toast"></div>
   </section>
 
-  <script id="thchat-script">
+  <script id="thx-script">
   (() => {
     const workerBase = "https://treasuryhub-chat-api.walter-ch-b.workers.dev";
     const chatUrl = workerBase + "/chat";
     const healthUrl = workerBase + "/health";
 
+    const STORAGE_KEY = "thx_chat_v1";
+    const MAX_MESSAGES = 40;
+
     let previousResponseId = null;
     let sending = false;
+    let unread = 0;
+    let typingEl = null;
 
     const $ = (id) => document.getElementById(id);
-    const openBtn = $("thchat-open");
-    const panel = $("thchat-panel");
-    const closeBtn = $("thchat-close");
-    const clearBtn = $("thchat-clear");
-    const healthBtn = $("thchat-health");
-    const log = $("thchat-log");
-    const diagnostic = $("thchat-diagnostic");
-    const input = $("thchat-input");
-    const sendBtn = $("thchat-send");
+    const launch = $("thx-launch");
+    const badge = $("thx-badge");
+    const panel = $("thx-panel");
+    const closeBtn = $("thx-close");
+    const clearBtn = $("thx-clear");
+    const log = $("thx-log");
+    const chipsWrap = $("thx-chips");
+    const input = $("thx-input");
+    const sendBtn = $("thx-send");
+    const toast = $("thx-toast");
+    const statusText = $("thx-status-text");
+    const statusWrap = $("thx-sub");
 
-    function showDiagnostic(text){
-      diagnostic.style.display = text ? "block" : "none";
-      diagnostic.textContent = text || "";
+    const state = {
+      open: false,
+      messages: []
+    };
+
+    function nowTime(){
+      try{
+        return new Intl.DateTimeFormat("es-PE", { hour: "2-digit", minute: "2-digit" }).format(new Date());
+      }catch(_){ return ""; }
     }
 
-    function appendMessage(role, text){
-      const wrap = document.createElement("div");
-      wrap.className = "thchat-msg " + (role === "Tú" ? "thchat-user" : "thchat-ai");
+    function setUnread(n){
+      unread = Math.max(0, Number(n)||0);
+      if(unread > 0){
+        badge.style.display = "inline-flex";
+        badge.textContent = unread > 99 ? "99+" : String(unread);
+      }else{
+        badge.style.display = "none";
+      }
+    }
 
-      const meta = document.createElement("div");
-      meta.className = "thchat-meta";
-      meta.textContent = role;
+    function showToast(message, ms=2200){
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(showToast._tm);
+      showToast._tm = setTimeout(() => toast.classList.remove("show"), ms);
+    }
 
-      const body = document.createElement("div");
-      body.textContent = text;
+    function isOpen(){
+      return panel.style.display === "flex";
+    }
 
-      wrap.appendChild(meta);
-      wrap.appendChild(body);
-      log.appendChild(wrap);
-      log.scrollTop = log.scrollHeight;
+    function openPanel(){
+      panel.style.display = "flex";
+      state.open = true;
+      setUnread(0);
+      saveState();
+      if(!state.messages.length){
+        pushMessage("Assistant", "¡Hola! Estoy listo para ayudarte con tesorería, ALM, FX, derivados y métricas de gestión.");
+      }
+      setTimeout(() => input.focus(), 40);
+      resizeInput();
+    }
+
+    function closePanel(){
+      panel.style.display = "none";
+      state.open = false;
+      saveState();
+    }
+
+    function togglePanel(){
+      isOpen() ? closePanel() : openPanel();
     }
 
     function setSending(flag){
@@ -14625,29 +14888,154 @@ function buildDaySummaryText(dayISO=ui.date){
       sendBtn.textContent = sending ? "..." : "Enviar";
     }
 
-    async function safeReadJson(response){
-      const text = await response.text();
-      try { return { json: JSON.parse(text), raw: text }; }
-      catch { return { json: null, raw: text }; }
+    function resizeInput(){
+      input.style.height = "auto";
+      const h = Math.min(input.scrollHeight, 132);
+      input.style.height = h + "px";
     }
 
-    async function callHealth(){
-      showDiagnostic("");
-      appendMessage("Assistant", "Probando estado del Worker...");
+    function addDayChipIfNeeded(){
+      const todayLabel = new Intl.DateTimeFormat("es-PE", { day: "2-digit", month: "short" }).format(new Date());
+      const last = log.lastElementChild;
+      if(!last || !last.classList || !last.classList.contains("thx-day")){
+        const d = document.createElement("div");
+        d.className = "thx-day";
+        d.textContent = todayLabel;
+        log.appendChild(d);
+      }
+    }
+
+    function createMessageEl(role, text, timeText){
+      const msg = document.createElement("article");
+      msg.className = "thx-msg " + (role === "Tú" ? "thx-user" : "thx-ai");
+
+      const meta = document.createElement("div");
+      meta.className = "thx-meta";
+      const roleSpan = document.createElement("span");
+      roleSpan.textContent = role;
+      const sep = document.createElement("span");
+      sep.className = "sep";
+      sep.textContent = "•";
+      const time = document.createElement("span");
+      time.textContent = timeText || nowTime();
+      meta.append(roleSpan, sep, time);
+
+      const body = document.createElement("div");
+      body.textContent = text;
+
+      msg.append(meta, body);
+      return msg;
+    }
+
+    function renderAll(){
+      log.innerHTML = "";
+      if(!state.messages.length) return;
+      addDayChipIfNeeded();
+      for(const m of state.messages){
+        log.appendChild(createMessageEl(m.role, m.text, m.time));
+      }
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function pushMessage(role, text, opts={}){
+      const record = {
+        role,
+        text: String(text ?? ""),
+        time: opts.time || nowTime()
+      };
+      state.messages.push(record);
+      if(state.messages.length > MAX_MESSAGES){
+        state.messages = state.messages.slice(-MAX_MESSAGES);
+      }
+
+      if(!log.childElementCount){
+        addDayChipIfNeeded();
+      }
+      log.appendChild(createMessageEl(record.role, record.text, record.time));
+      log.scrollTop = log.scrollHeight;
+      saveState();
+
+      if(role === "Assistant" && !isOpen()){
+        setUnread(unread + 1);
+      }
+    }
+
+    function addTyping(){
+      removeTyping();
+      const wrap = document.createElement("div");
+      wrap.className = "thx-typing";
+      wrap.innerHTML = "<span></span><span></span><span></span>";
+      typingEl = wrap;
+      log.appendChild(wrap);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function removeTyping(){
+      if(typingEl && typingEl.parentNode){
+        typingEl.parentNode.removeChild(typingEl);
+      }
+      typingEl = null;
+    }
+
+    function saveState(){
       try{
-        const r = await fetch(healthUrl, { method: "GET" });
-        const { json, raw } = await safeReadJson(r);
-        if(!r.ok){
-          const msg = `Health falló (HTTP ${r.status}). ${json?.error || raw || "Sin detalle"}`;
-          appendMessage("Assistant", "⚠️ " + msg);
-          showDiagnostic(msg);
-          return;
+        const payload = {
+          open: state.open,
+          messages: state.messages,
+          previousResponseId
+        };
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      }catch(_){}
+    }
+
+    function loadState(){
+      try{
+        const raw = sessionStorage.getItem(STORAGE_KEY);
+        if(!raw) return;
+        const data = JSON.parse(raw);
+        if(Array.isArray(data.messages)) state.messages = data.messages.slice(-MAX_MESSAGES);
+        previousResponseId = data.previousResponseId || null;
+        state.open = !!data.open;
+      }catch(_){}
+    }
+
+    async function safeJson(res){
+      const text = await res.text();
+      try{ return { json: JSON.parse(text), raw: text }; }
+      catch{ return { json: null, raw: text }; }
+    }
+
+    function isPrevNotFound(status, payload){
+      const msg = String(payload?.error || payload?.detail || payload?.raw || "").toLowerCase();
+      return status === 400 && msg.includes("previous response") && msg.includes("not found");
+    }
+
+    async function postChat(message, prevId){
+      const r = await fetch(chatUrl, {
+        method: "POST",
+        headers: { "Content-Type":"application/json" },
+        body: JSON.stringify({ message, previous_response_id: prevId })
+      });
+      const parsed = await safeJson(r);
+      return { r, ...parsed };
+    }
+
+    async function checkHealth(){
+      try{
+        const controller = new AbortController();
+        const tm = setTimeout(()=>controller.abort(), 2800);
+        const r = await fetch(healthUrl, { method:"GET", signal:controller.signal });
+        clearTimeout(tm);
+        if(r.ok){
+          statusText.textContent = "En línea";
+          statusWrap.classList.add("online");
+        }else{
+          statusText.textContent = "Conexión parcial";
+          statusWrap.classList.remove("online");
         }
-        appendMessage("Assistant", "✅ Worker OK: " + (json ? JSON.stringify(json) : raw));
-      }catch(err){
-        const msg = "No se pudo consultar /health. " + (err?.message || String(err));
-        appendMessage("Assistant", "⚠️ " + msg);
-        showDiagnostic(msg);
+      }catch(_){
+        statusText.textContent = "Sin conexión";
+        statusWrap.classList.remove("online");
       }
     }
 
@@ -14655,67 +15043,101 @@ function buildDaySummaryText(dayISO=ui.date){
       const message = (input.value || "").trim();
       if(!message || sending) return;
 
-      appendMessage("Tú", message);
+      pushMessage("Tú", message);
       input.value = "";
-      showDiagnostic("");
+      resizeInput();
       setSending(true);
+      addTyping();
 
       try{
-        const r = await fetch(chatUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message, previous_response_id: previousResponseId })
-        });
+        let attempt = await postChat(message, previousResponseId);
 
-        const { json, raw } = await safeReadJson(r);
+        if(!attempt.r.ok && isPrevNotFound(attempt.r.status, attempt.json || { raw: attempt.raw })){
+          previousResponseId = null;
+          attempt = await postChat(message, null);
+          showToast("Contexto reiniciado automáticamente");
+        }
 
-        if(!r.ok){
-          const backendError = json?.error || json?.detail || raw || "Sin detalle";
-          const msg = `HTTP ${r.status} - ${backendError}`;
-          appendMessage("Assistant", "⚠️ " + msg);
-          showDiagnostic(msg);
+        removeTyping();
+
+        if(!attempt.r.ok){
+          const detail = attempt.json?.error || attempt.json?.detail || attempt.raw || "Sin detalle";
+          pushMessage("Assistant", "No pude responder en este momento. " + detail);
           return;
         }
 
-        const answer = json?.answer || "Sin respuesta.";
-        previousResponseId = json?.response_id || previousResponseId;
-        appendMessage("Assistant", answer);
+        const answer = attempt.json?.answer || "Sin respuesta.";
+        previousResponseId = attempt.json?.response_id || previousResponseId;
+        pushMessage("Assistant", answer);
+
+        if(attempt.json?.context_reset){
+          showToast("Se reinició el contexto de conversación");
+        }
 
       }catch(err){
-        const msg = "Fallo de red/CORS: " + (err?.message || String(err));
-        appendMessage("Assistant", "⚠️ " + msg);
-        showDiagnostic(msg);
+        removeTyping();
+        pushMessage("Assistant", "No pude conectar con el asistente. Verifica conexión e inténtalo otra vez.");
+        showToast("Error de red/CORS");
       }finally{
         setSending(false);
         input.focus();
+        saveState();
       }
     }
 
-    openBtn.addEventListener("click", () => {
-      panel.style.display = panel.style.display === "flex" ? "none" : "flex";
-      if(panel.style.display === "flex"){
-        if(!log.childElementCount){
-          appendMessage("Assistant", "Hola, soy tu asistente. Si algo falla, aquí mostraré el error exacto.");
-        }
-        setTimeout(() => input.focus(), 40);
+    function clearChat(){
+      state.messages = [];
+      previousResponseId = null;
+      saveState();
+      log.innerHTML = "";
+      pushMessage("Assistant", "Conversación reiniciada. ¿En qué te ayudo ahora?");
+      input.focus();
+    }
+
+    function initChips(){
+      chipsWrap.addEventListener("click", (e)=>{
+        const btn = e.target.closest(".thx-chip");
+        if(!btn) return;
+        const q = btn.getAttribute("data-q") || "";
+        input.value = q;
+        resizeInput();
+        input.focus();
+      });
+    }
+
+    // bindings
+    launch.addEventListener("click", togglePanel);
+    closeBtn.addEventListener("click", closePanel);
+    clearBtn.addEventListener("click", clearChat);
+    sendBtn.addEventListener("click", sendMessage);
+
+    input.addEventListener("input", resizeInput);
+    input.addEventListener("keydown", (e)=>{
+      if(e.key === "Enter" && !e.shiftKey){
+        e.preventDefault();
+        sendMessage();
       }
     });
 
-    closeBtn.addEventListener("click", () => panel.style.display = "none");
-    clearBtn.addEventListener("click", () => {
-      log.innerHTML = "";
-      showDiagnostic("");
-      previousResponseId = null;
-      appendMessage("Assistant", "Conversación reiniciada.");
-      input.focus();
-    });
-    healthBtn.addEventListener("click", callHealth);
-    sendBtn.addEventListener("click", sendMessage);
-    input.addEventListener("keydown", (e) => {
-      if(e.key === "Enter") sendMessage();
-    });
+    // boot
+    loadState();
+    renderAll();
+    initChips();
+    checkHealth();
+
+    if(state.open) openPanel();
+    else closePanel();
+
+    if(!state.messages.length){
+      pushMessage("Assistant", "¡Hola! Soy tu asistente de TreasuryHub.");
+      if(!state.open){
+        // keep first greeting without notification badge
+        setUnread(0);
+      }
+    }
   })();
   </script>
+
 
 </body>
 </html>
