@@ -14920,8 +14920,7 @@ function buildDaySummaryText(dayISO=ui.date){
   function parseSSEBlock(block){
     let event = "message";
     let data = "";
-    const lines = block.split("
-");
+    const lines = block.split("\n");
     for(const line of lines){
       if(line.startsWith("event:")) event = line.slice(6).trim();
       else if(line.startsWith("data:")) data += line.slice(5).trimStart();
@@ -14998,9 +14997,7 @@ function buildDaySummaryText(dayISO=ui.date){
       buffer += decoder.decode(value, { stream: true });
 
       let idx;
-      while((idx = buffer.indexOf("
-
-")) !== -1){
+      while((idx = buffer.indexOf("\n\n")) !== -1){
         const block = buffer.slice(0, idx).trim();
         buffer = buffer.slice(idx + 2);
         if(!block) continue;
