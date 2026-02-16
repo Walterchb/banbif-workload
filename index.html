@@ -3762,7 +3762,7 @@
               <select class="ctrl" id="p_leader"></select>
             </div>
             <div>
-              <label class="label">Importancia (1-5)</label>
+              <label class="label">Escala (1-5)</label>
               <input class="ctrl" id="p_importance" type="number" min="1" max="5" step="1" />
             </div>
           </div>
@@ -11225,7 +11225,7 @@ function buildDaySummaryText(dayISO=ui.date){
             <div class="kv"><b>Fechas base</b><span>${esc(fmtDate(p.startDate))} → ${esc(fmtDate(p.endDate))}</span></div>
             <div class="kv"><b>Recurrencia</b><span>${esc(recurrence)}</span></div>
             <div class="kv"><b>Solicitud</b><span>${esc(fmtDate(p.reqDate || p.startDate))}</span></div>
-            <div class="kv"><b>Prioridad</b><span>${esc(p.priority)} · Importancia ${Number(p.importance||3)}/5</span></div>
+            <div class="kv"><b>Prioridad</b><span>${esc(p.priority)} · Escala ${Number(p.importance||3)}/5</span></div>
             <div class="kv"><b>Líder</b><span>${esc(leader)}</span></div>
             <div class="kv"><b>Objetivo</b><span>${esc(p.objective || '—')}</span></div>
             <div class="kv"><b>Entregable</b><span>${esc(p.deliverable || '—')}</span></div>
