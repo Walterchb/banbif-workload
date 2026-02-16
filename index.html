@@ -14492,208 +14492,230 @@ function buildDaySummaryText(dayISO=ui.date){
 
   </script>
 
-  <!-- TH_CHAT_WIDGET_START -->
-  <div id="th-chat-root" aria-live="polite"></div>
-  <script>
-  (function(){
-    if (window.__TH_CHAT_WIDGET_INIT__) return;
-    window.__TH_CHAT_WIDGET_INIT__ = true;
+  <!-- TreasuryHub GPT Chat Widget -->
+  <style id="thchat-style">
+    #thchat-open{
+      position:fixed; right:18px; bottom:18px; z-index:2147483000;
+      border:none; border-radius:999px; padding:11px 15px; cursor:pointer;
+      font-weight:800; font-size:12px; letter-spacing:.02em; text-transform:uppercase;
+      background:linear-gradient(135deg,#376fff,#6e8dff); color:#fff;
+      box-shadow:0 8px 28px rgba(0,0,0,.28);
+    }
+    #thchat-panel{
+      position:fixed; right:18px; bottom:68px; z-index:2147483000;
+      width:360px; max-width:calc(100vw - 24px); height:560px; max-height:74vh;
+      background:#0d1f31; color:#eaf2ff; border:1px solid rgba(117,151,196,.3);
+      border-radius:14px; box-shadow:0 16px 44px rgba(0,0,0,.45);
+      display:none; flex-direction:column; overflow:hidden;
+      backdrop-filter: blur(5px);
+    }
+    #thchat-head{
+      display:flex; align-items:center; justify-content:space-between; gap:8px;
+      padding:10px 12px; border-bottom:1px solid rgba(117,151,196,.25);
+      background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.01));
+    }
+    #thchat-title{font-weight:800; font-size:13px; letter-spacing:.02em;}
+    #thchat-sub{font-size:11px; opacity:.82;}
+    #thchat-actions{display:flex; gap:6px; align-items:center;}
+    .thchat-btn-mini{
+      border:1px solid rgba(117,151,196,.35); background:rgba(255,255,255,.04);
+      color:#eaf2ff; border-radius:8px; padding:5px 7px; font-size:11px; cursor:pointer;
+    }
+    #thchat-log{
+      flex:1; overflow:auto; padding:12px; display:flex; flex-direction:column; gap:10px;
+      background:radial-gradient(1200px 500px at 100% -200px, rgba(55,111,255,.15), transparent 50%);
+    }
+    .thchat-msg{max-width:92%; padding:9px 10px; border-radius:10px; line-height:1.35; white-space:pre-wrap; word-break:break-word;}
+    .thchat-user{align-self:flex-end; background:rgba(55,111,255,.25); border:1px solid rgba(116,157,255,.45);}
+    .thchat-ai{align-self:flex-start; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14);}
+    .thchat-meta{font-size:10px; opacity:.7; margin-bottom:4px;}
+    #thchat-diagnostic{
+      padding:7px 10px; font-size:11px; border-top:1px dashed rgba(117,151,196,.28);
+      background:rgba(255,255,255,.03); color:#d7e7ff; display:none; white-space:pre-wrap;
+    }
+    #thchat-input-wrap{
+      display:flex; gap:8px; padding:10px; border-top:1px solid rgba(117,151,196,.25);
+      background:rgba(255,255,255,.02);
+    }
+    #thchat-input{
+      flex:1; min-width:0; border:1px solid rgba(117,151,196,.38); outline:none;
+      background:rgba(255,255,255,.06); color:#f2f7ff; border-radius:9px; padding:10px 11px;
+      font-size:14px;
+    }
+    #thchat-send{
+      border:none; border-radius:9px; cursor:pointer; padding:0 12px; font-weight:700;
+      background:#376fff; color:#fff; min-width:72px;
+    }
+    #thchat-send[disabled]{opacity:.6; cursor:not-allowed;}
+    @media (max-width: 768px){
+      #thchat-panel{right:8px; bottom:58px; width:calc(100vw - 16px); height:70vh; border-radius:12px;}
+      #thchat-open{right:8px; bottom:10px;}
+    }
+  </style>
 
-    const WORKER_URL = "https://treasuryhub-chat-api.walter-ch-b.workers.dev/chat";
+  <button id="thchat-open" type="button" aria-label="Abrir chat IA">Chat IA</button>
 
-    const css = `
-      #th-chat-launcher{
-        position:fixed;right:18px;bottom:18px;z-index:115;
-        border:1px solid var(--line);background:linear-gradient(135deg,var(--primary),#376fff);color:#fff;
-        border-radius:999px;padding:11px 14px;cursor:pointer;font-weight:800;font-size:12px;
-        box-shadow:0 10px 24px rgba(2,8,23,.25);
-      }
-      #th-chat-launcher:hover{transform:translateY(-1px);filter:brightness(1.03)}
-      #th-chat-panel{
-        position:fixed;right:18px;bottom:68px;z-index:115;
-        width:min(380px,calc(100vw - 20px));
-        height:min(560px,70vh);
-        background:var(--surface);color:var(--text);
-        border:1px solid var(--line);border-radius:8px;box-shadow:0 20px 40px rgba(2,8,23,.30);
-        display:none;grid-template-rows:auto 1fr auto;overflow:hidden;
-      }
-      #th-chat-panel.open{display:grid}
-      #th-chat-head{
-        padding:10px 12px;border-bottom:1px solid var(--line);background:var(--surface-2);
-        display:flex;align-items:center;justify-content:space-between;gap:10px;
-      }
-      #th-chat-head .ttl{display:flex;align-items:center;gap:8px;font-weight:800;font-size:13px}
-      #th-chat-head .dot{
-        width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block;
-        box-shadow:0 0 0 0 rgba(34,197,94,.7);animation:thChatPulse 1.6s infinite;
-      }
-      #th-chat-close{
-        border:1px solid var(--line);background:var(--surface);color:var(--text);height:28px;width:28px;border-radius:6px;cursor:pointer;
-      }
-      #th-chat-log{
-        padding:10px;overflow:auto;background:var(--surface);
-        display:grid;gap:8px;align-content:start;
-      }
-      .th-chat-msg{max-width:92%;border:1px solid var(--line);border-radius:6px;padding:8px 9px;line-height:1.35;font-size:12px;white-space:pre-wrap}
-      .th-chat-msg.user{margin-left:auto;background:color-mix(in srgb, var(--primary) 10%, var(--surface));border-color:color-mix(in srgb, var(--primary) 36%, var(--line))}
-      .th-chat-msg.bot{margin-right:auto;background:var(--surface-2)}
-      .th-chat-meta{margin-top:4px;font-size:10px;color:var(--muted)}
-      #th-chat-inputbar{
-        border-top:1px solid var(--line);padding:8px;background:var(--surface-2);display:grid;grid-template-columns:1fr auto;gap:8px;
-      }
-      #th-chat-input{
-        border:1px solid var(--line);background:var(--surface);color:var(--text);
-        border-radius:6px;padding:9px 10px;font-size:13px;outline:none;
-      }
-      #th-chat-input:focus{border-color:color-mix(in srgb, var(--primary) 45%, var(--line));box-shadow:0 0 0 2px color-mix(in srgb, var(--primary) 16%, transparent)}
-      #th-chat-send{
-        border:none;background:linear-gradient(135deg,var(--primary),#376fff);color:#fff;
-        border-radius:6px;padding:0 12px;font-weight:800;font-size:12px;cursor:pointer;
-      }
-      #th-chat-send[disabled]{opacity:.65;cursor:not-allowed}
-      .th-chat-typing{font-size:11px;color:var(--muted);padding:0 2px 2px}
-      @keyframes thChatPulse{
-        0%{box-shadow:0 0 0 0 rgba(34,197,94,.55)}
-        70%{box-shadow:0 0 0 8px rgba(34,197,94,0)}
-        100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}
-      }
-      @media (max-width:700px){
-        #th-chat-launcher{right:10px;bottom:10px}
-        #th-chat-panel{right:10px;bottom:58px;height:min(70vh,560px);width:calc(100vw - 14px)}
-      }
-    `;
+  <section id="thchat-panel" role="dialog" aria-label="TreasuryHub Assistant" aria-modal="false">
+    <div id="thchat-head">
+      <div>
+        <div id="thchat-title">TreasuryHub Assistant</div>
+        <div id="thchat-sub">Conectado al Worker</div>
+      </div>
+      <div id="thchat-actions">
+        <button class="thchat-btn-mini" id="thchat-health" type="button" title="Probar estado del Worker">Health</button>
+        <button class="thchat-btn-mini" id="thchat-clear" type="button" title="Limpiar conversación">Limpiar</button>
+        <button class="thchat-btn-mini" id="thchat-close" type="button" title="Cerrar">✕</button>
+      </div>
+    </div>
 
-    const style = document.createElement('style');
-    style.id = 'th-chat-style';
-    style.textContent = css;
-    document.head.appendChild(style);
+    <div id="thchat-log" aria-live="polite"></div>
+    <div id="thchat-diagnostic"></div>
+    <div id="thchat-input-wrap">
+      <input id="thchat-input" type="text" autocomplete="off" placeholder="Escribe tu consulta..." />
+      <button id="thchat-send" type="button">Enviar</button>
+    </div>
+  </section>
 
-    const root = document.getElementById('th-chat-root');
-    root.innerHTML = `
-      <button id="th-chat-launcher" type="button" aria-expanded="false" aria-controls="th-chat-panel">
-        <i class="fa-solid fa-robot" style="margin-right:6px"></i>Chat IA
-      </button>
-      <section id="th-chat-panel" role="dialog" aria-label="TreasuryHub Assistant">
-        <header id="th-chat-head">
-          <div class="ttl"><span class="dot"></span> TreasuryHub Assistant</div>
-          <button id="th-chat-close" type="button" aria-label="Cerrar chat">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
-        </header>
-        <div id="th-chat-log"></div>
-        <div id="th-chat-inputbar">
-          <input id="th-chat-input" type="text" placeholder="Escribe tu consulta..." autocomplete="off" />
-          <button id="th-chat-send" type="button">Enviar</button>
-        </div>
-      </section>
-    `;
-
-    const launcher = document.getElementById('th-chat-launcher');
-    const panel = document.getElementById('th-chat-panel');
-    const closeBtn = document.getElementById('th-chat-close');
-    const log = document.getElementById('th-chat-log');
-    const input = document.getElementById('th-chat-input');
-    const send = document.getElementById('th-chat-send');
+  <script id="thchat-script">
+  (() => {
+    const workerBase = "https://treasuryhub-chat-api.walter-ch-b.workers.dev";
+    const chatUrl = workerBase + "/chat";
+    const healthUrl = workerBase + "/health";
 
     let previousResponseId = null;
     let sending = false;
 
-    function nowStamp(){
-      const d = new Date();
-      return d.toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit'});
+    const $ = (id) => document.getElementById(id);
+    const openBtn = $("thchat-open");
+    const panel = $("thchat-panel");
+    const closeBtn = $("thchat-close");
+    const clearBtn = $("thchat-clear");
+    const healthBtn = $("thchat-health");
+    const log = $("thchat-log");
+    const diagnostic = $("thchat-diagnostic");
+    const input = $("thchat-input");
+    const sendBtn = $("thchat-send");
+
+    function showDiagnostic(text){
+      diagnostic.style.display = text ? "block" : "none";
+      diagnostic.textContent = text || "";
     }
 
-    function pushMsg(role, text){
-      const box = document.createElement('div');
-      box.className = `th-chat-msg ${role === 'user' ? 'user' : 'bot'}`;
-      const p = document.createElement('div');
-      p.textContent = text;
-      const meta = document.createElement('div');
-      meta.className = 'th-chat-meta';
-      meta.textContent = `${role === 'user' ? 'Tú' : 'Assistant'} · ${nowStamp()}`;
-      box.appendChild(p);
-      box.appendChild(meta);
-      log.appendChild(box);
+    function appendMessage(role, text){
+      const wrap = document.createElement("div");
+      wrap.className = "thchat-msg " + (role === "Tú" ? "thchat-user" : "thchat-ai");
+
+      const meta = document.createElement("div");
+      meta.className = "thchat-meta";
+      meta.textContent = role;
+
+      const body = document.createElement("div");
+      body.textContent = text;
+
+      wrap.appendChild(meta);
+      wrap.appendChild(body);
+      log.appendChild(wrap);
       log.scrollTop = log.scrollHeight;
     }
 
-    function typing(on){
-      let t = document.getElementById('th-chat-typing');
-      if (on){
-        if (!t){
-          t = document.createElement('div');
-          t.id = 'th-chat-typing';
-          t.className = 'th-chat-typing';
-          t.textContent = 'Escribiendo…';
-          log.appendChild(t);
+    function setSending(flag){
+      sending = !!flag;
+      sendBtn.disabled = sending;
+      input.disabled = sending;
+      sendBtn.textContent = sending ? "..." : "Enviar";
+    }
+
+    async function safeReadJson(response){
+      const text = await response.text();
+      try { return { json: JSON.parse(text), raw: text }; }
+      catch { return { json: null, raw: text }; }
+    }
+
+    async function callHealth(){
+      showDiagnostic("");
+      appendMessage("Assistant", "Probando estado del Worker...");
+      try{
+        const r = await fetch(healthUrl, { method: "GET" });
+        const { json, raw } = await safeReadJson(r);
+        if(!r.ok){
+          const msg = `Health falló (HTTP ${r.status}). ${json?.error || raw || "Sin detalle"}`;
+          appendMessage("Assistant", "⚠️ " + msg);
+          showDiagnostic(msg);
+          return;
         }
-      }else if (t){
-        t.remove();
+        appendMessage("Assistant", "✅ Worker OK: " + (json ? JSON.stringify(json) : raw));
+      }catch(err){
+        const msg = "No se pudo consultar /health. " + (err?.message || String(err));
+        appendMessage("Assistant", "⚠️ " + msg);
+        showDiagnostic(msg);
       }
-      log.scrollTop = log.scrollHeight;
-    }
-
-    function setOpen(open){
-      panel.classList.toggle('open', open);
-      launcher.setAttribute('aria-expanded', open ? 'true' : 'false');
-      if (open) setTimeout(()=>input.focus(), 40);
     }
 
     async function sendMessage(){
-      const msg = (input.value || '').trim();
-      if (!msg || sending) return;
-      sending = true;
-      send.disabled = true;
-      pushMsg('user', msg);
-      input.value = '';
-      typing(true);
+      const message = (input.value || "").trim();
+      if(!message || sending) return;
+
+      appendMessage("Tú", message);
+      input.value = "";
+      showDiagnostic("");
+      setSending(true);
 
       try{
-        const res = await fetch(WORKER_URL, {
-          method: 'POST',
-          mode: 'cors',
-          cache: 'no-store',
-          headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({
-            message: msg,
-            previous_response_id: previousResponseId
-          })
+        const r = await fetch(chatUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message, previous_response_id: previousResponseId })
         });
 
-        const raw = await res.text();
-        let data = {};
-        try { data = raw ? JSON.parse(raw) : {}; } catch(_) { data = { raw }; }
+        const { json, raw } = await safeReadJson(r);
 
-        if (!res.ok) {
-          throw new Error(data?.error || data?.detail || data?.raw || `Error HTTP ${res.status}`);
+        if(!r.ok){
+          const backendError = json?.error || json?.detail || raw || "Sin detalle";
+          const msg = `HTTP ${r.status} - ${backendError}`;
+          appendMessage("Assistant", "⚠️ " + msg);
+          showDiagnostic(msg);
+          return;
         }
 
-        if (data.response_id) previousResponseId = data.response_id;
-        pushMsg('bot', data.answer || data.output_text || 'Sin respuesta.');
+        const answer = json?.answer || "Sin respuesta.";
+        previousResponseId = json?.response_id || previousResponseId;
+        appendMessage("Assistant", answer);
+
       }catch(err){
-        pushMsg('bot', '⚠️ ' + (err?.message || 'No pude conectar con el asistente.'));
-        console.error('[th-chat]', err);
+        const msg = "Fallo de red/CORS: " + (err?.message || String(err));
+        appendMessage("Assistant", "⚠️ " + msg);
+        showDiagnostic(msg);
       }finally{
-        typing(false);
-        sending = false;
-        send.disabled = false;
+        setSending(false);
         input.focus();
       }
     }
 
-    launcher.addEventListener('click', ()=>setOpen(!panel.classList.contains('open')));
-    closeBtn.addEventListener('click', ()=>setOpen(false));
-    send.addEventListener('click', sendMessage);
-    input.addEventListener('keydown', (e)=>{
-      if (e.key === 'Enter') sendMessage();
-      if (e.key === 'Escape') setOpen(false);
+    openBtn.addEventListener("click", () => {
+      panel.style.display = panel.style.display === "flex" ? "none" : "flex";
+      if(panel.style.display === "flex"){
+        if(!log.childElementCount){
+          appendMessage("Assistant", "Hola, soy tu asistente. Si algo falla, aquí mostraré el error exacto.");
+        }
+        setTimeout(() => input.focus(), 40);
+      }
     });
 
-    // saludo inicial
-    pushMsg('bot', 'Hola 👋 Soy tu asistente IA de TreasuryHub. ¿Qué necesitas revisar hoy?');
+    closeBtn.addEventListener("click", () => panel.style.display = "none");
+    clearBtn.addEventListener("click", () => {
+      log.innerHTML = "";
+      showDiagnostic("");
+      previousResponseId = null;
+      appendMessage("Assistant", "Conversación reiniciada.");
+      input.focus();
+    });
+    healthBtn.addEventListener("click", callHealth);
+    sendBtn.addEventListener("click", sendMessage);
+    input.addEventListener("keydown", (e) => {
+      if(e.key === "Enter") sendMessage();
+    });
   })();
   </script>
-  <!-- TH_CHAT_WIDGET_END -->
 
 </body>
 </html>
