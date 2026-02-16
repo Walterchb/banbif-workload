@@ -1,0 +1,406 @@
+[
+  {
+    "id": "hub_identity_001",
+    "title": "Identidad de la plataforma",
+    "text": "La interfaz presenta el encabezado 'Hub | Mercado de Capitales & Control de Gestión' y la marca BIF/TREASURY & GLOBAL MARKETS.",
+    "url": "https://treasuryhub.app/",
+    "tags": [
+      "hub",
+      "identidad",
+      "treasury",
+      "capitales",
+      "control de gestión"
+    ],
+    "updated_at": "2026-02-16"
+  },
+  {
+    "id": "view_nav_001",
+    "title": "Vistas principales",
+    "text": "La navegación principal incluye las vistas: Día, Semana, Mensual, Gantt y Roadmap.",
+    "url": "https://treasuryhub.app/",
+    "tags": [
+      "vistas",
+      "día",
+      "semana",
+      "mensual",
+      "gantt",
+      "roadmap"
+    ],
+    "updated_at": "2026-02-16"
+  },
+  {
+    "id": "controls_001",
+    "title": "Controles globales",
+    "text": "Hay controles visibles como Hoy, Zoom (semanal/anual) y filtros activos.",
+    "url": "https://treasuryhub.app/",
+    "tags": [
+      "controles",
+      "hoy",
+      "zoom",
+      "filtros"
+    ],
+    "updated_at": "2026-02-16"
+  },
+  {
+    "id": "filters_001",
+    "title": "Filtros disponibles",
+    "text": "Se observan filtros por Responsable, Equipo, Estatus y Prioridad.",
+    "url": "https://treasuryhub.app/",
+    "tags": [
+      "filtros",
+      "responsable",
+      "equipo",
+      "estatus",
+      "prioridad"
+    ],
+    "updated_at": "2026-02-16"
+  },
+  {
+    "id": "dashboard_001",
+    "title": "Bloques de resumen",
+    "text": "El tablero muestra componentes como 'Equipo hoy' y 'Radar de prioridades'.",
+    "url": "https://treasuryhub.app/",
+    "tags": [
+      "dashboard",
+      "equipo hoy",
+      "radar",
+      "prioridades"
+    ],
+    "updated_at": "2026-02-16"
+  },
+  {
+    "id": "priority_001",
+    "title": "Niveles de prioridad",
+    "text": "Los niveles de prioridad visibles son Alta, Media y Baja.",
+    "url": "https://treasuryhub.app/",
+    "tags": [
+      "prioridad",
+      "alta",
+      "media",
+      "baja"
+    ],
+    "updated_at": "2026-02-16"
+  },
+  {
+    "id": "access_001",
+    "title": "Módulo de acceso interno",
+    "text": "La pantalla de acceso muestra 'INTERNAL ACCESS · Volt 1.0' junto a títulos de Treasury & Global Markets.",
+    "url": "https://treasuryhub.app/",
+    "tags": [
+      "login",
+      "access",
+      "internal",
+      "seguridad"
+    ],
+    "updated_at": "2026-02-16"
+  },
+  {
+    "id": "cfg_tabs_001",
+    "title": "Pestañas de configuración",
+    "text": "En configuración existen pestañas: Proyectos, Equipo y Bloqueos, Feriados, Notificaciones y Datos.",
+    "url": "https://treasuryhub.app/",
+    "tags": [
+      "configuración",
+      "proyectos",
+      "equipo y bloqueos",
+      "feriados",
+      "notificaciones",
+      "datos"
+    ],
+    "updated_at": "2026-02-16"
+  },
+  {
+    "id": "autosave_001",
+    "title": "Guardado automático",
+    "text": "La interfaz indica funcionalidad de guardado automático.",
+    "url": "https://treasuryhub.app/",
+    "tags": [
+      "guardado",
+      "autosave",
+      "datos"
+    ],
+    "updated_at": "2026-02-16"
+  },
+  {
+    "id": "project_form_001",
+    "title": "Campos generales de proyecto",
+    "text": "El formulario de proyecto incluye nombre, equipo/solicitante, fechas base (inicio y fin), recurrencia, prioridad y responsable.",
+    "url": "https://treasuryhub.app/",
+    "tags": [
+      "proyecto",
+      "formulario",
+      "campos",
+      "fechas",
+      "responsable"
+    ],
+    "updated_at": "2026-02-16"
+  },
+  {
+    "id": "project_form_002",
+    "title": "Campos estratégicos de proyecto",
+    "text": "El formulario incluye objetivo estratégico, alcance/entregable y dependencias/riesgos/notas.",
+    "url": "https://treasuryhub.app/",
+    "tags": [
+      "proyecto",
+      "objetivo",
+      "alcance",
+      "riesgos",
+      "notas"
+    ],
+    "updated_at": "2026-02-16"
+  },
+  {
+    "id": "project_form_003",
+    "title": "Estatus automático y escala",
+    "text": "El proyecto contempla estatus automático, líder/responsable y escala de valoración del 1 al 5.",
+    "url": "https://treasuryhub.app/",
+    "tags": [
+      "estatus",
+      "automático",
+      "líder",
+      "escala"
+    ],
+    "updated_at": "2026-02-16"
+  },
+  {
+    "id": "activities_001",
+    "title": "Gestión de actividades",
+    "text": "Cada proyecto permite agregar actividades con campos: actividad, detalle, inicio, fin, hora inicio, hora fin, finalizado y foco principal.",
+    "url": "https://treasuryhub.app/",
+    "tags": [
+      "actividades",
+      "tareas",
+      "inicio",
+      "fin",
+      "foco"
+    ],
+    "updated_at": "2026-02-16"
+  },
+  {
+    "id": "modal_001",
+    "title": "Acciones de edición",
+    "text": "Los modales de proyecto incluyen acciones como Guardar, Cancelar y Eliminar.",
+    "url": "https://treasuryhub.app/",
+    "tags": [
+      "modal",
+      "guardar",
+      "cancelar",
+      "eliminar"
+    ],
+    "updated_at": "2026-02-16"
+  },
+  {
+    "id": "roadmap_001",
+    "title": "Roadmap y ruta de avance",
+    "text": "El módulo Roadmap incorpora ruta de avance y detalle de pasos por iniciativa.",
+    "url": "https://treasuryhub.app/",
+    "tags": [
+      "roadmap",
+      "ruta de avance",
+      "pasos",
+      "iniciativas"
+    ],
+    "updated_at": "2026-02-16"
+  },
+  {
+    "id": "roadmap_002",
+    "title": "Vista organizacional manual",
+    "text": "En Roadmap se muestra una vista organizacional manual para seguimiento.",
+    "url": "https://treasuryhub.app/",
+    "tags": [
+      "roadmap",
+      "organización",
+      "seguimiento"
+    ],
+    "updated_at": "2026-02-16"
+  },
+  {
+    "id": "notif_001",
+    "title": "Centro de recordatorios",
+    "text": "Existe un centro de recordatorios dentro del módulo de Notificaciones.",
+    "url": "https://treasuryhub.app/",
+    "tags": [
+      "notificaciones",
+      "recordatorios",
+      "alertas"
+    ],
+    "updated_at": "2026-02-16"
+  },
+  {
+    "id": "reports_001",
+    "title": "Reportes a demanda",
+    "text": "Hay funcionalidad para reportes a demanda y opción de copiar reporte.",
+    "url": "https://treasuryhub.app/",
+    "tags": [
+      "reportes",
+      "copiar reporte",
+      "resumen"
+    ],
+    "updated_at": "2026-02-16"
+  },
+  {
+    "id": "replan_001",
+    "title": "Impacto de reprogramación automática",
+    "text": "El sistema muestra un cuadro de impacto de reprogramación con antes, después, cambio y motivo.",
+    "url": "https://treasuryhub.app/",
+    "tags": [
+      "reprogramación",
+      "impacto",
+      "antes",
+      "después",
+      "cambio",
+      "motivo"
+    ],
+    "updated_at": "2026-02-16"
+  },
+  {
+    "id": "week_controls_001",
+    "title": "Navegación semanal",
+    "text": "En la vista semanal hay controles para semana anterior, semana actual y semana siguiente.",
+    "url": "https://treasuryhub.app/",
+    "tags": [
+      "semana",
+      "navegación",
+      "anterior",
+      "actual",
+      "siguiente"
+    ],
+    "updated_at": "2026-02-16"
+  },
+  {
+    "id": "team_001",
+    "title": "Equipo y disponibilidad",
+    "text": "Existe una sección de equipo y bloqueos para gestionar disponibilidad y coordinación.",
+    "url": "https://treasuryhub.app/",
+    "tags": [
+      "equipo",
+      "bloqueos",
+      "disponibilidad"
+    ],
+    "updated_at": "2026-02-16"
+  },
+  {
+    "id": "holidays_001",
+    "title": "Feriados",
+    "text": "La configuración incluye pestaña de feriados para ajustar calendario laboral.",
+    "url": "https://treasuryhub.app/",
+    "tags": [
+      "feriados",
+      "calendario",
+      "laborable"
+    ],
+    "updated_at": "2026-02-16"
+  },
+  {
+    "id": "data_sync_001",
+    "title": "Origen de datos JSON",
+    "text": "La aplicación referencia un JSON remoto en la ruta data/banbif_workload.latest.json.",
+    "url": "https://treasuryhub.app/data/banbif_workload.latest.json",
+    "tags": [
+      "json",
+      "datos",
+      "banbif_workload.latest.json",
+      "sync"
+    ],
+    "updated_at": "2026-02-16"
+  },
+  {
+    "id": "data_sync_002",
+    "title": "Mensaje de sincronización",
+    "text": "La interfaz contempla mensaje de error de sincronización automática desde JSON remoto.",
+    "url": "https://treasuryhub.app/",
+    "tags": [
+      "sincronización",
+      "json remoto",
+      "error"
+    ],
+    "updated_at": "2026-02-16"
+  },
+  {
+    "id": "read_only_001",
+    "title": "Vista de solo lectura",
+    "text": "Existe modalidad de 'Vista de solo lectura' para revisar detalle del proyecto.",
+    "url": "https://treasuryhub.app/",
+    "tags": [
+      "solo lectura",
+      "detalle",
+      "proyecto"
+    ],
+    "updated_at": "2026-02-16"
+  },
+  {
+    "id": "kpi_001",
+    "title": "Bandas KPI",
+    "text": "El tablero usa bandas KPI en distintas vistas para resumir estado operativo y métricas clave.",
+    "url": "https://treasuryhub.app/",
+    "tags": [
+      "kpi",
+      "dashboard",
+      "métricas"
+    ],
+    "updated_at": "2026-02-16"
+  },
+  {
+    "id": "focus_001",
+    "title": "Foco principal de actividad",
+    "text": "Las actividades permiten marcar foco principal para priorizar trabajo crítico.",
+    "url": "https://treasuryhub.app/",
+    "tags": [
+      "foco",
+      "priorización",
+      "actividad"
+    ],
+    "updated_at": "2026-02-16"
+  },
+  {
+    "id": "status_001",
+    "title": "Estatus de proyecto",
+    "text": "El estatus de proyecto se maneja con lógica automática basada en planificación y avance.",
+    "url": "https://treasuryhub.app/",
+    "tags": [
+      "estatus",
+      "avance",
+      "planificación"
+    ],
+    "updated_at": "2026-02-16"
+  },
+  {
+    "id": "ux_001",
+    "title": "Flujo de configuración",
+    "text": "La interfaz combina creación rápida de proyecto (+ Proyecto), edición modal y resumen operativo en tablero.",
+    "url": "https://treasuryhub.app/",
+    "tags": [
+      "ux",
+      "flujo",
+      "configuración",
+      "proyecto"
+    ],
+    "updated_at": "2026-02-16"
+  },
+  {
+    "id": "terminology_001",
+    "title": "Terminología operativa",
+    "text": "La plataforma utiliza terminología de gestión como proyectos, actividades, responsables, prioridad, estatus y roadmap.",
+    "url": "https://treasuryhub.app/",
+    "tags": [
+      "terminología",
+      "proyectos",
+      "actividades",
+      "roadmap"
+    ],
+    "updated_at": "2026-02-16"
+  },
+  {
+    "id": "guardrail_001",
+    "title": "Regla de respuesta del asistente",
+    "text": "Si una pregunta no está sustentada por la base de conocimiento de TreasuryHub, el asistente debe indicarlo explícitamente.",
+    "url": "https://treasuryhub.app/",
+    "tags": [
+      "asistente",
+      "reglas",
+      "alucinación",
+      "fuentes"
+    ],
+    "updated_at": "2026-02-16"
+  }
+]
