@@ -1876,6 +1876,7 @@
       .controls{align-items:center}
       .controls > .row{width:auto}
       .controls > .row.filters .ctrl{flex:0 0 auto;min-width:100px}
+      .controls > .filter-active-note,
       .controls > .row.filters .filter-active-note{padding:0 9px}
       .ctrl.search{min-width:130px;width:140px}
       .day-grid{min-width:760px}
@@ -1885,6 +1886,7 @@
     }
     @media (max-width:860px){
       /* Indicador compacto de filtros en móvil */
+      .controls > .filter-active-note,
       .controls > .row.filters .filter-active-note{
         order:-1;
         margin-right:2px;
@@ -1899,20 +1901,25 @@
         border-radius:999px;
         box-shadow:0 0 0 1px color-mix(in srgb, var(--warn) 24%, var(--line));
       }
+      .controls > .filter-active-note .dot,
+      .controls > .filter-active-note .txt,
       .controls > .row.filters .filter-active-note .dot,
       .controls > .row.filters .filter-active-note .txt{
         display:none !important;
       }
+      .controls > .filter-active-note .icon,
       .controls > .row.filters .filter-active-note .icon{
         display:inline-flex !important;
         font-size:13px;
       }
+      .controls > .filter-active-note .count,
       .controls > .row.filters .filter-active-note .count{
         display:inline-flex;
         position:absolute;
         top:-4px;
         right:-4px;
       }
+      .controls > .filter-active-note[data-count="0"] .count,
       .controls > .row.filters .filter-active-note[data-count="0"] .count{
         display:none !important;
       }
@@ -1972,6 +1979,7 @@
     @media (max-width:560px){
       .app{padding:0 8px 14px}
       .controls{margin:0 10px 10px}
+      .controls > .filter-active-note,
       .controls > .row.filters .filter-active-note{height:30px;font-size:10px;padding:0 8px}
       .kpi-band,.split{margin:0 10px 10px}
       .title{font-size:18px}
@@ -5485,6 +5493,10 @@
     $('fStatus').addEventListener('change',e=>{ ui.filters.status = e.target.value; render(); });
     $('fPriority').addEventListener('change',e=>{ ui.filters.priority = e.target.value; render(); });
     $('fSearch').addEventListener('input',e=>{ ui.filters.q = e.target.value.trim().toLowerCase(); render(); });
+
+    window.addEventListener('resize', ()=>{
+      syncMainFiltersIndicatorPlacement();
+    }, { passive:true });
 
     $('segView').addEventListener('click',e=>{
       const b = e.target.closest('button[data-view]');
@@ -9529,11 +9541,33 @@ function buildDaySummaryText(dayISO=ui.date){
     return active;
   }
 
+  function syncMainFiltersIndicatorPlacement(){
+    const controls = document.querySelector('.controls');
+    const row = $('mainFiltersRow') || document.querySelector('.controls > .row.filters');
+    const note = $('activeFiltersNote');
+    if(!controls || !row || !note) return;
+
+    const isMobileControls = window.matchMedia('(max-width: 860px)').matches;
+
+    if(isMobileControls){
+      if(note.parentElement !== controls || controls.firstElementChild !== note){
+        controls.insertBefore(note, controls.firstElementChild);
+      }
+      return;
+    }
+
+    if(note.parentElement !== row || row.firstElementChild !== note){
+      row.insertBefore(note, row.firstElementChild);
+    }
+  }
+
   function updateMainFiltersIndicator(){
     const row = $('mainFiltersRow') || document.querySelector('.controls > .row.filters');
     const note = $('activeFiltersNote');
     const noteText = $('activeFiltersNoteText');
     const noteCount = $('activeFiltersNoteCount');
+
+    syncMainFiltersIndicatorPlacement();
 
     const binding = [
       ['fOwner','owner'],
