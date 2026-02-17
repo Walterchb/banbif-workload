@@ -2866,6 +2866,170 @@
       border-bottom:1px dashed color-mix(in srgb,var(--line) 75%, transparent);
     }
 
+    #projectOverlay .project-conflict-wrap{
+      margin-top:10px;
+      border:1px solid color-mix(in srgb,var(--line) 84%, transparent);
+      border-radius:10px;
+      background:color-mix(in srgb,var(--surface) 90%, var(--surface-2));
+      padding:10px;
+      display:grid;
+      gap:10px;
+    }
+
+    #projectOverlay .project-conflict-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    #projectOverlay .project-conflict-head h5{
+      margin:0 0 4px;
+      font-size:12px;
+      letter-spacing:.2px;
+      text-transform:uppercase;
+    }
+
+    #projectOverlay .project-conflict-filters{
+      display:grid;
+      gap:4px;
+      min-width:250px;
+      max-width:100%;
+    }
+
+    #projectOverlay .project-conflict-filter-row{
+      display:flex;
+      gap:6px;
+      align-items:center;
+    }
+
+    #projectOverlay .project-conflict-filter-row .ctrl{
+      min-width:150px;
+      flex:1 1 auto;
+    }
+
+    #projectOverlay .project-conflict-summary{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+    }
+
+    #projectOverlay .project-conflict-summary .pill{
+      background:color-mix(in srgb,var(--surface-2) 72%, var(--surface));
+    }
+
+    #projectOverlay .project-conflict-summary .pc-plain{
+      font-size:11.5px;
+      color:var(--muted);
+      padding:3px 0;
+    }
+
+    #projectOverlay .project-conflict-list{
+      display:grid;
+      gap:8px;
+      max-height:220px;
+      overflow:auto;
+      padding-right:2px;
+    }
+
+    #projectOverlay .pc-day{
+      border:1px solid color-mix(in srgb,var(--line) 85%, transparent);
+      border-radius:8px;
+      background:var(--surface);
+      padding:8px;
+      display:grid;
+      gap:8px;
+    }
+
+    #projectOverlay .pc-day.danger{
+      border-color:color-mix(in srgb,var(--danger) 36%, var(--line));
+      background:color-mix(in srgb,var(--danger) 8%, var(--surface));
+    }
+
+    #projectOverlay .pc-day.warn{
+      border-color:color-mix(in srgb,var(--warn) 36%, var(--line));
+      background:color-mix(in srgb,var(--warn) 8%, var(--surface));
+    }
+
+    #projectOverlay .pc-day-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+    }
+
+    #projectOverlay .pc-day-title{
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.15px;
+    }
+
+    #projectOverlay .pc-list{
+      margin:0;
+      padding:0;
+      list-style:none;
+      display:grid;
+      gap:6px;
+    }
+
+    #projectOverlay .pc-item{
+      display:grid;
+      grid-template-columns:8px 1fr;
+      gap:8px;
+      align-items:flex-start;
+      font-size:11.5px;
+      line-height:1.4;
+      padding:6px 0;
+      border-top:1px dashed color-mix(in srgb,var(--line) 65%, transparent);
+    }
+
+    #projectOverlay .pc-item:first-child{
+      border-top:0;
+      padding-top:0;
+    }
+
+    #projectOverlay .pc-item .pc-dot{
+      width:8px;
+      height:8px;
+      border-radius:999px;
+      margin-top:4px;
+      background:var(--muted);
+    }
+
+    #projectOverlay .pc-item.warn .pc-dot{
+      background:var(--warn);
+    }
+
+    #projectOverlay .pc-item.danger .pc-dot{
+      background:var(--danger);
+    }
+
+    #projectOverlay .pc-item-top{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:flex-start;
+      margin-bottom:2px;
+    }
+
+    #projectOverlay .pc-item-top b{
+      font-size:11.5px;
+    }
+
+    #projectOverlay .pc-item-txt{
+      color:var(--text);
+    }
+
+    #projectOverlay .pc-empty{
+      border:1px dashed color-mix(in srgb,var(--line) 75%, transparent);
+      background:var(--surface);
+      border-radius:8px;
+      padding:10px;
+      font-size:11.5px;
+      color:var(--muted);
+    }
+
     @media (max-width:1260px){
       #projectOverlay .modal{width:min(1240px,99vw)}
       #projectOverlay .project-form th,
@@ -3844,6 +4008,24 @@ html[data-theme="dark"] .task.priority-Baja .h{
               <tbody id="activityBody"></tbody>
             </table>
           </div>
+
+          <div class="project-conflict-wrap" id="projectConflictWrap">
+            <div class="project-conflict-head">
+              <div>
+                <h5>Posibles conflictos (en tiempo real)</h5>
+                <p class="small muted">Desagregado por fecha para detectar cruces, bloqueos y sobrecarga antes de guardar.</p>
+              </div>
+              <div class="project-conflict-filters">
+                <label class="small muted" for="projectConflictFilterDate">Filtrar por fecha</label>
+                <div class="project-conflict-filter-row">
+                  <input class="ctrl" type="date" id="projectConflictFilterDate" />
+                  <button class="btn" type="button" id="projectConflictClearDate">Limpiar</button>
+                </div>
+              </div>
+            </div>
+            <div class="project-conflict-summary" id="projectConflictSummary"></div>
+            <div class="project-conflict-list" id="projectConflictList"></div>
+          </div>
         </section>
       </div>
       <div class="m-foot">
@@ -4184,7 +4366,9 @@ html[data-theme="dark"] .task.priority-Baja .h{
     filters: { owner:'', client:'', status:'', priority:'', q:'' },
     lastAdjustedBusinessDates: 0,
     teamWeekOffset: 0,
-    editorPrimaryFocus: false
+    editorPrimaryFocus: false,
+    teamBlockFilterDate: '',
+    teamBlockSort: 'start_asc'
   };
 
   const $ = (id) => document.getElementById(id);
@@ -11576,13 +11760,419 @@ function buildDaySummaryText(dayISO=ui.date){
     $('p_start').onchange = ()=>{
       enforceBusinessDateInput($('p_start'),'Inicio del proyecto');
       refreshProjectAutoStatus();
+      renderProjectConflictPanel();
     };
     $('p_end').onchange = ()=>{
       enforceBusinessDateInput($('p_end'),'Fin del proyecto');
       refreshProjectAutoStatus();
+      renderProjectConflictPanel();
     };
 
+    ensureProjectConflictBindings();
+    if($('projectConflictFilterDate')) $('projectConflictFilterDate').value = '';
+    renderProjectConflictPanel();
     openOverlay('projectOverlay');
+  }
+
+  function ensureProjectConflictBindings(){
+    const dateFilter = $('projectConflictFilterDate');
+    if(dateFilter && !dateFilter.dataset.bound){
+      dateFilter.dataset.bound = '1';
+      dateFilter.addEventListener('change', renderProjectConflictPanel);
+      dateFilter.addEventListener('input', renderProjectConflictPanel);
+    }
+
+    const clearBtn = $('projectConflictClearDate');
+    if(clearBtn && !clearBtn.dataset.bound){
+      clearBtn.dataset.bound = '1';
+      clearBtn.addEventListener('click', ()=>{
+        if(dateFilter) dateFilter.value = '';
+        renderProjectConflictPanel();
+      });
+    }
+  }
+
+  function collectEditorActivitiesDraft(){
+    let pStart = normalizeISO($('p_start')?.value) || todayISO();
+    let pEnd = normalizeISO($('p_end')?.value) || pStart;
+    if(pStart > pEnd) [pStart, pEnd] = [pEnd, pStart];
+
+    const rows = [...($('activityBody')?.querySelectorAll('tr') || [])];
+    const activities = [];
+
+    rows.forEach((tr, idx)=>{
+      const name = String(tr.querySelector('[data-k="name"]')?.value || '').trim();
+      if(!name) return;
+
+      let startDate = normalizeISO(tr.querySelector('[data-k="startDate"]')?.value) || pStart;
+      let endDate = normalizeISO(tr.querySelector('[data-k="endDate"]')?.value) || startDate;
+      if(startDate > endDate) [startDate, endDate] = [endDate, startDate];
+
+      startDate = clampISO(startDate, pStart, pEnd);
+      endDate = clampISO(endDate, pStart, pEnd);
+      if(startDate > endDate) endDate = startDate;
+
+      let startHour = normalizeHHMM(tr.querySelector('[data-k="startHour"]')?.value, '09:00');
+      let endHour = normalizeHHMM(tr.querySelector('[data-k="endHour"]')?.value, '10:00');
+      if(timeToMin(endHour) <= timeToMin(startHour)){
+        endHour = minToHHMM(Math.min(timeToMin(startHour) + 60, 23*60+59));
+      }
+
+      activities.push({
+        id: tr.dataset.id || `draft_${idx+1}`,
+        rowIndex: idx + 1,
+        name,
+        detail: String(tr.querySelector('[data-k="detail"]')?.value || '').trim(),
+        startDate,
+        endDate,
+        startHour,
+        endHour,
+        ownerId: String(tr.querySelector('[data-k="ownerId"]')?.value || $('p_leader')?.value || '').trim(),
+        done: Boolean(tr.querySelector('[data-k="done"]')?.checked)
+      });
+    });
+
+    return { projectStart: pStart, projectEnd: pEnd, activities };
+  }
+
+  function buildProjectConflictReport(){
+    const draft = collectEditorActivitiesDraft();
+    const draftActivities = draft.activities.filter(a=>!a.done && a.ownerId);
+    const dayBuckets = new Map();
+    const summary = {
+      totalItems: 0,
+      days: 0,
+      danger: 0,
+      warn: 0,
+      internalOverlap: 0,
+      externalOverlap: 0,
+      blocked: 0,
+      capacity: 0,
+      outOfShift: 0,
+      duplicate: 0,
+      missingOwner: 0
+    };
+
+    const ensureBucket = (dayISO)=>{
+      if(!dayBuckets.has(dayISO)){
+        dayBuckets.set(dayISO, {
+          dayISO,
+          items: [],
+          dedupe: new Set(),
+          score: 0
+        });
+      }
+      return dayBuckets.get(dayISO);
+    };
+
+    const toneScore = { danger: 3, warn: 2, info: 1 };
+
+    const addConflict = (dayISO, level, category, ownerId, text, dedupeKey) => {
+      if(!dayISO) return;
+      const bucket = ensureBucket(dayISO);
+      const key = String(dedupeKey || `${category}|${ownerId}|${text}|${dayISO}`);
+      if(bucket.dedupe.has(key)) return;
+      bucket.dedupe.add(key);
+
+      const ownerName = findTeam(ownerId)?.name || 'Sin responsable';
+      const tone = (level === 'danger' || level === 'warn') ? level : 'warn';
+
+      bucket.items.push({
+        level: tone,
+        category,
+        ownerName,
+        text: String(text || '')
+      });
+      bucket.score = Math.max(bucket.score, toneScore[tone] || 1);
+
+      summary.totalItems += 1;
+      if(tone === 'danger') summary.danger += 1;
+      if(tone === 'warn') summary.warn += 1;
+
+      if(category === 'Solape interno') summary.internalOverlap += 1;
+      if(category === 'Solape con agenda existente') summary.externalOverlap += 1;
+      if(category === 'Cruce con bloqueo') summary.blocked += 1;
+      if(category === 'Sobrecapacidad diaria') summary.capacity += 1;
+      if(category === 'Fuera de jornada') summary.outOfShift += 1;
+      if(category === 'Posible duplicidad') summary.duplicate += 1;
+      if(category === 'Sin responsable') summary.missingOwner += 1;
+    };
+
+    // Valida responsables faltantes
+    draft.activities.filter(a=>!a.done).forEach(a=>{
+      if(a.ownerId) return;
+      const days = eachBusinessDateBetween(a.startDate, a.endDate);
+      if(!days.length) days.push(a.startDate);
+      days.forEach(day=>{
+        addConflict(
+          day,
+          'warn',
+          'Sin responsable',
+          '',
+          `La actividad «${a.name}» (fila ${a.rowIndex}) no tiene responsable asignado.`,
+          `owner_missing|${a.id}|${day}`
+        );
+      });
+    });
+
+    // Conflictos internos entre actividades del mismo borrador
+    for(let i=0;i<draftActivities.length;i++){
+      const a = draftActivities[i];
+      for(let j=i+1;j<draftActivities.length;j++){
+        const b = draftActivities[j];
+        if(a.ownerId !== b.ownerId) continue;
+        if(!dateRangesOverlap(a.startDate, a.endDate, b.startDate, b.endDate)) continue;
+        if(!timeRangesOverlap(a.startHour, a.endHour, b.startHour, b.endHour)) continue;
+
+        const overlapStart = maxISO(a.startDate, b.startDate);
+        const overlapEnd = minISO(a.endDate, b.endDate);
+        const days = eachBusinessDateBetween(overlapStart, overlapEnd);
+
+        days.forEach(day=>{
+          addConflict(
+            day,
+            'danger',
+            'Solape interno',
+            a.ownerId,
+            `«${a.name}» (fila ${a.rowIndex}) se cruza con «${b.name}» (fila ${b.rowIndex}). Horas: ${a.startHour}-${a.endHour} y ${b.startHour}-${b.endHour}.`,
+            `internal_overlap|${a.id}|${b.id}|${day}`
+          );
+        });
+
+        const normA = String(a.name || '').toLowerCase().replace(/\s+/g,' ').trim();
+        const normB = String(b.name || '').toLowerCase().replace(/\s+/g,' ').trim();
+        const sameTime = a.startDate===b.startDate && a.endDate===b.endDate && a.startHour===b.startHour && a.endHour===b.endHour;
+        const similarName = normA && normB && (normA===normB || normA.includes(normB) || normB.includes(normA));
+
+        if(sameTime && similarName){
+          const dupDays = eachBusinessDateBetween(a.startDate, a.endDate);
+          dupDays.forEach(day=>{
+            addConflict(
+              day,
+              'warn',
+              'Posible duplicidad',
+              a.ownerId,
+              `«${a.name}» y «${b.name}» parecen duplicadas (mismo responsable, fechas y horario).`,
+              `dup_like|${a.id}|${b.id}|${day}`
+            );
+          });
+        }
+      }
+    }
+
+    // Referencias de agenda existente (otros proyectos)
+    const external = [];
+    (state.projects || []).forEach(p=>{
+      if(ui.editingProjectId && String(p?.id || '') === String(ui.editingProjectId)) return;
+      (p.activities || []).forEach(a=>{
+        if(a?.done) return;
+        external.push({
+          projectId: String(p?.id || ''),
+          projectName: String(p?.name || 'Proyecto'),
+          activityId: String(a?.id || ''),
+          activityName: String(a?.name || 'Actividad'),
+          ownerId: String(a?.ownerId || ''),
+          startDate: normalizeISO(a?.startDate) || '',
+          endDate: normalizeISO(a?.endDate) || '',
+          startHour: normalizeHHMM(a?.startHour, '09:00'),
+          endHour: normalizeHHMM(a?.endHour, '10:00')
+        });
+      });
+    });
+
+    // Solapes contra agenda existente
+    draftActivities.forEach(a=>{
+      external.forEach(ex=>{
+        if(!ex.ownerId || ex.ownerId !== a.ownerId) return;
+        if(!dateRangesOverlap(a.startDate, a.endDate, ex.startDate, ex.endDate)) return;
+        if(!timeRangesOverlap(a.startHour, a.endHour, ex.startHour, ex.endHour)) return;
+
+        const overlapStart = maxISO(a.startDate, ex.startDate);
+        const overlapEnd = minISO(a.endDate, ex.endDate);
+        const days = eachBusinessDateBetween(overlapStart, overlapEnd);
+
+        days.forEach(day=>{
+          addConflict(
+            day,
+            'danger',
+            'Solape con agenda existente',
+            a.ownerId,
+            `«${a.name}» se cruza con «${ex.activityName}» (${ex.projectName}) en ${a.startHour}-${a.endHour}.`,
+            `external_overlap|${a.id}|${ex.projectId}|${ex.activityId}|${day}`
+          );
+        });
+      });
+    });
+
+    // Bloqueos y jornada permitida
+    draftActivities.forEach(a=>{
+      const owner = findTeam(a.ownerId);
+      if(!owner) return;
+
+      const sMin = timeToMin(a.startHour);
+      const eMin = timeToMin(a.endHour);
+      const outOfShift = sMin < owner.startHour*60 || eMin > owner.endHour*60;
+
+      const days = eachBusinessDateBetween(a.startDate, a.endDate);
+      days.forEach(day=>{
+        if(outOfShift){
+          addConflict(
+            day,
+            'warn',
+            'Fuera de jornada',
+            a.ownerId,
+            `«${a.name}» (${a.startHour}-${a.endHour}) está fuera de la jornada de ${owner.name} (${String(owner.startHour).padStart(2,'0')}:00-${String(owner.endHour).padStart(2,'0')}:00).`,
+            `shift|${a.id}|${day}`
+          );
+        }
+
+        const overlaps = blockIntervalsForDay(owner, day).filter(iv=>
+          Math.max(iv.startMin, sMin) < Math.min(iv.endMin, eMin)
+        );
+
+        if(overlaps.length){
+          const ranges = overlaps.slice(0,2).map(iv=>`${iv.startHour}-${iv.endHour}`).join(', ');
+          addConflict(
+            day,
+            'danger',
+            'Cruce con bloqueo',
+            a.ownerId,
+            `«${a.name}» cruza un bloqueo de ${owner.name} (${ranges}${overlaps.length>2?', ...':''}).`,
+            `block|${a.id}|${day}|${ranges}`
+          );
+        }
+      });
+    });
+
+    // Sobrecapacidad diaria (solo días tocados por el borrador)
+    const ownerDayLoad = new Map();
+    const pushLoad = (item, sourceType)=>{
+      const ownerId = String(item.ownerId || '').trim();
+      if(!ownerId) return;
+      const owner = findTeam(ownerId);
+      if(!owner) return;
+
+      const spanDays = eachBusinessDateBetween(item.startDate, item.endDate);
+      const duration = durationMinutes(item.startHour, item.endHour);
+      if(duration <= 0) return;
+
+      spanDays.forEach(day=>{
+        const key = `${ownerId}|${day}`;
+        if(!ownerDayLoad.has(key)){
+          ownerDayLoad.set(key, {
+            ownerId,
+            dayISO: day,
+            totalMin: 0,
+            capMin: getDailyCapacityMin(owner, day),
+            hasDraft: false
+          });
+        }
+        const rec = ownerDayLoad.get(key);
+        rec.totalMin += duration;
+        if(sourceType === 'draft') rec.hasDraft = true;
+      });
+    };
+
+    draftActivities.forEach(a=>pushLoad(a, 'draft'));
+    external.forEach(a=>pushLoad(a, 'external'));
+
+    ownerDayLoad.forEach((rec, key)=>{
+      if(!rec.hasDraft) return;
+      if(rec.totalMin <= rec.capMin) return;
+      const owner = findTeam(rec.ownerId);
+      const loadTxt = fmtH(rec.totalMin);
+      const capTxt = fmtH(rec.capMin);
+      addConflict(
+        rec.dayISO,
+        'warn',
+        'Sobrecapacidad diaria',
+        rec.ownerId,
+        `Carga estimada ${loadTxt} vs capacidad ${capTxt} para ${owner?.name || 'responsable'}.`,
+        `capacity|${key}|${rec.totalMin}|${rec.capMin}`
+      );
+    });
+
+    const days = [...dayBuckets.values()]
+      .sort((a,b)=>a.dayISO.localeCompare(b.dayISO))
+      .map(day=>({
+        dayISO: day.dayISO,
+        tone: day.score >= 3 ? 'danger' : 'warn',
+        items: day.items.sort((x,y)=>{
+          const wx = x.level === 'danger' ? 0 : 1;
+          const wy = y.level === 'danger' ? 0 : 1;
+          if(wx !== wy) return wx - wy;
+          return x.category.localeCompare(y.category);
+        })
+      }));
+
+    summary.days = days.length;
+
+    return {
+      analyzed: draftActivities.length,
+      days,
+      summary
+    };
+  }
+
+  function renderProjectConflictPanel(){
+    const summaryEl = $('projectConflictSummary');
+    const listEl = $('projectConflictList');
+    if(!summaryEl || !listEl) return;
+
+    const report = buildProjectConflictReport();
+    const dateFilter = normalizeISO($('projectConflictFilterDate')?.value || '');
+    const days = dateFilter ? report.days.filter(d=>d.dayISO === dateFilter) : report.days;
+
+    if(report.analyzed === 0){
+      summaryEl.innerHTML = `<span class="pc-plain">Agrega al menos una actividad con responsable para activar la vista de conflictos.</span>`;
+      listEl.innerHTML = `<div class="pc-empty">Aquí verás alertas por fecha (ej.: 19/02/2026) para evitar choques y doble trabajo.</div>`;
+      return;
+    }
+
+    const s = report.summary;
+    summaryEl.innerHTML = `
+      <span class="pill">Actividades analizadas: <b>${report.analyzed}</b></span>
+      <span class="pill ${s.days ? (s.danger ? 'danger' : 'warn') : 'ok'}">Fechas con alertas: <b>${s.days}</b></span>
+      <span class="pill ${s.danger ? 'danger':'ok'}">Críticas: <b>${s.danger}</b></span>
+      <span class="pill ${s.warn ? 'warn':'ok'}">Advertencias: <b>${s.warn}</b></span>
+      <span class="pill">Solapes: <b>${s.internalOverlap + s.externalOverlap}</b></span>
+      <span class="pill">Bloqueos: <b>${s.blocked}</b></span>
+      <span class="pill">Sobrecapacidad: <b>${s.capacity}</b></span>
+      ${dateFilter ? `<span class="pill">Filtro: <b>${fmtDate(dateFilter)}</b></span>` : ''}
+    `;
+
+    if(dateFilter && !days.length){
+      listEl.innerHTML = `<div class="pc-empty">No se detectaron conflictos para <b>${esc(fmtDate(dateFilter))}</b>.</div>`;
+      return;
+    }
+
+    if(!days.length){
+      listEl.innerHTML = `<div class="pc-empty">Sin conflictos detectados con la configuración actual. Puedes guardar.</div>`;
+      return;
+    }
+
+    listEl.innerHTML = days.map(day=>`
+      <article class="pc-day ${day.tone}">
+        <div class="pc-day-head">
+          <div class="pc-day-title">${esc(fmtDate(day.dayISO))}</div>
+          <span class="pill ${day.tone === 'danger' ? 'danger':'warn'}">${day.items.length} alerta${day.items.length===1?'':'s'}</span>
+        </div>
+        <ul class="pc-list">
+          ${day.items.map(item=>`
+            <li class="pc-item ${item.level}">
+              <span class="pc-dot" aria-hidden="true"></span>
+              <div class="pc-item-main">
+                <div class="pc-item-top">
+                  <b>${esc(item.category)}</b>
+                  <span class="small muted">${esc(item.ownerName)}</span>
+                </div>
+                <div class="pc-item-txt">${esc(item.text)}</div>
+              </div>
+            </li>
+          `).join('')}
+        </ul>
+      </article>
+    `).join('');
   }
 
   function refreshProjectAutoStatus(){
@@ -11677,6 +12267,7 @@ function buildDaySummaryText(dayISO=ui.date){
     const refresh = () => {
       refreshActivityRowStatus(tr);
       refreshProjectAutoStatus();
+      renderProjectConflictPanel();
     };
 
     const inStartDate = tr.querySelector('[data-k="startDate"]');
@@ -11708,6 +12299,7 @@ function buildDaySummaryText(dayISO=ui.date){
     tr.querySelector('[data-del-row]').addEventListener('click',()=>{
       tr.remove();
       refreshProjectAutoStatus();
+      renderProjectConflictPanel();
     });
 
     tb.appendChild(tr);
@@ -12382,12 +12974,26 @@ function buildDaySummaryText(dayISO=ui.date){
     return byStartAsc() || byName();
   }
 
+    
     function renderManageProjects(options = {}){
     // En móvil, evitar reconstruir todo el panel en cada tecla para no perder foco/teclado.
     const partial = !!options.partial;
     const ref = todayISO();
+
+    if(typeof ui.manageProjectSort !== 'string') ui.manageProjectSort = 'priority_desc';
+    if(typeof ui.manageProjectSearch !== 'string') ui.manageProjectSearch = '';
+    if(typeof ui.manageProjectStatusFilter !== 'string') ui.manageProjectStatusFilter = '';
+    if(typeof ui.manageProjectLeaderFilter !== 'string') ui.manageProjectLeaderFilter = '';
+    if(typeof ui.manageProjectDateFilter !== 'string') ui.manageProjectDateFilter = '';
+
     const sortMode = ui.manageProjectSort || 'priority_desc';
     const searchQuery = String(ui.manageProjectSearch || '').trim().toLowerCase();
+    const statusFilter = String(ui.manageProjectStatusFilter || '').trim();
+    const leaderFilter = String(ui.manageProjectLeaderFilter || '').trim();
+    const dateFilter = normalizeISO(ui.manageProjectDateFilter || '');
+
+    const statusCatalog = [...new Set((state.projects || []).map(p=>projectStatus(p, ref)).filter(Boolean))]
+      .sort((a,b)=>String(a).localeCompare(String(b), APP_LOCALE, { sensitivity:'base' }));
 
     const matchesSearch = (p)=>{
       if(!searchQuery) return true;
@@ -12407,9 +13013,19 @@ function buildDaySummaryText(dayISO=ui.date){
       return haystack.includes(searchQuery);
     };
 
+    const matchesStatus = (p)=>!statusFilter || projectStatus(p,ref) === statusFilter;
+    const matchesLeader = (p)=>!leaderFilter || String(p.leaderId || '') === leaderFilter;
+    const matchesDate = (p)=>{
+      if(!dateFilter) return true;
+      const s = normalizeISO(p.startDate || '');
+      const e = normalizeISO(p.endDate || s || '');
+      if(!s || !e) return false;
+      return dateFilter >= s && dateFilter <= e;
+    };
+
     const filteredProjects = state.projects
       .slice()
-      .filter(matchesSearch)
+      .filter(p=>matchesSearch(p) && matchesStatus(p) && matchesLeader(p) && matchesDate(p))
       .sort((a,b)=>compareManageProject(a,b,sortMode,ref));
 
     const rows = filteredProjects
@@ -12432,10 +13048,16 @@ function buildDaySummaryText(dayISO=ui.date){
 
     const total = state.projects.length;
     const shown = filteredProjects.length;
-    const emptyMessage = searchQuery
-      ? `No se encontraron proyectos para "${esc(ui.manageProjectSearch)}".`
+    const emptyMessage = (searchQuery || statusFilter || leaderFilter || dateFilter)
+      ? 'No hay proyectos para los filtros seleccionados.'
       : 'No hay proyectos.';
 
+    const statusCounts = filteredProjects.reduce((acc,p)=>{
+      const st = projectStatus(p,ref);
+      acc[st] = (acc[st] || 0) + 1;
+      return acc;
+    }, {});
+    const statusStats = statusCatalog.map(st=>`${st}: ${statusCounts[st] || 0}`).join(' · ');
     const metaText = `Portafolio actual ${isAdmin()?'':'· modo lectura'} · Mostrando ${shown} de ${total}`;
 
     const bindManageProjectRowActions = ()=>{
@@ -12456,12 +13078,16 @@ function buildDaySummaryText(dayISO=ui.date){
       }));
     };
 
-    // Render parcial: solo meta + filas (mantiene el input vivo y evita pérdida de foco en móvil).
+    // Render parcial: meta + resumen + filas.
     if(partial && $('manageProjectsTbody')){
       const metaNode = $('manageProjectsMeta');
       if(metaNode) metaNode.textContent = metaText;
+      const statsNode = $('manageProjectsStatusStats');
+      if(statsNode) statsNode.textContent = statusStats ? `Distribución visible · ${statusStats}` : 'Sin proyectos visibles';
       const tbody = $('manageProjectsTbody');
       if(tbody) tbody.innerHTML = rows || `<tr><td colspan="8" class="muted">${emptyMessage}</td></tr>`;
+      const clearBtn = $('manageProjectClearFilters');
+      if(clearBtn) clearBtn.disabled = !(searchQuery || statusFilter || leaderFilter || dateFilter);
       bindManageProjectRowActions();
       return;
     }
@@ -12471,18 +13097,29 @@ function buildDaySummaryText(dayISO=ui.date){
       <div class="row" style="justify-content:space-between;margin-bottom:8px;gap:10px;align-items:center;flex-wrap:wrap">
         <div class="row" style="gap:8px;align-items:center;flex-wrap:wrap">
           <div class="small muted" id="manageProjectsMeta">${metaText}</div>
-          <input class="ctrl" id="manageProjectSearch" type="search" placeholder="Buscar: proyecto, equipo, líder, estado..." value="${esc(ui.manageProjectSearch||'')}" style="min-width:290px" />
-          <select class="ctrl" id="manageProjectSort" title="Ordenar proyectos" style="min-width:230px">
+          <input class="ctrl" id="manageProjectSearch" type="search" placeholder="Buscar: proyecto, equipo, líder, estado..." value="${esc(ui.manageProjectSearch||'')}" style="min-width:260px" />
+          <select class="ctrl" id="manageProjectStatusFilter" title="Filtrar por estado" style="min-width:170px">
+            <option value="">Estado: todos</option>
+            ${statusCatalog.map(st=>`<option value="${esc(st)}" ${statusFilter===st?'selected':''}>${esc(st)}</option>`).join('')}
+          </select>
+          <select class="ctrl" id="manageProjectLeaderFilter" title="Filtrar por líder" style="min-width:180px">
+            <option value="">Líder: todos</option>
+            ${state.team.map(t=>`<option value="${esc(t.id)}" ${leaderFilter===t.id?'selected':''}>${esc(t.name)}</option>`).join('')}
+          </select>
+          <input class="ctrl" id="manageProjectDateFilter" type="date" value="${esc(dateFilter || '')}" title="Filtrar proyectos activos en fecha" />
+          <select class="ctrl" id="manageProjectSort" title="Ordenar proyectos" style="min-width:210px">
             <option value="priority_desc" ${sortMode==='priority_desc'?'selected':''}>Prioridad: Alta → Baja</option>
             <option value="priority_asc" ${sortMode==='priority_asc'?'selected':''}>Prioridad: Baja → Alta</option>
             <option value="start_asc" ${sortMode==='start_asc'?'selected':''}>Inicio: más antiguo → más reciente</option>
             <option value="start_desc" ${sortMode==='start_desc'?'selected':''}>Inicio: más reciente → más antiguo</option>
           </select>
+          <button class="btn" id="manageProjectClearFilters" ${!(searchQuery || statusFilter || leaderFilter || dateFilter)?'disabled':''}>Limpiar</button>
         </div>
         ${isAdmin() ? `<button class="btn primary" id="manageNewProject">+ Nuevo</button>` : ''}
       </div>
-      <div class="table-wrap"><table>
-        <thead><tr><th>Proyecto</th><th>Fechas base</th><th>Recurrencia</th><th>Prioridad</th><th>Estatus</th><th>Líder</th><th>Actividades</th><th>Acciones</th></tr></thead>
+      <div class="small muted" id="manageProjectsStatusStats" style="margin:0 0 8px">${statusStats ? `Distribución visible · ${statusStats}` : 'Sin proyectos visibles'}</div>
+      <div class="table-wrap" style="max-height:420px;overflow:auto"><table>
+        <thead style="position:sticky;top:0;z-index:2;background:var(--surface)"><tr><th>Proyecto</th><th>Fechas base</th><th>Recurrencia</th><th>Prioridad</th><th>Estatus</th><th>Líder</th><th>Actividades</th><th>Acciones</th></tr></thead>
         <tbody id="manageProjectsTbody">${rows || `<tr><td colspan="8" class="muted">${emptyMessage}</td></tr>`}</tbody>
       </table></div>
     `;
@@ -12492,17 +13129,45 @@ function buildDaySummaryText(dayISO=ui.date){
       renderManageProjects({ partial:true });
     });
 
+    $('manageProjectStatusFilter')?.addEventListener('change', e=>{
+      ui.manageProjectStatusFilter = String(e.target.value || '');
+      renderManageProjects({ partial:true });
+    });
+
+    $('manageProjectLeaderFilter')?.addEventListener('change', e=>{
+      ui.manageProjectLeaderFilter = String(e.target.value || '');
+      renderManageProjects({ partial:true });
+    });
+
+    $('manageProjectDateFilter')?.addEventListener('change', e=>{
+      ui.manageProjectDateFilter = normalizeISO(e.target.value || '');
+      renderManageProjects({ partial:true });
+    });
+
     $('manageProjectSort')?.addEventListener('change', e=>{
       ui.manageProjectSort = e.target.value || 'priority_desc';
       renderManageProjects({ partial:true });
+    });
+
+    $('manageProjectClearFilters')?.addEventListener('click', ()=>{
+      ui.manageProjectSearch = '';
+      ui.manageProjectStatusFilter = '';
+      ui.manageProjectLeaderFilter = '';
+      ui.manageProjectDateFilter = '';
+      renderManageProjects();
     });
 
     bindManageProjectRowActions();
   }
 
 
+
+  
   function renderManageRequesters(){
     const disabled = !isAdmin();
+    if(typeof ui.requesterSearch !== 'string') ui.requesterSearch = '';
+    if(typeof ui.requesterSort !== 'string') ui.requesterSort = 'name_asc';
+
     const list = Array.isArray(state.requesterTeams) ? state.requesterTeams : [];
 
     const rows = list.map(rt=>`
@@ -12523,20 +13188,144 @@ function buildDaySummaryText(dayISO=ui.date){
         </div>` : '<span class="small muted">Modo lectura</span>'}
       </div>
 
-      <div class="table-wrap"><table>
-        <thead><tr><th style="width:32%">Equipo solicitante</th><th>Miembros</th><th style="width:120px">Acción</th></tr></thead>
+      <div class="row wrap" style="gap:8px;align-items:flex-end;margin-bottom:8px">
+        <div style="min-width:240px">
+          <label class="label" style="margin-bottom:4px">Buscar equipo o miembro</label>
+          <input class="ctrl" id="requesterSearch" type="search" placeholder="Ej. Riesgo, Biagio..." value="${esc(ui.requesterSearch || '')}" />
+        </div>
+        <div style="min-width:220px">
+          <label class="label" style="margin-bottom:4px">Orden</label>
+          <select class="ctrl" id="requesterSort">
+            <option value="name_asc" ${(ui.requesterSort||'name_asc')==='name_asc'?'selected':''}>Nombre (A-Z)</option>
+            <option value="name_desc" ${(ui.requesterSort||'name_asc')==='name_desc'?'selected':''}>Nombre (Z-A)</option>
+            <option value="members_desc" ${(ui.requesterSort||'name_asc')==='members_desc'?'selected':''}>Más miembros primero</option>
+          </select>
+        </div>
+        <div class="row" style="gap:6px">
+          <button class="btn" id="requesterClearFilters" ${!(ui.requesterSearch || (ui.requesterSort && ui.requesterSort!=='name_asc'))?'disabled':''}>Limpiar</button>
+        </div>
+        <div class="small muted" id="requesterMeta" style="margin-left:auto"></div>
+      </div>
+
+      <div class="table-wrap" style="max-height:380px;overflow:auto"><table>
+        <thead style="position:sticky;top:0;z-index:2;background:var(--surface)"><tr><th style="width:32%">Equipo solicitante</th><th>Miembros</th><th style="width:120px">Acción</th></tr></thead>
         <tbody id="requesterBody">${rows || '<tr><td colspan="3" class="muted">Sin equipos solicitantes. Agrega al menos uno para continuar.</td></tr>'}</tbody>
       </table></div>
     `;
 
-    if(disabled) return;
-
     const body = $('requesterBody');
+    const searchEl = $('requesterSearch');
+    const sortEl = $('requesterSort');
+    const metaEl = $('requesterMeta');
+    const clearBtn = $('requesterClearFilters');
+
     const ensurePlaceholder = ()=>{
       if(!body) return;
       if(body.querySelector('tr[data-rq-row]')) return;
       body.innerHTML = '<tr><td colspan="3" class="muted">Sin equipos solicitantes. Agrega al menos uno para continuar.</td></tr>';
     };
+
+    const syncRequesterRowMeta = (tr)=>{
+      if(!tr || !tr.matches('tr[data-rq-row]')) return;
+      const name = String(tr.querySelector('[data-rq-name]')?.value || '').trim();
+      const membersRaw = String(tr.querySelector('[data-rq-members]')?.value || '');
+      const members = normalizeRequesterMembers(membersRaw);
+      tr.dataset.rqNameText = name.toLowerCase();
+      tr.dataset.rqMembersText = members.join(' ').toLowerCase();
+      tr.dataset.rqMembersCount = String(members.length);
+    };
+
+    const sortRequesterRows = ()=>{
+      if(!body) return;
+      const mode = ui.requesterSort || 'name_asc';
+      const rows = [...body.querySelectorAll('tr[data-rq-row]')];
+      rows.sort((a,b)=>{
+        const an = String(a.dataset.rqNameText || '').toLowerCase();
+        const bn = String(b.dataset.rqNameText || '').toLowerCase();
+        const ac = Number(a.dataset.rqMembersCount || 0);
+        const bc = Number(b.dataset.rqMembersCount || 0);
+        if(mode === 'name_desc') return bn.localeCompare(an);
+        if(mode === 'members_desc') return bc - ac || an.localeCompare(bn);
+        return an.localeCompare(bn);
+      });
+      rows.forEach(r=>body.appendChild(r));
+    };
+
+    const applyRequesterView = ()=>{
+      if(!body) return;
+      const query = String(searchEl?.value || ui.requesterSearch || '').trim().toLowerCase();
+      ui.requesterSearch = query;
+      ui.requesterSort = String(sortEl?.value || ui.requesterSort || 'name_asc');
+
+      const rows = [...body.querySelectorAll('tr[data-rq-row]')];
+      rows.forEach(syncRequesterRowMeta);
+      sortRequesterRows();
+
+      let visible = 0;
+      rows.forEach(tr=>{
+        const hay = `${tr.dataset.rqNameText || ''} | ${tr.dataset.rqMembersText || ''}`;
+        const show = !query || hay.includes(query);
+        tr.style.display = show ? '' : 'none';
+        if(show) visible += 1;
+      });
+
+      const prevEmpty = body.querySelector('tr[data-rq-filter-empty]');
+      if(prevEmpty) prevEmpty.remove();
+      if(rows.length > 0 && visible === 0){
+        const tr = document.createElement('tr');
+        tr.setAttribute('data-rq-filter-empty','1');
+        tr.innerHTML = `<td colspan="3" class="muted">Sin equipos para los filtros seleccionados.</td>`;
+        body.appendChild(tr);
+      }
+
+      if(metaEl){
+        if(rows.length === 0){
+          metaEl.textContent = '0 equipos registrados';
+        }else if(query){
+          metaEl.textContent = `Mostrando ${visible} de ${rows.length} · Filtro activo`;
+        }else{
+          metaEl.textContent = `Mostrando ${visible} de ${rows.length}`;
+        }
+      }
+      if(clearBtn) clearBtn.disabled = !(query || (ui.requesterSort && ui.requesterSort !== 'name_asc'));
+    };
+
+    const bindRequesterRow = (tr)=>{
+      if(!tr || tr.dataset.rqBound === '1') return;
+      tr.dataset.rqBound = '1';
+
+      tr.querySelector('[data-rq-name]')?.addEventListener('input', ()=>{
+        syncRequesterRowMeta(tr);
+        applyRequesterView();
+      });
+      tr.querySelector('[data-rq-members]')?.addEventListener('input', ()=>{
+        syncRequesterRowMeta(tr);
+        applyRequesterView();
+      });
+
+      tr.querySelector('[data-rq-del]')?.addEventListener('click', ()=>{
+        if(disabled) return;
+        tr.remove();
+        ensurePlaceholder();
+        applyRequesterView();
+      });
+    };
+
+    body?.querySelectorAll('tr[data-rq-row]').forEach(bindRequesterRow);
+
+    searchEl?.addEventListener('input', applyRequesterView);
+    sortEl?.addEventListener('change', applyRequesterView);
+    clearBtn?.addEventListener('click', ()=>{
+      if(searchEl) searchEl.value = '';
+      if(sortEl) sortEl.value = 'name_asc';
+      ui.requesterSearch = '';
+      ui.requesterSort = 'name_asc';
+      applyRequesterView();
+    });
+
+    applyRequesterView();
+
+    if(disabled) return;
 
     $('btnRequesterAdd')?.addEventListener('click', ()=>{
       if(!body) return;
@@ -12551,17 +13340,11 @@ function buildDaySummaryText(dayISO=ui.date){
         <td><button class="btn danger" data-rq-del>Eliminar</button></td>
       `;
       body.appendChild(tr);
-
-      tr.querySelector('[data-rq-del]')?.addEventListener('click', ()=>{
-        tr.remove();
-        ensurePlaceholder();
-      });
+      bindRequesterRow(tr);
+      syncRequesterRowMeta(tr);
+      applyRequesterView();
+      tr.querySelector('[data-rq-name]')?.focus();
     });
-
-    $('tab_requesters').querySelectorAll('[data-rq-del]').forEach(btn=>btn.addEventListener('click', ()=>{
-      btn.closest('tr')?.remove();
-      ensurePlaceholder();
-    }));
 
     $('btnRequesterSave')?.addEventListener('click', ()=>{
       const rowsEls = [...$('tab_requesters').querySelectorAll('tr[data-rq-row]')];
@@ -12586,6 +13369,8 @@ function buildDaySummaryText(dayISO=ui.date){
     });
   }
 
+
+
   function refreshRoadmapRowProgress(row){
     if(!row) return;
     const status = row.querySelector('[data-rm-status]')?.value || 'Propuesto';
@@ -12606,10 +13391,17 @@ function buildDaySummaryText(dayISO=ui.date){
     }
   }
 
+  
   function renderManageRoadmap(){
     const disabled = !isAdmin();
     const teamList = Array.isArray(state.team) ? state.team.slice() : [];
     const requesterList = Array.isArray(state.requesterTeams) ? state.requesterTeams.slice() : [];
+
+    if(typeof ui.manageRoadmapSearch !== 'string') ui.manageRoadmapSearch = '';
+    if(typeof ui.manageRoadmapDateFilter !== 'string') ui.manageRoadmapDateFilter = '';
+    if(typeof ui.manageRoadmapStatusFilter !== 'string') ui.manageRoadmapStatusFilter = '';
+    if(typeof ui.manageRoadmapOwnerFilter !== 'string') ui.manageRoadmapOwnerFilter = '';
+    if(typeof ui.manageRoadmapSort !== 'string') ui.manageRoadmapSort = 'date_asc';
 
     const buildOwnerOptions = (selectedId='')=>{
       if(!teamList.length) return '<option value="">Sin usuarios en Equipo</option>';
@@ -12700,9 +13492,49 @@ function buildDaySummaryText(dayISO=ui.date){
         </div>` : '<span class="small muted">Modo lectura</span>'}
       </div>
 
-      <div class="table-wrap rm-table-wrap">
+      <div class="row wrap" style="gap:8px;align-items:flex-end;margin:0 0 8px">
+        <div style="min-width:250px">
+          <label class="label" style="margin-bottom:4px">Buscar iniciativa / notas</label>
+          <input class="ctrl" id="roadmapFilterSearch" type="search" placeholder="Ej. ALM, clasificación, riesgo..." value="${esc(ui.manageRoadmapSearch || '')}" />
+        </div>
+        <div style="min-width:170px">
+          <label class="label" style="margin-bottom:4px">Calendario</label>
+          <input class="ctrl" id="roadmapFilterDate" type="date" value="${esc(normalizeISO(ui.manageRoadmapDateFilter || '') || '')}" />
+        </div>
+        <div style="min-width:180px">
+          <label class="label" style="margin-bottom:4px">Estado</label>
+          <select class="ctrl" id="roadmapFilterStatus">
+            <option value="">Todos</option>
+            ${ROADMAP_STATUSES.map(st=>`<option value="${esc(st)}" ${(ui.manageRoadmapStatusFilter||'')===st?'selected':''}>${esc(st)}</option>`).join('')}
+            <option value="Demorada" ${(ui.manageRoadmapStatusFilter||'')==='Demorada'?'selected':''}>Demorada</option>
+          </select>
+        </div>
+        <div style="min-width:200px">
+          <label class="label" style="margin-bottom:4px">Responsable</label>
+          <select class="ctrl" id="roadmapFilterOwner">
+            <option value="">Todos</option>
+            ${teamList.map(t=>`<option value="${esc(t.id)}" ${(ui.manageRoadmapOwnerFilter||'')===t.id?'selected':''}>${esc(t.name)}</option>`).join('')}
+          </select>
+        </div>
+        <div style="min-width:210px">
+          <label class="label" style="margin-bottom:4px">Orden</label>
+          <select class="ctrl" id="roadmapSortMode">
+            <option value="date_asc" ${(ui.manageRoadmapSort||'date_asc')==='date_asc'?'selected':''}>Fecha: más próxima</option>
+            <option value="date_desc" ${(ui.manageRoadmapSort||'date_asc')==='date_desc'?'selected':''}>Fecha: más lejana</option>
+            <option value="priority_desc" ${(ui.manageRoadmapSort||'date_asc')==='priority_desc'?'selected':''}>Prioridad: Alta → Baja</option>
+            <option value="progress_desc" ${(ui.manageRoadmapSort||'date_asc')==='progress_desc'?'selected':''}>Avance: mayor → menor</option>
+            <option value="title_asc" ${(ui.manageRoadmapSort||'date_asc')==='title_asc'?'selected':''}>Título (A-Z)</option>
+          </select>
+        </div>
+        <div class="row" style="gap:6px">
+          <button class="btn" id="roadmapClearFilters" ${!(ui.manageRoadmapSearch || ui.manageRoadmapDateFilter || ui.manageRoadmapStatusFilter || ui.manageRoadmapOwnerFilter || (ui.manageRoadmapSort && ui.manageRoadmapSort!=='date_asc'))?'disabled':''}>Limpiar</button>
+        </div>
+        <div class="small muted" id="roadmapFilterMeta" style="margin-left:auto"></div>
+      </div>
+
+      <div class="table-wrap rm-table-wrap" style="max-height:460px;overflow:auto">
         <table>
-          <thead>
+          <thead style="position:sticky;top:0;z-index:2;background:var(--surface)">
             <tr>
               <th>Fecha</th>
               <th>Iniciativa + contexto</th>
@@ -12720,16 +13552,198 @@ function buildDaySummaryText(dayISO=ui.date){
       </div>
     `;
 
-    if(disabled) return;
+    const body = $('roadmapRows');
+    const searchEl = $('roadmapFilterSearch');
+    const dateEl = $('roadmapFilterDate');
+    const statusEl = $('roadmapFilterStatus');
+    const ownerEl = $('roadmapFilterOwner');
+    const sortEl = $('roadmapSortMode');
+    const clearBtn = $('roadmapClearFilters');
+    const metaEl = $('roadmapFilterMeta');
 
     const ensurePlaceholder = ()=>{
-      const body = $('roadmapRows');
       if(!body) return;
       if(body.querySelector('tr[data-rm-row]')) return;
       body.innerHTML = '<tr><td colspan="9" class="muted">Sin iniciativas</td></tr>';
     };
 
-    const body = $('roadmapRows');
+    const syncRoadmapRowMeta = (tr)=>{
+      if(!tr || !tr.matches('tr[data-rm-row]')) return;
+      const date = normalizeISO(tr.querySelector('[data-rm-date]')?.value || '');
+      const title = String(tr.querySelector('[data-rm-title]')?.value || '').trim().toLowerCase();
+      const notes = String(tr.querySelector('[data-rm-notes]')?.value || '').trim().toLowerCase();
+      const team = String(tr.querySelector('[data-rm-team]')?.value || '').trim().toLowerCase();
+      const ownerSel = tr.querySelector('[data-rm-owner-id]');
+      const ownerId = String(ownerSel?.value || '').trim();
+      const ownerName = String(ownerSel?.options?.[ownerSel.selectedIndex]?.textContent || '').trim().toLowerCase();
+      const priority = String(tr.querySelector('[data-rm-priority]')?.value || 'Media').trim();
+      const status = String(tr.querySelector('[data-rm-status]')?.value || 'Propuesto').trim();
+      const progress = Number.parseInt(String(tr.querySelector('[data-rm-progress]')?.textContent || '0'), 10) || 0;
+      const delayed = tr.querySelector('[data-rm-progress]')?.classList.contains('late') || false;
+
+      tr.dataset.rmDate = date;
+      tr.dataset.rmTitle = title;
+      tr.dataset.rmNotes = notes;
+      tr.dataset.rmTeam = team;
+      tr.dataset.rmOwnerId = ownerId;
+      tr.dataset.rmOwnerName = ownerName;
+      tr.dataset.rmPriority = priority;
+      tr.dataset.rmStatus = status;
+      tr.dataset.rmProgress = String(progress);
+      tr.dataset.rmDelayed = delayed ? '1' : '0';
+    };
+
+    const sortRoadmapRows = ()=>{
+      if(!body) return;
+      const mode = ui.manageRoadmapSort || 'date_asc';
+      const rows = [...body.querySelectorAll('tr[data-rm-row]')];
+
+      rows.sort((a,b)=>{
+        const ad = String(a.dataset.rmDate || '');
+        const bd = String(b.dataset.rmDate || '');
+        const at = String(a.dataset.rmTitle || '');
+        const bt = String(b.dataset.rmTitle || '');
+        const ap = String(a.dataset.rmPriority || 'Media');
+        const bp = String(b.dataset.rmPriority || 'Media');
+        const apr = Number(a.dataset.rmProgress || 0);
+        const bpr = Number(b.dataset.rmProgress || 0);
+
+        if(mode === 'date_desc') return bd.localeCompare(ad) || at.localeCompare(bt);
+        if(mode === 'priority_desc') return priorityRank(ap) - priorityRank(bp) || ad.localeCompare(bd) || at.localeCompare(bt);
+        if(mode === 'progress_desc') return bpr - apr || ad.localeCompare(bd) || at.localeCompare(bt);
+        if(mode === 'title_asc') return at.localeCompare(bt) || ad.localeCompare(bd);
+        return ad.localeCompare(bd) || at.localeCompare(bt);
+      });
+
+      rows.forEach(r=>body.appendChild(r));
+    };
+
+    const applyRoadmapView = ()=>{
+      if(!body) return;
+      const q = String(searchEl?.value || '').trim().toLowerCase();
+      const filterDate = normalizeISO(dateEl?.value || '');
+      const filterStatus = String(statusEl?.value || '');
+      const filterOwner = String(ownerEl?.value || '');
+      const sortMode = String(sortEl?.value || 'date_asc');
+
+      ui.manageRoadmapSearch = q;
+      ui.manageRoadmapDateFilter = filterDate;
+      ui.manageRoadmapStatusFilter = filterStatus;
+      ui.manageRoadmapOwnerFilter = filterOwner;
+      ui.manageRoadmapSort = sortMode;
+
+      const rows = [...body.querySelectorAll('tr[data-rm-row]')];
+      rows.forEach(syncRoadmapRowMeta);
+      sortRoadmapRows();
+
+      let visible = 0;
+      let delayedVisible = 0;
+      rows.forEach(tr=>{
+        const hay = `${tr.dataset.rmTitle || ''} ${tr.dataset.rmNotes || ''} ${tr.dataset.rmTeam || ''} ${tr.dataset.rmOwnerName || ''}`;
+        const rowDate = tr.dataset.rmDate || '';
+        const rowStatus = tr.dataset.rmStatus || '';
+        const rowOwner = tr.dataset.rmOwnerId || '';
+        const isDelayed = tr.dataset.rmDelayed === '1';
+
+        const matchQ = !q || hay.includes(q);
+        const matchDate = !filterDate || (rowDate && rowDate === filterDate);
+        const matchStatus = !filterStatus || (filterStatus === 'Demorada' ? isDelayed : rowStatus === filterStatus);
+        const matchOwner = !filterOwner || rowOwner === filterOwner;
+
+        const show = matchQ && matchDate && matchStatus && matchOwner;
+        tr.style.display = show ? '' : 'none';
+        if(show){
+          visible += 1;
+          if(isDelayed) delayedVisible += 1;
+        }
+      });
+
+      const prevEmpty = body.querySelector('tr[data-rm-filter-empty]');
+      if(prevEmpty) prevEmpty.remove();
+      if(rows.length > 0 && visible === 0){
+        const tr = document.createElement('tr');
+        tr.setAttribute('data-rm-filter-empty','1');
+        tr.innerHTML = `<td colspan="9" class="muted">Sin iniciativas para los filtros seleccionados.</td>`;
+        body.appendChild(tr);
+      }
+
+      if(metaEl){
+        if(rows.length === 0){
+          metaEl.textContent = '0 iniciativas registradas';
+        }else if(filterDate || filterStatus || filterOwner || q){
+          metaEl.textContent = `Mostrando ${visible} de ${rows.length} · Demoradas visibles: ${delayedVisible}`;
+        }else{
+          metaEl.textContent = `Mostrando ${visible} de ${rows.length} · Demoradas: ${delayedVisible}`;
+        }
+      }
+      if(clearBtn){
+        clearBtn.disabled = !(q || filterDate || filterStatus || filterOwner || sortMode!=='date_asc');
+      }
+    };
+
+    const bindRoadmapRow = (tr)=>{
+      if(!tr || tr.dataset.rmBound === '1') return;
+      tr.dataset.rmBound = '1';
+
+      const stepsEl = tr.querySelector('[data-rm-steps]');
+      const statusElRow = tr.querySelector('[data-rm-status]');
+
+      const refreshAndApply = ()=>{
+        refreshRoadmapRowProgress(tr);
+        syncRoadmapRowMeta(tr);
+        applyRoadmapView();
+      };
+
+      [tr.querySelector('[data-rm-title]'),
+       tr.querySelector('[data-rm-notes]'),
+       tr.querySelector('[data-rm-date]'),
+       tr.querySelector('[data-rm-team]'),
+       tr.querySelector('[data-rm-owner-id]'),
+       tr.querySelector('[data-rm-priority]'),
+       stepsEl,
+       statusElRow].forEach(el=>{
+        if(!el) return;
+        const evt = el.tagName === 'SELECT' || el.type === 'date' ? 'change' : 'input';
+        el.addEventListener(evt, refreshAndApply);
+        if(evt !== 'change') el.addEventListener('change', refreshAndApply);
+      });
+
+      tr.querySelector('[data-rm-del]')?.addEventListener('click', ()=>{
+        if(disabled) return;
+        tr.remove();
+        ensurePlaceholder();
+        applyRoadmapView();
+      });
+    };
+
+    body?.querySelectorAll('tr[data-rm-row]').forEach(tr=>{
+      refreshRoadmapRowProgress(tr);
+      bindRoadmapRow(tr);
+      syncRoadmapRowMeta(tr);
+    });
+
+    searchEl?.addEventListener('input', applyRoadmapView);
+    dateEl?.addEventListener('change', applyRoadmapView);
+    statusEl?.addEventListener('change', applyRoadmapView);
+    ownerEl?.addEventListener('change', applyRoadmapView);
+    sortEl?.addEventListener('change', applyRoadmapView);
+    clearBtn?.addEventListener('click', ()=>{
+      if(searchEl) searchEl.value = '';
+      if(dateEl) dateEl.value = '';
+      if(statusEl) statusEl.value = '';
+      if(ownerEl) ownerEl.value = '';
+      if(sortEl) sortEl.value = 'date_asc';
+      ui.manageRoadmapSearch = '';
+      ui.manageRoadmapDateFilter = '';
+      ui.manageRoadmapStatusFilter = '';
+      ui.manageRoadmapOwnerFilter = '';
+      ui.manageRoadmapSort = 'date_asc';
+      applyRoadmapView();
+    });
+
+    applyRoadmapView();
+
+    if(disabled) return;
 
     $('btnRoadmapAdd')?.addEventListener('click', ()=>{
       if(!body) return;
@@ -12787,38 +13801,11 @@ function buildDaySummaryText(dayISO=ui.date){
         <td><button class="btn danger" data-rm-del>Eliminar</button></td>
       `;
       body.appendChild(tr);
-
-      tr.querySelector('[data-rm-del]')?.addEventListener('click', ()=>{
-        tr.remove();
-        ensurePlaceholder();
-      });
-
+      bindRoadmapRow(tr);
       refreshRoadmapRowProgress(tr);
-    });
-
-    $('tab_roadmap').querySelectorAll('[data-rm-del]').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        btn.closest('tr')?.remove();
-        ensurePlaceholder();
-      });
-    });
-
-    body?.querySelectorAll('tr[data-rm-row]').forEach(tr=>refreshRoadmapRowProgress(tr));
-
-    body?.addEventListener('input', (ev)=>{
-      const target = ev.target;
-      if(!(target instanceof HTMLElement)) return;
-      if(!target.matches('[data-rm-steps], [data-rm-status]')) return;
-      const tr = target.closest('tr[data-rm-row]');
-      refreshRoadmapRowProgress(tr);
-    });
-
-    body?.addEventListener('change', (ev)=>{
-      const target = ev.target;
-      if(!(target instanceof HTMLElement)) return;
-      if(!target.matches('[data-rm-steps], [data-rm-status]')) return;
-      const tr = target.closest('tr[data-rm-row]');
-      refreshRoadmapRowProgress(tr);
+      syncRoadmapRowMeta(tr);
+      applyRoadmapView();
+      tr.querySelector('[data-rm-title]')?.focus();
     });
 
     $('btnRoadmapSave')?.addEventListener('click', ()=>{
@@ -12850,6 +13837,8 @@ function buildDaySummaryText(dayISO=ui.date){
     });
   }
 
+
+
   function renderManageTeam(){
     const disabled = !isAdmin();
     state.teamBoard = sanitizeTeamBoard(state.teamBoard, state.team);
@@ -12867,10 +13856,33 @@ function buildDaySummaryText(dayISO=ui.date){
     `).join('');
 
     const flatBlocks = [];
-    state.team.forEach(t=>(t.blocks||[]).forEach(b=>flatBlocks.push({...b, ownerId:t.id})));
+    state.team.forEach(t=>(t.blocks||[]).forEach(b=>flatBlocks.push({...b, ownerId:t.id, ownerName:t.name || ''})));
 
-    const blockRows = flatBlocks.map(b=>`
-      <tr data-block-id="${esc(b.id)}">
+    const sortMode = ui.teamBlockSort || 'start_asc';
+    const sortedFlatBlocks = flatBlocks.slice().sort((a,b)=>{
+      const aStart = normalizeISO(a.startDate) || '';
+      const bStart = normalizeISO(b.startDate) || '';
+      const aEnd = normalizeISO(a.endDate) || aStart;
+      const bEnd = normalizeISO(b.endDate) || bStart;
+      const aOwner = String(a.ownerName || '').toLowerCase();
+      const bOwner = String(b.ownerName || '').toLowerCase();
+      const aType = String(a.type || '').toLowerCase();
+      const bType = String(b.type || '').toLowerCase();
+
+      if(sortMode === 'start_desc'){
+        return bStart.localeCompare(aStart) || bEnd.localeCompare(aEnd) || aOwner.localeCompare(bOwner);
+      }
+      if(sortMode === 'owner_asc'){
+        return aOwner.localeCompare(bOwner) || aStart.localeCompare(bStart) || aType.localeCompare(bType);
+      }
+      if(sortMode === 'type_asc'){
+        return aType.localeCompare(bType) || aStart.localeCompare(bStart) || aOwner.localeCompare(bOwner);
+      }
+      return aStart.localeCompare(bStart) || aEnd.localeCompare(bEnd) || aOwner.localeCompare(bOwner);
+    });
+
+    const blockRows = sortedFlatBlocks.map(b=>`
+      <tr data-block-id="${esc(b.id)}" data-block-start="${esc(normalizeISO(b.startDate) || '')}" data-block-end="${esc(normalizeISO(b.endDate) || normalizeISO(b.startDate) || '')}" data-block-owner="${esc(b.ownerName || '')}" data-block-type="${esc(b.type || '')}">
         <td>
           <select class="ctrl" data-block-owner ${disabled?'disabled':''}>
             ${state.team.map(t=>`<option value="${esc(t.id)}" ${t.id===b.ownerId?'selected':''}>${esc(t.name)}</option>`).join('')}
@@ -12925,12 +13937,32 @@ function buildDaySummaryText(dayISO=ui.date){
         <tbody>${teamRows}</tbody>
       </table></div>
 
-      <div class="row" style="justify-content:space-between;margin:12px 0 8px">
+      <div class="row wrap" style="justify-content:space-between;gap:8px;margin:12px 0 8px">
         <b>Bloqueos de tiempo por usuario (almuerzo, vacaciones, permisos, capacitación, trayecto)</b>
         ${isAdmin() ? `<button class="btn" id="btnAddBlock">+ Bloqueo</button>` : ''}
       </div>
-      <div class="table-wrap"><table>
-        <thead><tr><th>Usuario</th><th>Tipo</th><th>Desde</th><th>Hasta</th><th>Todo día</th><th>Hora inicio</th><th>Hora fin</th><th></th></tr></thead>
+      <div class="row wrap" style="gap:8px;align-items:flex-end;margin:0 0 8px">
+        <div style="min-width:180px">
+          <label class="label" style="margin-bottom:4px">Calendario (filtrar por fecha)</label>
+          <input class="ctrl" id="blockFilterDate" type="date" value="${esc(ui.teamBlockFilterDate || '')}" ${disabled?'disabled':''} />
+        </div>
+        <div style="min-width:220px">
+          <label class="label" style="margin-bottom:4px">Orden</label>
+          <select class="ctrl" id="blockSortMode" ${disabled?'disabled':''}>
+            <option value="start_asc" ${(ui.teamBlockSort||'start_asc')==='start_asc'?'selected':''}>Fecha más próxima</option>
+            <option value="start_desc" ${(ui.teamBlockSort||'start_asc')==='start_desc'?'selected':''}>Fecha más lejana</option>
+            <option value="owner_asc" ${(ui.teamBlockSort||'start_asc')==='owner_asc'?'selected':''}>Usuario (A-Z)</option>
+            <option value="type_asc" ${(ui.teamBlockSort||'start_asc')==='type_asc'?'selected':''}>Tipo (A-Z)</option>
+          </select>
+        </div>
+        <div class="row" style="gap:6px">
+          <button class="btn" id="btnBlockFilterToday" ${disabled?'disabled':''}>Hoy</button>
+          <button class="btn" id="btnBlockFilterClear" ${disabled || !(ui.teamBlockFilterDate||'')?'disabled':''}>Limpiar</button>
+        </div>
+        <div class="small muted" id="blockFilterSummary" style="margin-left:auto"></div>
+      </div>
+      <div class="table-wrap" style="max-height:360px;overflow:auto"><table>
+        <thead style="position:sticky;top:0;z-index:2;background:var(--surface)"><tr><th>Usuario</th><th>Tipo</th><th>Desde</th><th>Hasta</th><th>Todo día</th><th>Hora inicio</th><th>Hora fin</th><th></th></tr></thead>
         <tbody id="blockBody">${blockRows || `<tr><td colspan="8" class="muted">Sin bloqueos</td></tr>`}</tbody>
       </table></div>
 
@@ -12961,17 +13993,179 @@ function buildDaySummaryText(dayISO=ui.date){
       </div>
     `;
 
-    // Toggle all-day rows
-    $('tab_team').querySelectorAll('[data-block-all]').forEach(chk=>{
-      chk.disabled = disabled;
-      chk.addEventListener('change', ()=>{
-        const tr = chk.closest('tr');
-        const sh = tr.querySelector('[data-block-sh]');
-        const eh = tr.querySelector('[data-block-eh]');
-        sh.disabled = chk.checked;
-        eh.disabled = chk.checked;
+    const blockBody = $('blockBody');
+    const blockFilterDateEl = $('blockFilterDate');
+    const blockSortModeEl = $('blockSortMode');
+    const blockFilterSummaryEl = $('blockFilterSummary');
+
+    const syncBlockRowMeta = (tr)=>{
+      if(!tr || !tr.matches('tr[data-block-id]')) return;
+      const ownerSel = tr.querySelector('[data-block-owner]');
+      const typeSel = tr.querySelector('[data-block-type]');
+      const startInp = tr.querySelector('[data-block-start]');
+      const endInp = tr.querySelector('[data-block-end]');
+      const ownerLabel = ownerSel?.options?.[ownerSel.selectedIndex]?.textContent || '';
+      const typeLabel = typeSel?.options?.[typeSel.selectedIndex]?.textContent || '';
+      const startISO = normalizeISO(startInp?.value) || '';
+      const endISO = normalizeISO(endInp?.value) || startISO;
+      tr.dataset.blockOwner = ownerLabel;
+      tr.dataset.blockType = typeLabel;
+      tr.dataset.blockStart = startISO;
+      tr.dataset.blockEnd = endISO;
+    };
+
+    const sortBlockRows = ()=>{
+      if(!blockBody) return;
+      const mode = ui.teamBlockSort || 'start_asc';
+      const rows = [...blockBody.querySelectorAll('tr[data-block-id]')];
+      rows.sort((a,b)=>{
+        const aStart = a.dataset.blockStart || '';
+        const bStart = b.dataset.blockStart || '';
+        const aEnd = a.dataset.blockEnd || aStart;
+        const bEnd = b.dataset.blockEnd || bStart;
+        const aOwner = String(a.dataset.blockOwner || '').toLowerCase();
+        const bOwner = String(b.dataset.blockOwner || '').toLowerCase();
+        const aType = String(a.dataset.blockType || '').toLowerCase();
+        const bType = String(b.dataset.blockType || '').toLowerCase();
+
+        if(mode === 'start_desc'){
+          return bStart.localeCompare(aStart) || bEnd.localeCompare(aEnd) || aOwner.localeCompare(bOwner);
+        }
+        if(mode === 'owner_asc'){
+          return aOwner.localeCompare(bOwner) || aStart.localeCompare(bStart) || aType.localeCompare(bType);
+        }
+        if(mode === 'type_asc'){
+          return aType.localeCompare(bType) || aStart.localeCompare(bStart) || aOwner.localeCompare(bOwner);
+        }
+        return aStart.localeCompare(bStart) || aEnd.localeCompare(bEnd) || aOwner.localeCompare(bOwner);
       });
+      rows.forEach(r=>blockBody.appendChild(r));
+    };
+
+    const applyBlockFilters = ()=>{
+      if(!blockBody) return;
+      const filterISO = normalizeISO(blockFilterDateEl?.value || ui.teamBlockFilterDate || '');
+      ui.teamBlockFilterDate = filterISO || '';
+      const rows = [...blockBody.querySelectorAll('tr[data-block-id]')];
+      let visible = 0;
+
+      rows.forEach(tr=>{
+        const startISO = tr.dataset.blockStart || normalizeISO(tr.querySelector('[data-block-start]')?.value) || '';
+        const endISO = tr.dataset.blockEnd || normalizeISO(tr.querySelector('[data-block-end]')?.value) || startISO;
+        const match = !filterISO || (startISO && filterISO >= startISO && filterISO <= (endISO || startISO));
+        tr.style.display = match ? '' : 'none';
+        if(match) visible += 1;
+      });
+
+      const prevEmpty = blockBody.querySelector('tr[data-block-filter-empty]');
+      if(prevEmpty) prevEmpty.remove();
+
+      if(rows.length > 0 && visible === 0){
+        const tr = document.createElement('tr');
+        tr.setAttribute('data-block-filter-empty','1');
+        tr.innerHTML = `<td colspan="8" class="muted">Sin bloqueos para la fecha seleccionada.</td>`;
+        blockBody.appendChild(tr);
+      }else if(rows.length === 0 && !blockBody.querySelector('tr[data-block-empty-base]')){
+        blockBody.innerHTML = `<tr data-block-empty-base="1"><td colspan="8" class="muted">Sin bloqueos</td></tr>`;
+      }
+
+      const clearBtn = $('btnBlockFilterClear');
+      if(clearBtn) clearBtn.disabled = disabled || !ui.teamBlockFilterDate;
+
+      if(blockFilterSummaryEl){
+        if(rows.length === 0){
+          blockFilterSummaryEl.textContent = '0 bloqueos registrados';
+        }else if(filterISO){
+          blockFilterSummaryEl.textContent = `Mostrando ${visible} de ${rows.length} · Fecha: ${fmtDate(filterISO)}`;
+        }else{
+          blockFilterSummaryEl.textContent = `Mostrando ${visible} de ${rows.length} · Sin filtro`;
+        }
+      }
+    };
+
+    const bindBlockRow = (tr)=>{
+      if(!tr || tr.dataset.blockBound === '1') return;
+      tr.dataset.blockBound = '1';
+
+      const allDayChk = tr.querySelector('[data-block-all]');
+      const startInp = tr.querySelector('[data-block-start]');
+      const endInp = tr.querySelector('[data-block-end]');
+      const ownerSel = tr.querySelector('[data-block-owner]');
+      const typeSel = tr.querySelector('[data-block-type]');
+      const sh = tr.querySelector('[data-block-sh]');
+      const eh = tr.querySelector('[data-block-eh]');
+      const delBtn = tr.querySelector('[data-block-del]');
+
+      if(allDayChk){
+        allDayChk.disabled = disabled;
+        const toggleAllDay = ()=>{
+          if(sh) sh.disabled = allDayChk.checked || disabled;
+          if(eh) eh.disabled = allDayChk.checked || disabled;
+        };
+        allDayChk.addEventListener('change', ()=>{
+          toggleAllDay();
+          syncBlockRowMeta(tr);
+          applyBlockFilters();
+        });
+        toggleAllDay();
+      }
+
+      [startInp,endInp].forEach(inp=>inp?.addEventListener('change', ()=>{
+        const s = normalizeISO(startInp?.value) || '';
+        const e = normalizeISO(endInp?.value) || s;
+        if(s && e && s > e){
+          endInp.value = s;
+        }
+        syncBlockRowMeta(tr);
+        sortBlockRows();
+        applyBlockFilters();
+      }));
+
+      [ownerSel,typeSel].forEach(sel=>sel?.addEventListener('change', ()=>{
+        syncBlockRowMeta(tr);
+        sortBlockRows();
+        applyBlockFilters();
+      }));
+
+      delBtn?.addEventListener('click', ()=>{
+        tr.remove();
+        if(blockBody && !blockBody.querySelector('tr[data-block-id]')){
+          blockBody.innerHTML = `<tr data-block-empty-base="1"><td colspan="8" class="muted">Sin bloqueos</td></tr>`;
+        }
+        applyBlockFilters();
+      });
+
+      syncBlockRowMeta(tr);
+    };
+
+    $('tab_team').querySelectorAll('#blockBody tr[data-block-id]').forEach(bindBlockRow);
+
+    blockFilterDateEl?.addEventListener('change', ()=>{
+      ui.teamBlockFilterDate = normalizeISO(blockFilterDateEl.value) || '';
+      applyBlockFilters();
     });
+
+    blockSortModeEl?.addEventListener('change', ()=>{
+      ui.teamBlockSort = blockSortModeEl.value || 'start_asc';
+      sortBlockRows();
+      applyBlockFilters();
+    });
+
+    $('btnBlockFilterToday')?.addEventListener('click', ()=>{
+      const today = ui.date || toISO(new Date());
+      ui.teamBlockFilterDate = today;
+      if(blockFilterDateEl) blockFilterDateEl.value = today;
+      applyBlockFilters();
+    });
+
+    $('btnBlockFilterClear')?.addEventListener('click', ()=>{
+      ui.teamBlockFilterDate = '';
+      if(blockFilterDateEl) blockFilterDateEl.value = '';
+      applyBlockFilters();
+    });
+
+    sortBlockRows();
+    applyBlockFilters();
 
     // Disable all editable controls in read mode
     if(disabled){
@@ -13018,7 +14212,7 @@ function buildDaySummaryText(dayISO=ui.date){
       const body = $('blockBody');
       if(body.querySelector('td[colspan="8"]')) body.innerHTML = '';
       const ownerId = state.team[0]?.id || '';
-      const today = ui.date;
+      const today = ui.teamBlockFilterDate || ui.date;
       const tr = document.createElement('tr');
       tr.dataset.blockId = rid('b');
       tr.innerHTML = `
@@ -13034,12 +14228,9 @@ function buildDaySummaryText(dayISO=ui.date){
         <td><button class="btn" data-block-del>✕</button></td>
       `;
       body.appendChild(tr);
-
-      tr.querySelector('[data-block-all]').addEventListener('change',e=>{
-        tr.querySelector('[data-block-sh]').disabled = e.target.checked;
-        tr.querySelector('[data-block-eh]').disabled = e.target.checked;
-      });
-      tr.querySelector('[data-block-del]').addEventListener('click',()=>tr.remove());
+      bindBlockRow(tr);
+      sortBlockRows();
+      applyBlockFilters();
     });
 
     $('btnOrgAddMember')?.addEventListener('click',()=>{
@@ -13062,13 +14253,7 @@ function buildDaySummaryText(dayISO=ui.date){
       }
     }));
 
-    $('tab_team').querySelectorAll('[data-block-del]').forEach(btn=>btn.addEventListener('click',()=>{
-      btn.closest('tr')?.remove();
-      const body = $('blockBody');
-      if(body && !body.querySelector('tr[data-block-id]')){
-        body.innerHTML = `<tr><td colspan="8" class="muted">Sin bloqueos</td></tr>`;
-      }
-    }));
+    // Eliminación de bloqueos gestionada por bindBlockRow().
 
     $('btnSaveTeam')?.addEventListener('click',()=>{
       const dStart = clampInt($('s_defaultStart').value,0,23,8);
@@ -13156,11 +14341,38 @@ function buildDaySummaryText(dayISO=ui.date){
     });
   }
 
+  
   function renderManageHolidays(){
     const disabled = !isAdmin();
-    const sorted = (holidaysState.items || []).slice().sort((a,b)=>a.date.localeCompare(b.date) || a.name.localeCompare(b.name));
+    if(typeof ui.manageHolidaySearch !== 'string') ui.manageHolidaySearch = '';
+    if(typeof ui.manageHolidayDate !== 'string') ui.manageHolidayDate = '';
+    if(typeof ui.manageHolidayStatus !== 'string') ui.manageHolidayStatus = '';
+    if(typeof ui.manageHolidaySort !== 'string') ui.manageHolidaySort = 'date_asc';
 
-    const rows = sorted.map(h=>`
+    const searchQ = String(ui.manageHolidaySearch || '').trim().toLowerCase();
+    const dateFilter = normalizeISO(ui.manageHolidayDate || '');
+    const statusFilter = String(ui.manageHolidayStatus || '');
+    const sortMode = String(ui.manageHolidaySort || 'date_asc');
+
+    const all = (holidaysState.items || []).slice();
+    all.sort((a,b)=>a.date.localeCompare(b.date) || a.name.localeCompare(b.name));
+
+    const filtered = all.filter(h=>{
+      const hay = `${String(h.name||'').toLowerCase()} ${String(h.date||'').toLowerCase()} ${h.active?'activo':'inactivo'}`;
+      const matchQ = !searchQ || hay.includes(searchQ);
+      const matchDate = !dateFilter || normalizeISO(h.date) === dateFilter;
+      const matchStatus = !statusFilter || (statusFilter === 'active' ? !!h.active : !h.active);
+      return matchQ && matchDate && matchStatus;
+    });
+
+    filtered.sort((a,b)=>{
+      if(sortMode === 'date_desc') return b.date.localeCompare(a.date) || a.name.localeCompare(b.name);
+      if(sortMode === 'name_asc') return a.name.localeCompare(b.name, APP_LOCALE, { sensitivity:'base' }) || a.date.localeCompare(b.date);
+      if(sortMode === 'name_desc') return b.name.localeCompare(a.name, APP_LOCALE, { sensitivity:'base' }) || a.date.localeCompare(b.date);
+      return a.date.localeCompare(b.date) || a.name.localeCompare(b.name, APP_LOCALE, { sensitivity:'base' });
+    });
+
+    const rows = filtered.map(h=>`
       <tr data-holiday-id="${esc(h.id)}">
         <td>${esc(fmtDate(h.date))}</td>
         <td><span class="holiday-name">${esc(h.name)}</span></td>
@@ -13175,6 +14387,39 @@ function buildDaySummaryText(dayISO=ui.date){
 
     $('tab_holidays').innerHTML = `
       <div class="small muted" style="margin-bottom:8px">Gestiona feriados para excluirlos de recurrencias y recálculos.</div>
+
+      <div class="row wrap" style="gap:8px;align-items:flex-end;margin-bottom:10px">
+        <div style="min-width:220px">
+          <label class="label" style="margin-bottom:4px">Buscar</label>
+          <input class="ctrl" id="holidaySearch" type="search" placeholder="Nombre del feriado..." value="${esc(ui.manageHolidaySearch || '')}" />
+        </div>
+        <div style="min-width:170px">
+          <label class="label" style="margin-bottom:4px">Calendario</label>
+          <input class="ctrl" id="holidayFilterDate" type="date" value="${esc(dateFilter || '')}" />
+        </div>
+        <div style="min-width:170px">
+          <label class="label" style="margin-bottom:4px">Estado</label>
+          <select class="ctrl" id="holidayFilterStatus">
+            <option value="">Todos</option>
+            <option value="active" ${statusFilter==='active'?'selected':''}>Activos</option>
+            <option value="inactive" ${statusFilter==='inactive'?'selected':''}>Inactivos</option>
+          </select>
+        </div>
+        <div style="min-width:200px">
+          <label class="label" style="margin-bottom:4px">Orden</label>
+          <select class="ctrl" id="holidaySortMode">
+            <option value="date_asc" ${sortMode==='date_asc'?'selected':''}>Fecha: más próxima</option>
+            <option value="date_desc" ${sortMode==='date_desc'?'selected':''}>Fecha: más lejana</option>
+            <option value="name_asc" ${sortMode==='name_asc'?'selected':''}>Nombre (A-Z)</option>
+            <option value="name_desc" ${sortMode==='name_desc'?'selected':''}>Nombre (Z-A)</option>
+          </select>
+        </div>
+        <div class="row" style="gap:6px">
+          <button class="btn" id="holidayClearFilters" ${!(searchQ || dateFilter || statusFilter || sortMode!=='date_asc')?'disabled':''}>Limpiar</button>
+        </div>
+        <div class="small muted" id="holidayMeta" style="margin-left:auto">Mostrando ${filtered.length} de ${all.length}</div>
+      </div>
+
       <div class="holiday-form" id="holidayForm">
         <div>
           <label class="label">Fecha</label>
@@ -13198,11 +14443,38 @@ function buildDaySummaryText(dayISO=ui.date){
         </div>
       </div>
 
-      <div class="table-wrap" style="margin-top:12px"><table>
-        <thead><tr><th>Fecha</th><th>Nombre</th><th>Estado</th><th style="width:180px">Acciones</th></tr></thead>
-        <tbody>${rows || `<tr><td colspan="4" class="muted">No hay feriados registrados.</td></tr>`}</tbody>
+      <div class="table-wrap" style="margin-top:12px;max-height:360px;overflow:auto"><table>
+        <thead style="position:sticky;top:0;z-index:2;background:var(--surface)"><tr><th>Fecha</th><th>Nombre</th><th>Estado</th><th style="width:180px">Acciones</th></tr></thead>
+        <tbody>${rows || `<tr><td colspan="4" class="muted">No hay feriados para los filtros seleccionados.</td></tr>`}</tbody>
       </table></div>
     `;
+
+    const bindHolidayFilterHandlers = ()=>{
+      $('holidaySearch')?.addEventListener('input', e=>{
+        ui.manageHolidaySearch = String(e.target.value || '');
+        renderManageHolidays();
+      });
+      $('holidayFilterDate')?.addEventListener('change', e=>{
+        ui.manageHolidayDate = normalizeISO(e.target.value || '');
+        renderManageHolidays();
+      });
+      $('holidayFilterStatus')?.addEventListener('change', e=>{
+        ui.manageHolidayStatus = String(e.target.value || '');
+        renderManageHolidays();
+      });
+      $('holidaySortMode')?.addEventListener('change', e=>{
+        ui.manageHolidaySort = String(e.target.value || 'date_asc');
+        renderManageHolidays();
+      });
+      $('holidayClearFilters')?.addEventListener('click', ()=>{
+        ui.manageHolidaySearch = '';
+        ui.manageHolidayDate = '';
+        ui.manageHolidayStatus = '';
+        ui.manageHolidaySort = 'date_asc';
+        renderManageHolidays();
+      });
+    };
+    bindHolidayFilterHandlers();
 
     if(disabled) return;
 
@@ -13270,6 +14542,7 @@ function buildDaySummaryText(dayISO=ui.date){
       toast('Feriado eliminado');
     }));
   }
+
 
 
   function countActivitiesInState(snapshot){
