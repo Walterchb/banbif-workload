@@ -3749,8 +3749,9 @@ html[data-theme="dark"] .task.priority-Baja .h{
               <input class="ctrl" id="p_name" placeholder="Ej: Preparación de resultados" />
             </div>
             <div>
-              <label class="label">Equipo / Solicitante</label>
-              <input class="ctrl" id="p_client" placeholder="Ej: Equipo Riesgos" />
+              <label class="label">Equipo solicitante</label>
+              <select class="ctrl" id="p_client"></select>
+              <div class="small muted">Solo se pueden usar equipos solicitantes previamente definidos en <b>Administrar → Equipos solicitantes</b>.</div>
             </div>
           </div>
         </section>
@@ -3866,6 +3867,7 @@ html[data-theme="dark"] .task.priority-Baja .h{
         <div class="tabs manage-tabs" id="manageTabs">
           <button class="btn tab active" data-tab="projects">Proyectos</button>
           <button class="btn tab" data-tab="team">Equipo y Bloqueos</button>
+          <button class="btn tab" data-tab="requesters">Equipos solicitantes</button>
           <button class="btn tab" data-tab="holidays">Feriados</button>
           <button class="btn tab" data-tab="notifications">Notificaciones</button>
           <button class="btn tab" data-tab="roadmap">Roadmap</button>
@@ -3874,6 +3876,7 @@ html[data-theme="dark"] .task.priority-Baja .h{
 
         <div id="tab_projects"></div>
         <div id="tab_team" class="hidden"></div>
+        <div id="tab_requesters" class="hidden"></div>
         <div id="tab_holidays" class="hidden"></div>
         <div id="tab_notifications" class="hidden"></div>
         <div id="tab_roadmap" class="hidden"></div>
@@ -4108,6 +4111,12 @@ html[data-theme="dark"] .task.priority-Baja .h{
           { id:'a8', name:'Mejoras dashboard', startDate:'2026-02-01', endDate:'2026-12-31', startHour:'16:00', endHour:'18:00', ownerId:'u2', done:false }
         ]
       }
+    ],
+
+    requesterTeams: [
+      { id:'rq1', name:'ALM', members:['Mesa ALM','Riesgo de Balance'] },
+      { id:'rq2', name:'Mercado de Capitales', members:['Trading Spot','Derivados'] },
+      { id:'rq3', name:'Interno', members:['Control de Gestión'] }
     ],
 
     roadmapItems: [
@@ -8526,7 +8535,7 @@ function buildDaySummaryText(dayISO=ui.date){
     const teamIds = new Set(base.team.map(t=>t.id));
 
     if(Array.isArray(legacy.roadmapItems)){
-      base.roadmapItems = sanitizeRoadmapItems(legacy.roadmapItems, base.team);
+      base.roadmapItems = sanitizeRoadmapItems(legacy.roadmapItems, base.team, base.requesterTeams);
     }
 
     if(Array.isArray(legacy.projects)){
@@ -8691,6 +8700,118 @@ function buildDaySummaryText(dayISO=ui.date){
     return { leader, members };
   }
 
+
+  function normalizeRequesterMembers(raw){
+    if(Array.isArray(raw)){
+      return [...new Set(raw
+        .map(x=>String(x || '').trim())
+        .filter(Boolean)
+        .map(x=>x.slice(0,80))
+      )].slice(0, 60);
+    }
+
+    const text = String(raw || '').trim();
+    if(!text) return [];
+
+    return [...new Set(text
+      .split(/\n|,|;|\|/g)
+      .map(x=>x.trim())
+      .filter(Boolean)
+      .map(x=>x.slice(0,80))
+    )].slice(0, 60);
+  }
+
+  function normalizeRequesterTeamName(rawName, requesterTeams){
+    const list = Array.isArray(requesterTeams)
+      ? requesterTeams
+      : (Array.isArray(state?.requesterTeams) ? state.requesterTeams : []);
+
+    if(!list.length){
+      return String(rawName || '').trim() || 'Interno';
+    }
+
+    const value = String(rawName || '').trim();
+    if(value){
+      const exact = list.find(t=>String(t?.name || '') === value);
+      if(exact) return exact.name;
+
+      const byLower = list.find(t=>String(t?.name || '').toLowerCase() === value.toLowerCase());
+      if(byLower) return byLower.name;
+    }
+
+    return String(list[0]?.name || 'Interno');
+  }
+
+  function sanitizeRequesterTeams(raw, sourceProjects, sourceRoadmap){
+    const src = Array.isArray(raw) ? raw : [];
+    const out = [];
+    const seen = new Set();
+
+    const pushTeam = (nameRaw, membersRaw, idRaw='')=>{
+      const name = String(nameRaw || '').trim().slice(0,60);
+      if(!name) return;
+
+      const key = name.toLowerCase();
+      if(seen.has(key)) return;
+      seen.add(key);
+
+      const members = normalizeRequesterMembers(membersRaw);
+      out.push({
+        id: String(idRaw || rid('rq')),
+        name,
+        members
+      });
+    };
+
+    src.forEach((item, idx)=>{
+      if(typeof item === 'string'){
+        pushTeam(item, [], `rq_${idx+1}`);
+        return;
+      }
+
+      pushTeam(
+        item?.name || item?.team || item?.requester || item?.label,
+        item?.members || item?.integrantes || item?.people || item?.usuarios,
+        item?.id || `rq_${idx+1}`
+      );
+    });
+
+    if(Array.isArray(sourceProjects)){
+      sourceProjects.forEach(p=>{
+        pushTeam(p?.client || p?.requesterTeam || p?.team, [], `rq_p_${p?.id || rid('rq')}`);
+      });
+    }
+
+    if(Array.isArray(sourceRoadmap)){
+      sourceRoadmap.forEach(it=>{
+        pushTeam(it?.requesterTeam || it?.tag || it?.team || it?.area, [], `rq_r_${it?.id || rid('rq')}`);
+      });
+    }
+
+    if(!out.length){
+      pushTeam('ALM', ['Mesa ALM']);
+      pushTeam('Interno', ['Control de Gestión']);
+    }
+
+    return out.slice(0, 80);
+  }
+
+  function requesterTeamOptionsHtml(selectedName=''){
+    const list = Array.isArray(state?.requesterTeams) ? state.requesterTeams : [];
+    const selected = normalizeRequesterTeamName(selectedName, list);
+
+    if(!list.length){
+      return '<option value="">Sin equipos solicitantes</option>';
+    }
+
+    return list.map(rt=>`<option value="${esc(rt.name)}" ${selected===rt.name?'selected':''}>${esc(rt.name)}</option>`).join('');
+  }
+
+  function refreshProjectRequesterTeamSelect(selectedName=''){
+    const sel = $('p_client');
+    if(!sel) return;
+    sel.innerHTML = requesterTeamOptionsHtml(selectedName);
+  }
 
   function normalizeRoadmapStatus(raw){
     const v = String(raw || '').trim().toLowerCase();
@@ -8857,7 +8978,7 @@ function buildDaySummaryText(dayISO=ui.date){
     return { ownerId: '', ownerName: '', linked: false, rawName: '' };
   }
 
-  function sanitizeRoadmapItems(raw, teamList){
+  function sanitizeRoadmapItems(raw, teamList, requesterTeams){
     const fallback = Array.isArray(DEFAULT_STATE.roadmapItems) ? structuredClone(DEFAULT_STATE.roadmapItems) : [];
     const src = Array.isArray(raw) ? raw : fallback;
 
@@ -8865,18 +8986,23 @@ function buildDaySummaryText(dayISO=ui.date){
       ? teamList
       : (Array.isArray(state?.team) ? state.team : []);
 
+    const requesterRef = Array.isArray(requesterTeams)
+      ? requesterTeams
+      : (Array.isArray(state?.requesterTeams) ? state.requesterTeams : []);
+
     const list = src.map((item, idx)=>{
       const date = normalizeISO(item?.date) || todayISO();
       const title = String(item?.title || item?.name || `Iniciativa ${idx+1}`).slice(0,140).trim();
       const status = normalizeRoadmapStatus(item?.status);
-      const requesterTeam = String(
+      const rawRequesterTeam = String(
         item?.requesterTeam
         || item?.requester
         || item?.team
         || item?.tag
         || item?.area
-        || 'ALM'
-      ).trim().slice(0, 36) || 'ALM';
+        || ''
+      ).trim().slice(0, 60);
+      const requesterTeam = normalizeRequesterTeamName(rawRequesterTeam, requesterRef);
 
       const ownerMeta = resolveRoadmapOwner(item, teamRef);
       const assignedOwner = ownerMeta.ownerId
@@ -8950,6 +9076,9 @@ function buildDaySummaryText(dayISO=ui.date){
     out.teamBoard = sanitizeTeamBoard(s.teamBoard, out.team);
     const teamIds = new Set(out.team.map(t=>t.id));
 
+    out.requesterTeams = sanitizeRequesterTeams(s.requesterTeams, s.projects, s.roadmapItems);
+    const requesterTeamNames = new Set(out.requesterTeams.map(rt=>rt.name));
+
     if(Array.isArray(s.projects)){
       out.projects = s.projects.map((p,idx)=>{
         const sDate = normalizeISO(p?.startDate) || toISO(new Date());
@@ -8998,10 +9127,15 @@ function buildDaySummaryText(dayISO=ui.date){
           if(target) target.primaryFocus = true;
         }
 
+        const rawClient = String(p?.client || p?.requesterTeam || p?.team || '').trim();
+        const client = requesterTeamNames.has(rawClient)
+          ? rawClient
+          : normalizeRequesterTeamName(rawClient, out.requesterTeams);
+
         return {
           id: String(p?.id || rid('p')),
           name: String(p?.name || `Proyecto ${idx+1}`).slice(0,120),
-          client: String(p?.client || '').slice(0,80),
+          client,
           reqDate: normalizeISO(p?.reqDate) || startDate,
           startDate,
           endDate,
@@ -9019,7 +9153,12 @@ function buildDaySummaryText(dayISO=ui.date){
 
     }
 
-    out.roadmapItems = sanitizeRoadmapItems(s.roadmapItems, out.team);
+    out.projects = (out.projects || []).map(p=>({
+      ...p,
+      client: normalizeRequesterTeamName(p?.client || '', out.requesterTeams)
+    }));
+
+    out.roadmapItems = sanitizeRoadmapItems(s.roadmapItems, out.team, out.requesterTeams);
     out.notifications = sanitizeNotifications(s.notifications, out.team);
 
     return out;
@@ -9735,14 +9874,22 @@ function buildDaySummaryText(dayISO=ui.date){
       .concat(state.team.map(t=>`<option value="${esc(t.id)}" ${ui.filters.owner===t.id?'selected':''}>${esc(t.name)}</option>`))
       .join('');
 
-    const clientOpts = [...new Set(state.projects.map(p=>String(p?.client || 'Interno').trim() || 'Interno'))]
+    const requesterNames = (state.requesterTeams || []).map(rt=>String(rt?.name || '').trim());
+    const roadmapTeams = (state.roadmapItems || []).map(it=>String(it?.requesterTeam || it?.tag || '').trim());
+    const projectTeams = state.projects.map(p=>String(p?.client || 'Interno').trim() || 'Interno');
+
+    const clientOpts = [...new Set([...requesterNames, ...projectTeams, ...roadmapTeams].filter(Boolean))]
       .sort((a,b)=>a.localeCompare(b,'es',{sensitivity:'base'}));
     $('fClient').innerHTML = ['<option value="">Equipo</option>']
       .concat(clientOpts.map(c=>`<option value="${esc(c)}" ${ui.filters.client===c?'selected':''}>${esc(c)}</option>`))
       .join('');
 
+    const roadmapStatusesForFilter = ['Propuesto','Planificado','En desarrollo','Completado','Demorada'];
+    let statusOpts = ui.view === 'roadmap' ? roadmapStatusesForFilter : AUTO_STATUSES;
+    if(ui.filters.status && !statusOpts.includes(ui.filters.status)) statusOpts = [ui.filters.status, ...statusOpts];
+
     $('fStatus').innerHTML = ['<option value="">Estatus</option>']
-      .concat(AUTO_STATUSES.map(s=>`<option value="${esc(s)}" ${ui.filters.status===s?'selected':''}>${esc(s)}</option>`))
+      .concat(statusOpts.map(s=>`<option value="${esc(s)}" ${ui.filters.status===s?'selected':''}>${esc(s)}</option>`))
       .join('');
 
     $('fPriority').innerHTML = ['<option value="">Prioridad</option>']
@@ -10535,6 +10682,7 @@ function buildDaySummaryText(dayISO=ui.date){
   function renderRoadmapBoardView(){
     const c = $('mainView');
     const items = (state.roadmapItems || [])
+      .filter(it=>roadmapItemVisible(it))
       .slice()
       .sort((a,b)=>{
         const da = String(a?.date || '');
@@ -10547,7 +10695,8 @@ function buildDaySummaryText(dayISO=ui.date){
       });
 
     if(!items.length){
-      c.innerHTML = `<div class="road-n-empty">No hay iniciativas en la hoja de ruta. Regístralas en Administrar → Roadmap.</div>`;
+      const hasFilters = Boolean(ui.filters.owner || ui.filters.client || ui.filters.status || ui.filters.priority || ui.filters.q);
+      c.innerHTML = `<div class="road-n-empty">${hasFilters ? 'No hay iniciativas que coincidan con los filtros actuales.' : 'No hay iniciativas en la hoja de ruta. Regístralas en Administrar → Roadmap.'}</div>`;
       return;
     }
 
@@ -11392,7 +11541,7 @@ function buildDaySummaryText(dayISO=ui.date){
 
     if(isEdit && p){
       $('p_name').value = p.name;
-      $('p_client').value = p.client || '';
+      refreshProjectRequesterTeamSelect(p.client || '');
       $('p_req').value = p.reqDate || p.startDate;
       $('p_start').value = coerceBusinessDateISO(p.startDate) || p.startDate;
       $('p_end').value = coerceBusinessDateISO(p.endDate) || p.endDate;
@@ -11408,7 +11557,7 @@ function buildDaySummaryText(dayISO=ui.date){
     }else{
       const d = ui.date;
       $('p_name').value = '';
-      $('p_client').value = '';
+      refreshProjectRequesterTeamSelect(state.requesterTeams?.[0]?.name || '');
       $('p_req').value = d;
       const dBiz = coerceBusinessDateISO(d) || d;
       $('p_start').value = dBiz;
@@ -11668,6 +11817,11 @@ function buildDaySummaryText(dayISO=ui.date){
 
     const focusOwnersInPayload = [...localPrimaryByOwner];
 
+    if(!Array.isArray(state.requesterTeams) || !state.requesterTeams.length){
+      toast('No hay equipos solicitantes configurados. Regístralos en Administrar → Equipos solicitantes.');
+      return;
+    }
+
     if(focusOwnersInPayload.length){
       const editingId = ui.editingProjectId || null;
       const existingFocusByOwner = new Map();
@@ -11707,7 +11861,7 @@ function buildDaySummaryText(dayISO=ui.date){
     const payload = {
       id: ui.editingProjectId || rid('p'),
       name,
-      client: $('p_client').value.trim(),
+      client: normalizeRequesterTeamName($('p_client').value.trim(), state.requesterTeams),
       reqDate: normalizeISO($('p_req').value) || pStart,
       startDate: pStart,
       endDate: pEnd,
@@ -12167,7 +12321,7 @@ function buildDaySummaryText(dayISO=ui.date){
   }
 
   function renderManage(){
-    const allTabs = ['projects','team','holidays','notifications','roadmap','data'];
+    const allTabs = ['projects','team','requesters','holidays','notifications','roadmap','data'];
     const allowedTabs = isAdmin() ? allTabs : ['projects','notifications','data'];
     if(!allowedTabs.includes(ui.manageTab)) ui.manageTab = 'projects';
 
@@ -12190,6 +12344,7 @@ function buildDaySummaryText(dayISO=ui.date){
 
     if(ui.manageTab==='projects') renderManageProjects();
     if(ui.manageTab==='team') renderManageTeam();
+    if(ui.manageTab==='requesters') renderManageRequesters();
     if(ui.manageTab==='holidays') renderManageHolidays();
     if(ui.manageTab==='notifications') renderManageNotifications();
     if(ui.manageTab==='roadmap') renderManageRoadmap();
@@ -12346,6 +12501,91 @@ function buildDaySummaryText(dayISO=ui.date){
   }
 
 
+  function renderManageRequesters(){
+    const disabled = !isAdmin();
+    const list = Array.isArray(state.requesterTeams) ? state.requesterTeams : [];
+
+    const rows = list.map(rt=>`
+      <tr data-rq-row data-rq-id="${esc(rt.id)}">
+        <td><input class="ctrl" data-rq-name value="${esc(rt.name)}" placeholder="Nombre del equipo solicitante" ${disabled?'disabled':''} /></td>
+        <td><textarea class="ctrl" data-rq-members rows="3" placeholder="Miembro 1\nMiembro 2" ${disabled?'disabled':''}>${esc((rt.members || []).join('\n'))}</textarea></td>
+        <td>${isAdmin() ? '<button class="btn danger" data-rq-del>Eliminar</button>' : '<span class="small muted">—</span>'}</td>
+      </tr>
+    `).join('');
+
+    $('tab_requesters').innerHTML = `
+      <div class="row" style="justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+        <div class="small muted">Define los <b>equipos solicitantes</b> y sus miembros. A partir de aquí, Proyectos y Roadmap solo podrán usar estos equipos.</div>
+        ${isAdmin() ? `
+        <div class="row" style="gap:8px">
+          <button class="btn" id="btnRequesterAdd">+ Equipo solicitante</button>
+          <button class="btn primary" id="btnRequesterSave">Guardar</button>
+        </div>` : '<span class="small muted">Modo lectura</span>'}
+      </div>
+
+      <div class="table-wrap"><table>
+        <thead><tr><th style="width:32%">Equipo solicitante</th><th>Miembros</th><th style="width:120px">Acción</th></tr></thead>
+        <tbody id="requesterBody">${rows || '<tr><td colspan="3" class="muted">Sin equipos solicitantes. Agrega al menos uno para continuar.</td></tr>'}</tbody>
+      </table></div>
+    `;
+
+    if(disabled) return;
+
+    const body = $('requesterBody');
+    const ensurePlaceholder = ()=>{
+      if(!body) return;
+      if(body.querySelector('tr[data-rq-row]')) return;
+      body.innerHTML = '<tr><td colspan="3" class="muted">Sin equipos solicitantes. Agrega al menos uno para continuar.</td></tr>';
+    };
+
+    $('btnRequesterAdd')?.addEventListener('click', ()=>{
+      if(!body) return;
+      const empty = body.querySelector('td[colspan="3"]');
+      if(empty) body.innerHTML = '';
+
+      const tr = document.createElement('tr');
+      tr.setAttribute('data-rq-row','');
+      tr.innerHTML = `
+        <td><input class="ctrl" data-rq-name placeholder="Nuevo equipo" /></td>
+        <td><textarea class="ctrl" data-rq-members rows="3" placeholder="Miembro 1\nMiembro 2"></textarea></td>
+        <td><button class="btn danger" data-rq-del>Eliminar</button></td>
+      `;
+      body.appendChild(tr);
+
+      tr.querySelector('[data-rq-del]')?.addEventListener('click', ()=>{
+        tr.remove();
+        ensurePlaceholder();
+      });
+    });
+
+    $('tab_requesters').querySelectorAll('[data-rq-del]').forEach(btn=>btn.addEventListener('click', ()=>{
+      btn.closest('tr')?.remove();
+      ensurePlaceholder();
+    }));
+
+    $('btnRequesterSave')?.addEventListener('click', ()=>{
+      const rowsEls = [...$('tab_requesters').querySelectorAll('tr[data-rq-row]')];
+      const draft = rowsEls.map((tr, idx)=>({
+        id: tr.getAttribute('data-rq-id') || rid('rq'),
+        name: String(tr.querySelector('[data-rq-name]')?.value || '').trim() || `Equipo ${idx+1}`,
+        members: normalizeRequesterMembers(tr.querySelector('[data-rq-members]')?.value || '')
+      }));
+
+      const cleaned = sanitizeRequesterTeams(draft, state.projects, state.roadmapItems);
+      if(!cleaned.length){
+        toast('Debes registrar al menos un equipo solicitante.');
+        return;
+      }
+
+      state.requesterTeams = cleaned;
+      state = sanitizeState(state);
+      saveState();
+      render();
+      renderManageRequesters();
+      toast('Equipos solicitantes actualizados');
+    });
+  }
+
   function refreshRoadmapRowProgress(row){
     if(!row) return;
     const status = row.querySelector('[data-rm-status]')?.value || 'Propuesto';
@@ -12369,6 +12609,7 @@ function buildDaySummaryText(dayISO=ui.date){
   function renderManageRoadmap(){
     const disabled = !isAdmin();
     const teamList = Array.isArray(state.team) ? state.team.slice() : [];
+    const requesterList = Array.isArray(state.requesterTeams) ? state.requesterTeams.slice() : [];
 
     const buildOwnerOptions = (selectedId='')=>{
       if(!teamList.length) return '<option value="">Sin usuarios en Equipo</option>';
@@ -12376,6 +12617,14 @@ function buildDaySummaryText(dayISO=ui.date){
       const safeId = normalized || String(teamList[0].id);
       return teamList
         .map(t=>`<option value="${esc(t.id)}" ${safeId===String(t.id)?'selected':''}>${esc(t.name)}</option>`)
+        .join('');
+    };
+
+    const buildRequesterOptions = (selectedName='')=>{
+      if(!requesterList.length) return '<option value="">Sin equipos solicitantes</option>';
+      const safe = normalizeRequesterTeamName(selectedName, requesterList);
+      return requesterList
+        .map(rt=>`<option value="${esc(rt.name)}" ${safe===rt.name?'selected':''}>${esc(rt.name)}</option>`)
         .join('');
     };
 
@@ -12398,7 +12647,11 @@ function buildDaySummaryText(dayISO=ui.date){
               </div>
             </td>
 
-            <td><input class="ctrl" type="text" data-rm-team value="${esc(it.requesterTeam || it.tag || 'ALM')}" maxlength="36" placeholder="Equipo solicitante" ${disabled?'disabled':''} /></td>
+            <td>
+              <select class="ctrl" data-rm-team ${disabled?'disabled':''}>
+                ${buildRequesterOptions(it.requesterTeam || it.tag || '')}
+              </select>
+            </td>
 
             <td style="min-width:210px">
               <div class="rm-col-stack">
@@ -12439,11 +12692,11 @@ function buildDaySummaryText(dayISO=ui.date){
 
     $('tab_roadmap').innerHTML = `
       <div class="row" style="justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
-        <div class="small muted">Registra iniciativas para la hoja de ruta. Responsable vinculado al equipo · pasos con fecha estimada · cálculo automático de avance y alerta temporal de demora.</div>
+        <div class="small muted">Registra iniciativas para la hoja de ruta. Responsable vinculado al equipo · pasos con fecha estimada · cálculo automático de avance y alerta temporal de demora.${requesterList.length ? '' : ' Primero configura equipos en Administrar → Equipos solicitantes.'}</div>
         ${isAdmin() ? `
         <div class="row" style="gap:8px">
-          <button class="btn" id="btnRoadmapAdd">+ Iniciativa</button>
-          <button class="btn primary" id="btnRoadmapSave">Guardar</button>
+          <button class="btn" id="btnRoadmapAdd" ${requesterList.length?'':'disabled'}>+ Iniciativa</button>
+          <button class="btn primary" id="btnRoadmapSave" ${requesterList.length?'':'disabled'}>Guardar</button>
         </div>` : '<span class="small muted">Modo lectura</span>'}
       </div>
 
@@ -12495,7 +12748,11 @@ function buildDaySummaryText(dayISO=ui.date){
           </div>
         </td>
 
-        <td><input class="ctrl" type="text" data-rm-team value="ALM" maxlength="36" placeholder="Equipo solicitante" /></td>
+        <td>
+          <select class="ctrl" data-rm-team>
+            ${buildRequesterOptions(requesterList[0]?.name || '')}
+          </select>
+        </td>
 
         <td style="min-width:210px">
           <select class="ctrl" data-rm-owner-id>
@@ -12576,7 +12833,7 @@ function buildDaySummaryText(dayISO=ui.date){
           date: tr.querySelector('[data-rm-date]')?.value || todayISO(),
           title: tr.querySelector('[data-rm-title]')?.value || `Iniciativa ${idx+1}`,
           status: tr.querySelector('[data-rm-status]')?.value || 'Propuesto',
-          requesterTeam: tr.querySelector('[data-rm-team]')?.value || 'ALM',
+          requesterTeam: normalizeRequesterTeamName(tr.querySelector('[data-rm-team]')?.value || '', state.requesterTeams),
           ownerId,
           owner: ownerName,
           priority: tr.querySelector('[data-rm-priority]')?.value || 'Media',
@@ -12585,7 +12842,7 @@ function buildDaySummaryText(dayISO=ui.date){
         };
       });
 
-      state.roadmapItems = sanitizeRoadmapItems(next, state.team);
+      state.roadmapItems = sanitizeRoadmapItems(next, state.team, state.requesterTeams);
       saveState();
       render();
       renderManageRoadmap();
@@ -13125,7 +13382,7 @@ function buildDaySummaryText(dayISO=ui.date){
       if(bundle.ui.roadmapZoom === 'week' || bundle.ui.roadmapZoom === 'month' || bundle.ui.roadmapZoom === 'year'){
         ui.roadmapZoom = bundle.ui.roadmapZoom;
       }
-      if(bundle.ui.manageTab === 'projects' || bundle.ui.manageTab === 'team' || bundle.ui.manageTab === 'holidays' || bundle.ui.manageTab === 'notifications' || bundle.ui.manageTab === 'roadmap' || bundle.ui.manageTab === 'data'){
+      if(bundle.ui.manageTab === 'projects' || bundle.ui.manageTab === 'team' || bundle.ui.manageTab === 'requesters' || bundle.ui.manageTab === 'holidays' || bundle.ui.manageTab === 'notifications' || bundle.ui.manageTab === 'roadmap' || bundle.ui.manageTab === 'data'){
         ui.manageTab = bundle.ui.manageTab;
       }
       if(typeof bundle.ui.manageProjectSort === 'string') ui.manageProjectSort = bundle.ui.manageProjectSort;
@@ -13990,6 +14247,56 @@ function buildDaySummaryText(dayISO=ui.date){
       });
     });
     return list;
+  }
+
+  function roadmapStatusMatchesFilter(item, filterStatus){
+    const fs = String(filterStatus || '').trim();
+    if(!fs) return true;
+
+    const status = normalizeRoadmapStatus(item?.status);
+    const delayed = roadmapProgressMeta(item).delayed;
+
+    if(ROADMAP_STATUSES.includes(fs)) return status === fs;
+    if(fs === 'Demorada' || fs === 'Demorado') return delayed;
+
+    if(fs === 'Programado') return status === 'Propuesto' || status === 'Planificado';
+    if(fs === 'En curso') return status === 'En desarrollo';
+    if(fs === 'Finalizado') return status === 'Completado';
+    if(fs === 'Demorado') return delayed;
+
+    return status === fs;
+  }
+
+  function roadmapItemVisible(item){
+    const requester = normalizeRequesterTeamName(item?.requesterTeam || item?.tag || '', state.requesterTeams);
+    if(ui.filters.client && requester !== ui.filters.client) return false;
+
+    if(ui.filters.owner){
+      const ownerId = String(item?.ownerId || '').trim();
+      if(ownerId !== ui.filters.owner) return false;
+    }
+
+    const priority = normalizeRoadmapPriority(item?.priority);
+    if(ui.filters.priority && priority !== ui.filters.priority) return false;
+
+    if(ui.filters.status && !roadmapStatusMatchesFilter(item, ui.filters.status)) return false;
+
+    const q = ui.filters.q;
+    if(q){
+      const ownerMeta = resolveRoadmapOwner(item);
+      const blob = normalizeSearchText([
+        item?.title || '',
+        item?.notes || '',
+        requester,
+        ownerMeta.ownerName || '',
+        normalizeRoadmapStatus(item?.status),
+        priority,
+        item?.date || ''
+      ].join(' '));
+      if(!blob.includes(q)) return false;
+    }
+
+    return true;
   }
 
   function projectVisible(p, refDate=todayISO()){
