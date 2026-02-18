@@ -1,13 +1,13 @@
 {
   "meta": {
     "app": "banbif_workload",
-    "exportedAt": "2026-02-16T13:33:44.646Z",
+    "exportedAt": "2026-02-18T16:57:52.399Z",
     "version": 2,
     "schema": "full_backup",
     "counts": {
       "team": 3,
-      "projects": 14,
-      "activities": 35,
+      "projects": 16,
+      "activities": 38,
       "holidays": 2,
       "notifications": 3
     }
@@ -54,23 +54,23 @@
             "note": ""
           },
           {
-            "id": "b_n0qi0j7",
-            "type": "Permiso",
-            "startDate": "2026-02-20",
-            "endDate": "2026-02-20",
+            "id": "b_fghm9m6",
+            "type": "Almuerzo",
+            "startDate": "2026-02-18",
+            "endDate": "2026-02-18",
             "allDay": false,
             "startHour": "13:00",
             "endHour": "14:00",
             "note": ""
           },
           {
-            "id": "b_pza2v8y",
-            "type": "Otro",
+            "id": "b_n0qi0j7",
+            "type": "Permiso",
             "startDate": "2026-02-20",
             "endDate": "2026-02-20",
             "allDay": false,
-            "startHour": "16:00",
-            "endHour": "22:00",
+            "startHour": "13:00",
+            "endHour": "14:15",
             "note": ""
           }
         ]
@@ -83,6 +83,16 @@
         "capacityHoursPerDay": 10,
         "blocks": [
           {
+            "id": "b_yphzx7h",
+            "type": "Otro",
+            "startDate": "2026-01-01",
+            "endDate": "2026-02-17",
+            "allDay": true,
+            "startHour": "08:00",
+            "endHour": "22:00",
+            "note": ""
+          },
+          {
             "id": "b_u2_lunch",
             "type": "Almuerzo",
             "startDate": "2026-01-01",
@@ -93,13 +103,13 @@
             "note": ""
           },
           {
-            "id": "b_yphzx7h",
-            "type": "Otro",
-            "startDate": "2026-01-01",
-            "endDate": "2026-02-17",
-            "allDay": true,
+            "id": "b_pza2v8y",
+            "type": "Capacitación",
+            "startDate": "2026-02-18",
+            "endDate": "2026-02-18",
+            "allDay": false,
             "startHour": "08:00",
-            "endHour": "22:00",
+            "endHour": "14:00",
             "note": ""
           }
         ]
@@ -181,7 +191,7 @@
         "id": "p_zmalm3v",
         "name": "Reporte de Concentración",
         "client": "ALM",
-        "reqDate": "2026-02-08",
+        "reqDate": "2026-01-01",
         "startDate": "2026-01-01",
         "endDate": "2026-12-31",
         "priority": "Baja",
@@ -211,7 +221,7 @@
         "id": "p_hbbubpq",
         "name": "Análisis de la Posición",
         "client": "Interno",
-        "reqDate": "2026-02-09",
+        "reqDate": "2026-01-01",
         "startDate": "2026-01-01",
         "endDate": "2026-12-31",
         "priority": "Media",
@@ -241,7 +251,7 @@
         "id": "p_plu9urt",
         "name": "Revisión ROF",
         "client": "Interno",
-        "reqDate": "2026-02-09",
+        "reqDate": "2026-01-01",
         "startDate": "2026-01-01",
         "endDate": "2026-12-31",
         "priority": "Media",
@@ -418,7 +428,7 @@
             "endHour": "18:00",
             "ownerId": "u1",
             "detail": "Elaborar PPT Flujos",
-            "done": false,
+            "done": true,
             "primaryFocus": false
           },
           {
@@ -430,7 +440,7 @@
             "endHour": "14:00",
             "ownerId": "u1",
             "detail": "Cerrar PPT Flujos",
-            "done": false,
+            "done": true,
             "primaryFocus": false
           },
           {
@@ -439,10 +449,10 @@
             "startDate": "2026-02-17",
             "endDate": "2026-02-17",
             "startHour": "16:00",
-            "endHour": "19:00",
+            "endHour": "22:00",
             "ownerId": "u1",
             "detail": "Elaborar PPT PJ",
-            "done": false,
+            "done": true,
             "primaryFocus": false
           },
           {
@@ -454,6 +464,18 @@
             "endHour": "14:00",
             "ownerId": "u1",
             "detail": "Cerrar PPT PJ",
+            "done": false,
+            "primaryFocus": false
+          },
+          {
+            "id": "a_798r1my",
+            "name": "PPT PJ",
+            "startDate": "2026-02-18",
+            "endDate": "2026-02-18",
+            "startHour": "18:00",
+            "endHour": "22:00",
+            "ownerId": "u1",
+            "detail": "Últimos detalles PPT",
             "done": false,
             "primaryFocus": false
           }
@@ -711,7 +733,7 @@
         "client": "Interno",
         "reqDate": "2026-02-16",
         "startDate": "2026-02-18",
-        "endDate": "2026-02-18",
+        "endDate": "2026-02-23",
         "priority": "Baja",
         "recurrenceFrequency": "Ninguna",
         "leaderId": "u1",
@@ -724,8 +746,8 @@
           {
             "id": "a_5xb0ac0",
             "name": "Enseñar y Grabar Proceso en WARI",
-            "startDate": "2026-02-18",
-            "endDate": "2026-02-18",
+            "startDate": "2026-02-23",
+            "endDate": "2026-02-23",
             "startHour": "16:00",
             "endHour": "18:00",
             "ownerId": "u1",
@@ -760,7 +782,7 @@
             "endHour": "20:00",
             "ownerId": "u1",
             "detail": "Preparación Inicial",
-            "done": false,
+            "done": true,
             "primaryFocus": false
           },
           {
@@ -772,7 +794,7 @@
             "endHour": "13:00",
             "ownerId": "u1",
             "detail": "Enviar Correo a Nómina",
-            "done": false,
+            "done": true,
             "primaryFocus": false
           }
         ]
@@ -848,6 +870,93 @@
             "primaryFocus": false
           }
         ]
+      },
+      {
+        "id": "p_9tq0kqw",
+        "name": "Revisión Carry FX",
+        "client": "trading",
+        "reqDate": "2026-02-18",
+        "startDate": "2026-02-18",
+        "endDate": "2026-02-18",
+        "priority": "Baja",
+        "recurrenceFrequency": "Ninguna",
+        "leaderId": "u1",
+        "importance": 2,
+        "objective": "",
+        "deliverable": "",
+        "notes": "",
+        "isPrimaryFocus": false,
+        "activities": [
+          {
+            "id": "a_4s8oj0i",
+            "name": "Reunión para revisar el cálculo del Carry",
+            "startDate": "2026-02-18",
+            "endDate": "2026-02-18",
+            "startHour": "16:00",
+            "endHour": "17:00",
+            "ownerId": "u1",
+            "detail": "Revisar con el equipo de Posición y definir la medición.",
+            "done": false,
+            "primaryFocus": false
+          }
+        ]
+      },
+      {
+        "id": "p_d4qtwe2",
+        "name": "Revisión Equipo",
+        "client": "Interno",
+        "reqDate": "2026-02-18",
+        "startDate": "2026-02-18",
+        "endDate": "2026-02-18",
+        "priority": "Media",
+        "recurrenceFrequency": "Ninguna",
+        "leaderId": "u1",
+        "importance": 3,
+        "objective": "",
+        "deliverable": "",
+        "notes": "",
+        "isPrimaryFocus": false,
+        "activities": [
+          {
+            "id": "a_2xivrgv",
+            "name": "Reunión de Equipo",
+            "startDate": "2026-02-18",
+            "endDate": "2026-02-18",
+            "startHour": "17:00",
+            "endHour": "18:00",
+            "ownerId": "u1",
+            "detail": "Definir estrategia y nuestra estructura del área",
+            "done": false,
+            "primaryFocus": false
+          }
+        ]
+      }
+    ],
+    "requesterTeams": [
+      {
+        "id": "rq_p_p_zmalm3v",
+        "name": "ALM",
+        "members": []
+      },
+      {
+        "id": "rq_p_p_hbbubpq",
+        "name": "Interno",
+        "members": []
+      },
+      {
+        "id": "rq_p_p_jn14rgl",
+        "name": "Tesorería",
+        "members": []
+      },
+      {
+        "id": "rq_r_rm13",
+        "name": "distribución",
+        "members": []
+      },
+      {
+        "id": "rq_r_rm15",
+        "name": "trading",
+        "members": []
       }
     ],
     "roadmapItems": [
@@ -952,8 +1061,8 @@
         "date": "2026-02-13",
         "title": "Dashboard Seguimiento Comercial",
         "status": "Completado",
-        "requesterTeam": "interno",
-        "tag": "interno",
+        "requesterTeam": "Interno",
+        "tag": "Interno",
         "ownerId": "u1",
         "owner": "WALTER",
         "priority": "Alta",
@@ -981,17 +1090,6 @@
         "updatedAt": "2026-02-10T07:59:27.607Z"
       },
       {
-        "id": "n_76tn7ay",
-        "title": "Pago Variable",
-        "message": "No olvidar estar alerta",
-        "userId": "u1",
-        "remindDate": "2026-02-17",
-        "remindTime": "11:00",
-        "done": false,
-        "createdAt": "2026-02-16T13:33:29.384Z",
-        "updatedAt": "2026-02-16T13:33:29.384Z"
-      },
-      {
         "id": "n_nztqexc",
         "title": "Requerimiento Covenants",
         "message": "Nathaly Hinostroza de PWC solicita que le envíe antes del 14/02 los Covenants Trimestrales de Diciembre 2025. Correo enviado por Biagio el 30/01",
@@ -1001,6 +1099,17 @@
         "done": true,
         "createdAt": "2026-02-09T18:36:39.225Z",
         "updatedAt": "2026-02-16T13:32:28.656Z"
+      },
+      {
+        "id": "n_76tn7ay",
+        "title": "Pago Variable",
+        "message": "No olvidar estar alerta",
+        "userId": "u1",
+        "remindDate": "2026-02-17",
+        "remindTime": "11:00",
+        "done": true,
+        "createdAt": "2026-02-16T13:33:29.384Z",
+        "updatedAt": "2026-02-18T16:36:52.282Z"
       }
     ]
   },
